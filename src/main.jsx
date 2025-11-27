@@ -24,7 +24,7 @@ import SetupPassword from './pages/Authentication/SetupPassword';
 import ForgotPassword from './pages/Authentication/ForgotPassword';
 import ResetPassword from './pages/Authentication/ResetPassword';
 import PublicRoute from './Routes/PublicRoute';
-import NotFound from './pages/Notfound';
+import NotFound from './pages/NotFound';
 import UserCreatedByAdminRoute from './Routes/UserCreatedByAdminRoute';
 
 createRoot(document.getElementById('root')).render(

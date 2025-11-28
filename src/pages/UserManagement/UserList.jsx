@@ -59,6 +59,8 @@ const UserList = ({ onUserSelect, selectedUser }) => {
     try {
       const id = userId;
       const deletedId = await dispatch(DeleteManager(id)).unwrap();
+       handleDeleteClose();
+       
       if (isMobile) setDrawerOpen(false);
 
       Swal.fire({
@@ -66,6 +68,8 @@ const UserList = ({ onUserSelect, selectedUser }) => {
         title: "Deleted",
         text: "User deleted",
       });
+
+     
     } catch (err) {
       Swal.fire({
         icon: "error",

@@ -158,24 +158,49 @@ export const StoreProvider = ({ children }) => {
   };
 
   // Logout: clear local state and optionally call backend logout
+  // const LogoutTrue = async (callBackend = true) => {
+  //   try {
+  //     if (callBackend) {
+  //       const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
+  //       await fetch(`${BASE}/auth/logout`, {
+  //         // method: "POST",
+  //         // method: "DELETE",
+  //         credentials: "include",
+  //         headers: { "Content-Type": "application/json" },
+  //       }).catch(() => { });
+  //     }
+  //   } catch (e) {
+  //     // swallow
+  //   } finally {
+  //     setToken(null);
+  //     setUser(null);
+  //   }
+  // };
+
   const LogoutTrue = async (callBackend = true) => {
-    try {
-      if (callBackend) {
-        const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
-        await fetch(`${BASE}/auth/logout`, {
-          // method: "POST",
-          // method: "DELETE",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        }).catch(() => { });
-      }
-    } catch (e) {
-      // swallow
-    } finally {
-      setToken(null);
-      setUser(null);
+  const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
+
+  try {
+    // 1) Immediately clear client-side session so route guards update instantly
+    setToken(null);
+    setUser(null);
+    try { localStorage.removeItem("token"); } catch {}
+    try { localStorage.removeItem("user"); } catch {}
+
+    // 2) Then ask backend to clear the httpOnly cookie (still await if you want)
+    if (callBackend) {
+      await fetch(`${BASE}/auth/logout`, {
+        method: "DELETE",               // <<< important — match backend route
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      }).catch(() => { /* swallow network errors if desired */ });
     }
-  };
+  } catch (e) {
+    // swallow or log
+    console.error("LogoutTrue error:", e);
+  } 
+};
+
 
   // fetch fresh user on demand
   const getUser = async () => {

@@ -42,6 +42,10 @@ const handleLogin = async (email, password) => {
 
     
     if (response.ok && data.message === "Login successful") {
+
+        if (data.token) {
+        try { localStorage.setItem("token", data.token); } catch (e) { /* ignore */ }
+    }
       
       login({ token: data.token, user: data.user });
 

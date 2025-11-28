@@ -27,7 +27,7 @@ const Icon = ({ src, alt, size = 24, className = "", ...props }) => (
 const MobDashMenu = ({ items = [], onItemClick, activePath = "/", openLogout, activeVenue = null }) => {
   return (
     <div
-      className="bg-[#E8EDF2] left-1/2 transform -translate-x-1/2 px-3 flex items-center justify-around rounded-t-[35px] fixed bottom-0 z-30 pt-1"
+      className="bg-[#E8EDF2] left-1/2 transform -translate-x-1/2 px-3 flex items-center justify-around rounded-t-[35px] fixed bottom-0 z-30 pt-1 w-full max-w-[500px]"
       role="navigation"
       aria-label="Mobile bottom navigation"
     >

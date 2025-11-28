@@ -120,7 +120,7 @@ export default function VenueSelect({ organizationId, value, onChange, className
 
   return (
     <div className={className} ref={ref}>
-      <div className="grid grid-cols-2 items-center gap-4 w-full ">
+      <div className="grid grid-cols-2 items-center gap-4 w-[7rem] sm:w-[14rem] md:w-[10rem] lg:w-[15rem] xl:w-[20rem]  ">
         {/* <label className="text-left font-medium text-gray-700">Venue</label> */}
 
         <div className="relative col-span-2 ">

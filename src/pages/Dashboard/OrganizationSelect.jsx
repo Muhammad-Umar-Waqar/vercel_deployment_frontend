@@ -56,8 +56,8 @@ export default function OrganizationSelect({ value="Organization", onChange, cla
     : "Select organization";
 
   return (
-    <div className={`w-full ${className}`} ref={containerRef}>
-      <div className="grid grid-cols-3 items-center gap-4 md:max-w-[250px]">
+    <div className={`${className}`} ref={containerRef}>
+      <div className="grid grid-cols-3 items-center gap-4 ">
 
 
 

@@ -257,7 +257,7 @@ export default function Dashboard() {
           <>
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-              <div>
+              <div className="w-[11rem] sm:w-[25rem] md:w-[13rem] lg:w-[20rem] xl:w-[25rem]">
                 {/* <p className="text-sm text-[#64748B] min-w-[250px] font-medium">Organization</p> */}
                 {user?.role === "admin" && (
                   <OrganizationSelect
@@ -268,7 +268,7 @@ export default function Dashboard() {
                 )}
               </div>
 
-              <div className="flex items-center">
+              <div className="flex items-center ">
                 <VenueSelect
                   organizationId={selectedOrgId || user?.organization}
                   value={selectedVenueId}

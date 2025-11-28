@@ -258,7 +258,7 @@ const findCondition = (conditionsArray = [], wantedType) => {
   const renderListMarkup = () => (
     <div className="ListPage device-list-container bg-white rounded-xl shadow-sm w-full h-full border border-[#E5E7EB]">
       {isDesktop ? (
-        <h1 className="organization-list-title font-semibold text-gray-800 mb-4">Venue Management</h1>
+        <h1 className="organization-list-title font-semibold text-gray-800 mb-4">Device Management</h1>
       ) : (
           <div className="flex justify-end">
           <IconButton

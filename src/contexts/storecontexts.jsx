@@ -63,46 +63,87 @@ export const StoreProvider = ({ children }) => {
 
   // Call backend to verify session / get current user.
   // This supports both cookie-based auth (httpOnly cookie) and token-in-localStorage flows.
+  // const verifySession = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
+  //     // Call a safe endpoint that returns the logged user when valid
+  //     const res = await fetch(`${BASE}/auth/verify/me`, {
+  //       method: "GET",
+  //       credentials: "include", // required if backend uses cookies
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         // include local token if server expects Authorization header (optional)
+  //         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  //       },
+  //     });
+
+  //     if (!res.ok) {
+  //       // Not authorized or no session
+  //       setUser(null);
+  //       // If server provides a new token or info, you can parse here.
+  //       // Optionally clear token: setToken(null)
+  //       setLoading(false);
+  //       return null;
+  //     }
+
+  //     const data = await res.json();
+  //     // expected: { user: {...} } or user object — adapt if needed
+  //     const fetchedUser = data.user ?? data;
+  //     console.log(fetchedUser)
+  //     setUser(sanitizeUser(fetchedUser));
+  //     // If backend returns token rotation, handle it like:
+  //     // if (data.token) setToken(data.token)
+  //     setLoading(false);
+  //     return fetchedUser;
+  //   } catch (err) {
+  //     console.error("verifySession error:", err);
+  //     setUser(null);
+  //     setLoading(false);
+  //     return null;
+  //   }
+  // };
+
   const verifySession = async () => {
-    setLoading(true);
-    try {
-      const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
-      // Call a safe endpoint that returns the logged user when valid
-      const res = await fetch(`${BASE}/auth/verify/me`, {
-        method: "GET",
-        credentials: "include", // required if backend uses cookies
-        headers: {
-          "Content-Type": "application/json",
-          // include local token if server expects Authorization header (optional)
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      });
+  setLoading(true);
+  try {
+    const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
 
-      if (!res.ok) {
-        // Not authorized or no session
-        setUser(null);
-        // If server provides a new token or info, you can parse here.
-        // Optionally clear token: setToken(null)
-        setLoading(false);
-        return null;
-      }
+    // prefer state token, fallback to localStorage token (helpful after reload)
+    const localToken = (() => {
+      try { return localStorage.getItem("token"); } catch { return null; }
+    })();
+    const effectiveToken = token || localToken || null;
 
-      const data = await res.json();
-      // expected: { user: {...} } or user object — adapt if needed
-      const fetchedUser = data.user ?? data;
-      console.log(fetchedUser)
-      setUser(sanitizeUser(fetchedUser));
-      // If backend returns token rotation, handle it like:
-      // if (data.token) setToken(data.token)
-      setLoading(false);
-      return fetchedUser;
-    } catch (err) {
-      console.error("verifySession error:", err);
+    // build headers
+    const headers = { "Content-Type": "application/json" };
+    if (effectiveToken) headers["Authorization"] = `Bearer ${effectiveToken}`;
+
+    const res = await fetch(`${BASE}/auth/verify/me`, {
+      method: "GET",
+      credentials: "include", // still include cookie if browser will send it
+      headers,
+    });
+
+    if (!res.ok) {
       setUser(null);
       setLoading(false);
       return null;
     }
-  };
+
+    const data = await res.json();
+    const fetchedUser = data.user ?? data;
+    setUser(sanitizeUser(fetchedUser));
+    setLoading(false);
+    return fetchedUser;
+  } catch (err) {
+    console.error("verifySession error:", err);
+    setUser(null);
+    setLoading(false);
+    return null;
+  }
+};
+
 
   // Run session verification once on mount
   useEffect(() => {

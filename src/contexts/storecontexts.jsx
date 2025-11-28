@@ -122,7 +122,8 @@ export const StoreProvider = ({ children }) => {
       if (callBackend) {
         const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
         await fetch(`${BASE}/auth/logout`, {
-          method: "POST",
+          // method: "POST",
+          // method: "DELETE",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
         }).catch(() => { });

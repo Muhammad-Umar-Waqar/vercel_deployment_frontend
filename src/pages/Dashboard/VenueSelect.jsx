@@ -15,6 +15,8 @@ const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
 export default function VenueSelect({ organizationId, value, onChange, className = "", excludeFirstN = 0 }) {
   const { user, getToken } = useStore();
 
+  console.log("User>", user);
+  
   const [venues, setVenues] = useState([]);
   const [visibleVenues, setVisibleVenues] = useState([]);
   const [loading, setLoading] = useState(false);

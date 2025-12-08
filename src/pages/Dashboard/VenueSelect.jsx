@@ -113,7 +113,8 @@ export default function VenueSelect({ organizationId, value, onChange, className
   };
 
   // keep hiding behavior: if user and total venues <= 3 => don't show control
-  if (user?.role === "user" && venues?.length <= 3) return null;
+  // if (user?.role === "user" && venues?.length <= 3) return null;
+  if (venues?.length <= 3) return null;
 
   const selectedVenue = visibleVenues.find((v) => String(v._id ?? v.id ?? v) === String(selected));
   const label = loading ? "Loading venues..." : selectedVenue ? selectedVenue.name ?? selectedVenue.venue_name ?? String(selected) : "Venue";

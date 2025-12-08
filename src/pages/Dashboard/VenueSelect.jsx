@@ -112,8 +112,8 @@ export default function VenueSelect({ organizationId, value, onChange, className
     if (e.key === "Escape") setDropdownOpen(false);
   };
 
-  // keep hiding behavior: if user and total venues <= 4 => don't show control
-  if (user?.role === "user" && venues?.length <= 4) return null;
+  // keep hiding behavior: if user and total venues <= 3 => don't show control
+  if (user?.role === "user" && venues?.length <= 3) return null;
 
   const selectedVenue = visibleVenues.find((v) => String(v._id ?? v.id ?? v) === String(selected));
   const label = loading ? "Loading venues..." : selectedVenue ? selectedVenue.name ?? selectedVenue.venue_name ?? String(selected) : "Venue";

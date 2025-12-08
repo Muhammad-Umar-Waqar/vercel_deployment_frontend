@@ -619,7 +619,7 @@ export default function Dashboard() {
   const isDesktop = useMediaQuery("(min-width:768px)");
   // add near the top of the component:
   const autoSelectedForVenueRef = React.useRef({}); // keys: venueId -> true
-  const [hasFetchedForVenue, setHasFetchedForVenue] = useState(false);
+  const [hasFetchedForVenue, setHasFetchedForVenue] = useState(true);
 
   // -------------------------
   // helpers (pure utility, no hooks inside)
@@ -716,17 +716,39 @@ useEffect(() => {
   // -------------------------
   // EFFECT #2: keep selectedVenueId synced with URL ?venue=
   // -------------------------
+  // useEffect(() => {
+  //   const sp = new URLSearchParams(location.search)
+  //   const venueFromUrl = sp.get("venue") || ""
+  //   if (venueFromUrl !== selectedVenueId) {
+  //   setHasFetchedForVenue(false);
+  //   setFreezerDevicesLoading(true);
+  //   setSelectedVenueId(venueFromUrl);
+  //   }
+  //   // no dependencies other than location.search so this always runs when URL changes
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [location.search])
+
   useEffect(() => {
-    const sp = new URLSearchParams(location.search)
-    const venueFromUrl = sp.get("venue") || ""
-    if (venueFromUrl !== selectedVenueId) {
-    setHasFetchedForVenue(false);
-    setFreezerDevicesLoading(true);
-    setSelectedVenueId(venueFromUrl);
-    }
-    // no dependencies other than location.search so this always runs when URL changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search])
+  const sp = new URLSearchParams(location.search)
+  const venueFromUrl = sp.get("venue") || ""
+
+  // if venueFromUrl unchanged, nothing to do
+  if (venueFromUrl === selectedVenueId) return
+
+  if (!venueFromUrl) {
+    // No venue in URL — make sure we stop any device-loading UI
+    setHasFetchedForVenue(true)
+    setFreezerDevicesLoading(false)
+    setSelectedVenueId("")
+  } else {
+    // There *is* a venue in URL — start fetch flow
+    setHasFetchedForVenue(false)
+    setFreezerDevicesLoading(true)
+    setSelectedVenueId(venueFromUrl)
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [location.search])
+
 
   // -------------------------
   // EFFECT #3: fetch devices when selectedVenueId changes
@@ -863,12 +885,22 @@ useEffect(() => {
 
 
 useEffect(() => {
-if (!selectedVenueId) {
-  setFreezerDevices([]);
-  setSelectedFreezerDeviceId(null);
-  autoSelectedForVenueRef.current = {};
-  return;
-}
+// if (!selectedVenueId) {
+//   setFreezerDevices([]);
+//   setSelectedFreezerDeviceId(null);
+//   autoSelectedForVenueRef.current = {};
+//   return;
+// }
+
+ if (!selectedVenueId) {
+   setFreezerDevices([]);
+   setSelectedFreezerDeviceId(null);
+   autoSelectedForVenueRef.current = {};
+   // no venue -> no loading; mark fetch as completed so spinner stops
+   setFreezerDevicesLoading(false);
+   setHasFetchedForVenue(true);
+   return;
+ }
 
 // IMPORTANT FIX:
 setFreezerDevicesLoading(true);

@@ -10,6 +10,7 @@ const Login = () => {
   const navigate = useNavigate()
   const { login, getUser } = useStore();
   const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
+  const [loading, setLoading] = useState(false);
 
   const onchange=(e)=>{
     const {name,value}=e.target;
@@ -27,7 +28,7 @@ const Login = () => {
 
 
 const handleLogin = async (email, password) => {
-
+  setLoading(true); // start loading
   try {
     const response = await fetch(`${BASE}/auth/login`, {
       method: "POST",
@@ -86,6 +87,8 @@ const handleLogin = async (email, password) => {
       title: "Server Error",
       text: "Unable to connect to the server. Please try again later.",
     });
+  } finally{
+    setLoading(false); 
   }
 };
 
@@ -190,10 +193,11 @@ const handleLogin = async (email, password) => {
             <div className="!mt-12">
               <button
                 type="button"
-                className="w-full shadow-xl py-2.5 px-4 text-[15px] font-medium tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none cursor-pointer"
+                 disabled={loading}
+                className={`w-full shadow-xl py-2.5 px-4 text-[15px] font-medium tracking-wide rounded-lg text-white focus:outline-none  ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"}`}
                 onClick={onSubmit}
              >
-                Log In
+                  {loading ? "Logging in..." : "Log In"}
               </button>
             </div>
           </form>

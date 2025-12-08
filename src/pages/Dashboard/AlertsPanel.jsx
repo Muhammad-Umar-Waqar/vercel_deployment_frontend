@@ -8,7 +8,8 @@ import { fetchAlertsByOrg } from "../../slices/alertsSlice";
 
 export default function AlertsPanel({ organizationId = null, pollInterval = null }) {
   const dispatch = useDispatch();
-  const { user } = useStore();
+  const { user, getToken } = useStore();
+  const token = getToken();
   const orgId = organizationId || user?.organization || null;
 
   const orgAlerts = useSelector((s) =>
@@ -17,13 +18,13 @@ export default function AlertsPanel({ organizationId = null, pollInterval = null
 
   useEffect(() => {
     if (!orgId) return;
-    dispatch(fetchAlertsByOrg(orgId));
+    dispatch(fetchAlertsByOrg(orgId, token));
   }, [orgId, dispatch]);
 
   useEffect(() => {
     if (!orgId || !pollInterval) return;
     const id = setInterval(() => {
-      dispatch(fetchAlertsByOrg(orgId));
+      dispatch(fetchAlertsByOrg(orgId, token));
     }, pollInterval);
     return () => clearInterval(id);
   }, [orgId, pollInterval, dispatch]);

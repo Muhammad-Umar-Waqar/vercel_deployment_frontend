@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useStore } from "../../contexts/storecontexts";
 
 const BASE = import.meta.env.VITE_BACKEND_API || "http://localhost:5050";
-const getToken = () => localStorage.getItem("token");
+// const getToken = () => localStorage.getItem("token");
 
 /**
  * Props:
@@ -13,7 +13,7 @@ const getToken = () => localStorage.getItem("token");
  * - excludeFirstN : number of first venues to exclude from the select (default 0)
  */
 export default function VenueSelect({ organizationId, value, onChange, className = "", excludeFirstN = 0 }) {
-  const { user } = useStore();
+  const { user, getToken } = useStore();
 
   const [venues, setVenues] = useState([]);
   const [visibleVenues, setVisibleVenues] = useState([]);

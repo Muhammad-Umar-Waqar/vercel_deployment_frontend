@@ -272,8 +272,8 @@ export default function FreezerDeviceCard({
 
               {/* Ambient Temperature Pill */}
            <div className={`ambient-pill bg-white/20 border border-white/30 flex items-center `}>
-            <img src="/odour-alert.svg" alt="" className="h-[45px] w-[45px]" />
-            <p className="ml-2 md:text-md lg:text-lg xl:text-xl">
+            <img src="/odour-alert.svg" alt="" className="h-[35px] w-[35px] xl:h-[45px] xl:w-[45px]" />
+            <p className="ml-2 text-sm md:text-md text-lg xl:text-xl">
               {odourAlert ? "Detected" : "Normal"}
             </p>
           </div>

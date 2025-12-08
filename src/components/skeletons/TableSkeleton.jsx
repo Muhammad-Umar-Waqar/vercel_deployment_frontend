@@ -1,7 +1,7 @@
 import React from "react";
 import { Skeleton } from "@mui/material";
 
-const TableSkeleton = ({ rows = 5, status=false }) => {
+const TableSkeleton = ({ rows = 5, status=false, role }) => {
   const items = Array.from({ length: rows });
 
   return (
@@ -18,7 +18,7 @@ const TableSkeleton = ({ rows = 5, status=false }) => {
             </div>
           </td>
 
-          {status && (
+          {(status && role === "admin") && (
             <td className="py-2 px-4 ml-10">
               <Skeleton variant="rounded" width={80} height={24} />
             </td>

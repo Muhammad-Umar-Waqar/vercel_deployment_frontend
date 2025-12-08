@@ -147,6 +147,36 @@ export const fetchOrganizationsByUser = createAsyncThunk(
   }
 );
 
+// fetch organization for a specific user
+export const fetchOrganizationByUserID = createAsyncThunk(
+  "Organizations/fetchByUserId",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return rejectWithValue("No authentication token found");
+
+      const res = await fetch(`${BASE}/organization/${userId}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) return rejectWithValue(data.message || "Failed to fetch organization for user");
+
+      // backend returns: { message, organization }
+      return data.organization || null;
+    } catch (err) {
+      return rejectWithValue(err.message || "Network error");
+    }
+  }
+);
+
+
 
 
 
@@ -239,7 +269,21 @@ const OrganizationSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload || action.error?.message || "Failed to fetch user organizations";
         state.Organizations = [];
-      });
+      })
+       .addCase(fetchOrganizationByUserID.pending, (state) => {
+    state.isLoading = true;
+    state.error = null;
+  })
+  .addCase(fetchOrganizationByUserID.fulfilled, (state, action) => {
+    state.isLoading = false;
+    // store the single organization as an array for compatibility
+    state.Organizations = action.payload ? [action.payload] : [];
+  })
+  .addCase(fetchOrganizationByUserID.rejected, (state, action) => {
+    state.isLoading = false;
+    state.error = action.payload || action.error?.message || "Failed to fetch organization for user";
+    state.Organizations = [];
+  });
       
   },
 });

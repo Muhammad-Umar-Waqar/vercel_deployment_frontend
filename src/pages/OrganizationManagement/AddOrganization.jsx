@@ -14,9 +14,8 @@ const AddOrganization = () => {
     organization_name: ""
   });
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((s) => s.Organization || { isLoading: false });
 
-
+  const [loadingformSubmit, setLoadingformSubmit] = useState(false); 
 
   const onchange = (e) => {
     const { name, value } = e.target;
@@ -31,6 +30,7 @@ const AddOrganization = () => {
       Swal.fire({ icon: "warning", title: "Missing field", text: "Organization name is required." });
       return;
     }
+    setLoadingformSubmit(true);
 
     try {
       // create organization via thunk (thunk reads token from localStorage)
@@ -55,6 +55,8 @@ const AddOrganization = () => {
         text: err || "Unable to create organization.",
       });
       console.error("create organization error:", err);
+    } finally{
+      setLoadingformSubmit(false);
     }
   };
 
@@ -80,12 +82,12 @@ const AddOrganization = () => {
         <button
           type="submit"
           onClick={handleSubmit}
-          disabled={isLoading}
+          disabled={loadingformSubmit}
           className={`w-full bg-[#1E64D9] hover:bg-[#1557C7] text-white font-semibold py-2.5 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer ${
-            isLoading ? "opacity-70 cursor-not-allowed" : ""
+            loadingformSubmit ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >
-          {isLoading ? "Saving..." : "Save"}
+          {loadingformSubmit ? "Saving..." : "Save"}
         </button>
       </div>
     </div>

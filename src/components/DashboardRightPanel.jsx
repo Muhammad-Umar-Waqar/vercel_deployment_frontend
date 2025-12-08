@@ -22,7 +22,7 @@ export default function DashboardRightPanel({
     return freezerDevices.find((d) => (d._id ?? d.id) === selectedFreezerDeviceId) ?? null;
   }, [freezerDevices, selectedFreezerDeviceId]);
 
-  console.log("selected", selected)
+  console.log("selected", selected);
 
   return (
     <div
@@ -42,6 +42,10 @@ export default function DashboardRightPanel({
           organizationId={selectedOrgId}
           closeIcon={closeIcon}   // forward
           onClose={onClose}       // forward
+          humidityAlert={selected?.humidityAlert}
+          odourAlert={selected?.odourAlert}
+          temperatureAlert={selected?.temperatureAlert}
+          deviceId={selected?.deviceId}
         />
       ) : (
         <VenueDetailsPanel
@@ -55,6 +59,11 @@ export default function DashboardRightPanel({
           organizationId={selectedOrgId}
           closeIcon={closeIcon}   
           onClose={onClose}       
+          
+          humidityAlert={false}
+          odourAlert={false}
+          temperatureAlert={false}
+          deviceId = {""}
         />
       )}
     </div>

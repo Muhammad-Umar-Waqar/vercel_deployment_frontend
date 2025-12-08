@@ -5,8 +5,10 @@ import { useEffect } from "react";
 import QRCode from "./QrCode";
 import { useLocation } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton } from "@mui/material";
+import { IconButton, Skeleton } from "@mui/material";
 import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
+import { Download } from "lucide-react";
+import Swal from "sweetalert2";
 
 export default function VenueDetailsPanel({
   organizationId = null,
@@ -18,7 +20,11 @@ export default function VenueDetailsPanel({
   apiKey = "",
   closeIcon = false,
   onClose = undefined,
-  humidity=0
+  humidity=0,
+  odourAlert = false,
+  temperatureAlert = false,
+  humidityAlert = false,
+  deviceId = "",
 }) {
   const dispatch = useDispatch();
   const { user } = useStore();
@@ -67,7 +73,12 @@ const venueId = params.get("venue"); // gives the ID
   const venues = orgAlerts?.venues || [];
  
   const handleDownload = () => {
-    alert(`Downloading report for ${venueName}`);
+    Swal.fire({
+        icon: "info", // or "warning"
+        title: "Coming Soon!",
+        text: "This feature is not available yet. Stay tuned!",
+        confirmButtonText: "OK"
+      });
   };
 
   const sameId = (a, b) => String(a) === String(b);
@@ -116,19 +127,20 @@ const venueId = params.get("venue"); // gives the ID
       )}
       
       {/* A. Venue Info Section */}
-      <div className="flex justify-start items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
+      <div className="flex justify-between items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
         <div>
-          <p className="text-sm text-[#64748B] font-medium">Venue</p>
-          <h2 className="text-sm text-[#1E293B] font-bold">{displayVenueName}</h2>
+          <p className="text-sm text-[#64748B] font-medium">Device ID </p>
+          {/* <h2 className="text-sm text-[#1E293B] font-bold">{displayVenueName}</h2> */}
+          <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70}  />}</h2>
         </div>
-        {/* <button
+        <button
           onClick={handleDownload}
-          className="inline-flex items-center gap-2 px-3 py-2 bg-[#2563EB] text-white rounded-full text-xs font-semibold hover:bg-[#1D4ED8] active:scale-[.98] transition shadow-sm"
+          className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a]  active:scale-[.98] transition shadow-sm cursor-pointer "
           aria-label="Download"
         >
           <span className="leading-none">Download</span>
           <Download className="w-3.5 h-3.5" />
-        </button> */}
+        </button>
       </div>
 
       {/* B. Refrigerator Image */}
@@ -150,11 +162,11 @@ const venueId = params.get("venue"); // gives the ID
 
       {/* C. Temperature Section */}
       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl">
-        <div className="flex flex-col-3 justify-around items-center ">
+        <div className="flex flex-col-3 justify-around items-center py-1 ">
           <div className="flex flex-col-2 items-center justify-center ">
-            <img src="/odour-alert.svg" className="h-[60px] w-[30px]" />
+            <img src="/odour-alert.svg" className="h-[70px] w-[35px]" />
           
-            <p className="text-sm md:text-md lg:text-xl font-semibold">
+            <p className="text-md md:text-md lg:text-lg xl:text-xl font-semibold">
               {freezerTemperature ? "Detected" : "Normal"}
           </p>
 
@@ -162,7 +174,7 @@ const venueId = params.get("venue"); // gives the ID
           </div>
 
           <div className="flex flex-col-2 items-center justify-center ">
-            <img src="/temperature-icon.svg" className="h-[60px] w-[30px]" />
+            <img src="/temperature-icon.svg" className="h-[60px] w-[35px]" />
             <div className="flex flex-col items-end justify-end">
               
               <p className="text-sm md:text-md lg:text-lg 2xl:text-2xl font-semibold">
@@ -173,7 +185,7 @@ const venueId = params.get("venue"); // gives the ID
           </div>
 
            <div className="flex flex-col-2 items-center justify-center">
-            <img src="/humidity-alert.svg" className="h-[60px] w-[30px]" />
+            <img src="/humidity-alert.svg" className="h-[60px] w-[35px]" />
             <div className="flex flex-col items-end justify-end">
              
               <p className="text-sm md:text-md lg:text-lg 2xl:text-2xl font-semibold">
@@ -184,15 +196,42 @@ const venueId = params.get("venue"); // gives the ID
           </div>
         </div>
 
+        {/* <div>
+          <h3><span></span>Alert Detected</h3>
+        </div> */}
+
         {/* <img
           src="red-alert-icon"
           alt="Freezer and Ambient Combo"
           className="w-full h-auto object-cover"
         /> */}
       </div>
-          <p className="text-md text-[#64748B] font-medium">Alerts</p>
+
+        <div className="icon-number-align">
+            <img src="/alert-icon.png" alt="Alert" className="w-4 h-4 mr-1" />
+            <span className="text-[#0D5CA4] text-sm font-medium underline  decoration-[#0D5CA4] decoration-[0.5px] ">Alerts Status</span>
+        </div>
+      
+      <div className="grid grid-cols-3 gap-1 ">
+      
+        <div className={`icon-number-align border border-1 rounded-sm py-0.5 ${odourAlert ? "border-red-500": "border-gray-400"}`}>
+            <img src="/odour-alert.svg" alt="Alert" className="w-6 h-6 " />
+            <span className="text-[#1E293B] text-xs ">{odourAlert? "Alert Det.": "Not Det."}</span>
+        </div>
+        <div className={`icon-number-align border border-1 rounded-sm py-0.5 ${temperatureAlert ? "border-red-500": "border-gray-400"}`}>
+            <img src="/temperature-icon.svg" alt="Alert" className="w-6 h-6 " />
+            <span className="text-[#1E293B] text-xs ">{temperatureAlert? "Alert Det.": "Not Det."}</span>
+        </div>
+        <div className={`icon-number-align border border-1 rounded-sm py-0.5  ${humidityAlert ? "border-red-500": "border-gray-400"}`}>
+            <img src="/humidity-alert.svg" alt="Alert" className="w-6 h-6 " />
+            <span className="text-[#1E293B] text-xs ">{humidityAlert? "Alert Det.": "Not Det."}</span>
+        </div>
+      </div>
+        
+
+        
       {/* D. Alerts Chart */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         {venues.length > 0 ? (
           <AlertsChart venues={venues} defaultMode="battery" />
         ) : (
@@ -200,9 +239,9 @@ const venueId = params.get("venue"); // gives the ID
             No alert data available
           </p>
         )}
-      </div>
+      </div> */}
       <div>
-    {apiKey && (
+    {/* {apiKey && (
       <div className="mt-3  p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
         <div className="flex items-center justify-between ">
           <div>
@@ -215,7 +254,36 @@ const venueId = params.get("venue"); // gives the ID
           <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || 'http://localhost:5173'} />
         </div>
       </div>
-    )}
+    )} */}
+
+
+
+{apiKey ? (
+  <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
+    <div className="flex items-center justify-between">
+      <div>
+        <strong>API Key:</strong>
+        <div className="mt-2 text-sm" title={apiKey}>
+          {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
+        </div>
+      </div>
+
+      <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || 'http://localhost:5173'} />
+    </div>
+  </div>
+) : (
+  <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
+    <div className="flex items-center justify-between">
+      <div>
+        {/* <strong>API Key:</strong> */}
+        <Skeleton variant="text" width={50} height={20} className="mb-2" />
+        <Skeleton variant="text" width={120} height={20} className="mb-2" />
+      </div>
+    <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: "10%" }}  />
+  </div>
+  </div>
+)}
+
       </div>
     </div>
   );

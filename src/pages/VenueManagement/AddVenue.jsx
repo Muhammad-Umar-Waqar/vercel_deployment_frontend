@@ -18,7 +18,7 @@ const AddVenue = () => {
   const dispatch = useDispatch();
   const { isLoading } = useSelector((s) => s.Venue || { isLoading: false });
   const { Organizations } = useSelector((s) => s.Organization || { Organizations: [] });
-
+  const [formLoading, setFormLoading] = useState();
 
   // constants (put near top of component)
 const SELECT_HEIGHT = 48;
@@ -52,13 +52,17 @@ const menuProps = {
 
   const handleVenue = async (e) => {
     e.preventDefault();
+
+  
+
     const name = (form.name || "").trim();
     const organization = form.organization;
 
     if (!name || !organization) {
       return Swal.fire({ icon: "warning", title: "Missing field", text: "Name and organization are required." });
     }
-
+    
+      setFormLoading(true);
     try {
       const created = await dispatch(createVenue({ name, organization })).unwrap();
       Swal.fire({ icon: "success", title: "Created", text: `Venue "${created.name}" created.` });
@@ -68,6 +72,8 @@ const menuProps = {
     } catch (err) {
       Swal.fire({ icon: "error", title: "Create failed", text: err || "Unable to create venue." });
       console.error("create venue error:", err);
+    } finally{
+    setFormLoading(false);
     }
   };
 
@@ -140,12 +146,22 @@ const menuProps = {
     </div>
         </div>
 
-        <button
+        {/* <button
           type="submit"
           className={`w-full bg-[#1E64D9] hover:bg-[#1557C7] text-white font-semibold py-2.5 px-4 rounded-md transition duration-300 shadow-md ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
           disabled={isLoading}
         >
           {isLoading ? "Saving..." : "Save"}
+        </button> */}
+
+        <button
+          type="submit"
+          className={`w-full bg-[#1E64D9] hover:bg-[#1557C7] text-white font-semibold py-2.5 px-4 rounded-md transition duration-300 shadow-md ${
+            formLoading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
+          disabled={formLoading} // disables button when loading
+        >
+          {formLoading ? "Saving..." : "Save"} 
         </button>
       </form>
     </div>

@@ -31,8 +31,8 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <StoreProvider>
           <BrowserRouter>
+        <StoreProvider>
             <Routes>
 
               {/* --------------------------
@@ -95,8 +95,8 @@ createRoot(document.getElementById('root')).render(
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
         </StoreProvider>
+          </BrowserRouter>
       </PersistGate>
     </Provider>
   </StrictMode>

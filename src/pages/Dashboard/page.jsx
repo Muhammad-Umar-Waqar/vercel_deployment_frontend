@@ -1102,7 +1102,7 @@ setFreezerDevicesLoading(true);
                   value={selectedVenueId}
                   onChange={onVenueChange}
                   className="mt-1"
-                  excludeFirstN={user?.role === "user" ? 4 : 0}
+                  excludeFirstN={user?.role === "user" ? 3 : 0}
                 />
               </div>
             </div>

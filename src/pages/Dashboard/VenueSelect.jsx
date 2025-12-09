@@ -29,71 +29,159 @@ export default function VenueSelect({ organizationId, value, onChange, className
     setSelected(value ?? "");
   }, [value]);
 
-  useEffect(() => {
-    if (!organizationId) {
-      setVenues([]);
-      setVisibleVenues([]);
-      setSelected("");
+  // useEffect(() => {
+  //   if (!organizationId) {
+  //     setVenues([]);
+  //     setVisibleVenues([]);
+  //     setSelected("");
+  //     setError(null);
+  //     return;
+  //   }
+
+  //   const abortCtrl = new AbortController();
+  //   const fetchVenues = async () => {
+  //     try {
+  //       setLoading(true);
+  //       setError(null);
+  //       const token = getToken();
+  //       const res = await fetch(`${BASE}/venue/venue-by-org/${organizationId}`, {
+  //         method: "GET",
+  //         credentials: "include",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  //         },
+  //         signal: abortCtrl.signal,
+  //       });
+
+  //       const data = await res.json();
+  //       if (!res.ok) {
+  //         const message = data?.message || "Failed to fetch venues";
+  //         setVenues([]);
+  //         setVisibleVenues([]);
+  //         setSelected("");
+  //         setError(message);
+  //         setLoading(false);
+  //         return;
+  //       }
+
+  //       const arr = Array.isArray(data) ? data : Array.isArray(data?.venues) ? data.venues : [];
+  //       setVenues(arr);
+
+  //       const filtered = excludeFirstN > 0 ? arr.slice(excludeFirstN) : arr;
+  //       setVisibleVenues(filtered);
+
+  //       if ((!value || value === "") && filtered.length > 0) {
+  //         const firstId = String(filtered[0]._id ?? filtered[0].id ?? filtered[0]);
+  //         setSelected(firstId);
+  //         if (typeof onChange === "function") onChange(firstId);
+  //       } else if (value) {
+  //         setSelected(value);
+  //       }
+  //     } catch (err) {
+  //       if (err.name === "AbortError") return;
+  //       console.error("Venue fetch error:", err);
+  //       setError(err.message || "Network error");
+  //       setVenues([]);
+  //       setVisibleVenues([]);
+  //       setSelected("");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchVenues();
+  //   return () => abortCtrl.abort();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [organizationId, excludeFirstN]);
+
+  // inside VenueSelect component, replace the fetch useEffect with this:
+
+useEffect(() => {
+  if (!organizationId) {
+    setVenues([]);
+    setVisibleVenues([]);
+    setSelected("");
+    setError(null);
+    return;
+  }
+
+  const abortCtrl = new AbortController();
+  const fetchVenues = async () => {
+    try {
+      setLoading(true);
       setError(null);
-      return;
-    }
+      const token = getToken();
 
-    const abortCtrl = new AbortController();
-    const fetchVenues = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const token = getToken();
-        const res = await fetch(`${BASE}/venue/venue-by-org/${organizationId}`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          signal: abortCtrl.signal,
-        });
+      // If this user was created by another user, fetch user-specific venues
+      // otherwise fetch organization venues
+      const isUserCreatedByUser = user?.createdBy && String(user.createdBy) === "user";
+      const url = isUserCreatedByUser
+        ? `${BASE}/venue/${user._id}`
+        : `${BASE}/venue/venue-by-org/${organizationId}`;
 
-        const data = await res.json();
-        if (!res.ok) {
-          const message = data?.message || "Failed to fetch venues";
-          setVenues([]);
-          setVisibleVenues([]);
-          setSelected("");
-          setError(message);
-          setLoading(false);
-          return;
-        }
+      const res = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        signal: abortCtrl.signal,
+      });
 
-        const arr = Array.isArray(data) ? data : Array.isArray(data?.venues) ? data.venues : [];
-        setVenues(arr);
-
-        const filtered = excludeFirstN > 0 ? arr.slice(excludeFirstN) : arr;
-        setVisibleVenues(filtered);
-
-        if ((!value || value === "") && filtered.length > 0) {
-          const firstId = String(filtered[0]._id ?? filtered[0].id ?? filtered[0]);
-          setSelected(firstId);
-          if (typeof onChange === "function") onChange(firstId);
-        } else if (value) {
-          setSelected(value);
-        }
-      } catch (err) {
-        if (err.name === "AbortError") return;
-        console.error("Venue fetch error:", err);
-        setError(err.message || "Network error");
+      const data = await res.json();
+      if (!res.ok) {
+        const message = data?.message || "Failed to fetch venues";
         setVenues([]);
         setVisibleVenues([]);
         setSelected("");
-      } finally {
+        setError(message);
         setLoading(false);
+        return;
       }
-    };
 
-    fetchVenues();
-    return () => abortCtrl.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId, excludeFirstN]);
+      // server might return either an array or { venues: [...] }
+      const arr = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.venues)
+        ? data.venues
+        : [];
+
+      // If the user-specific endpoint returns objects like { venueId, venueName }
+      // keep them as-is: downstream code handles v._id or v.id or v.venueId
+      setVenues(arr);
+
+      const filtered = excludeFirstN > 0 ? arr.slice(excludeFirstN) : arr;
+      setVisibleVenues(filtered);
+
+      // auto-select first visible if no explicit value
+      if ((!value || value === "") && filtered.length > 0) {
+        const firstId = String(filtered[0]._id ?? filtered[0].id ?? filtered[0].venueId ?? filtered[0]);
+        setSelected(firstId);
+        if (typeof onChange === "function") onChange(firstId);
+      } else if (value) {
+        setSelected(value);
+      }
+    } catch (err) {
+      if (err.name === "AbortError") return;
+      console.error("Venue fetch error:", err);
+      setError(err.message || "Network error");
+      setVenues([]);
+      setVisibleVenues([]);
+      setSelected("");
+    } finally {
+      if (!abortCtrl.signal.aborted) setLoading(false);
+    }
+  };
+
+  fetchVenues();
+  return () => abortCtrl.abort();
+// include user in deps because we read user.createdBy and user._id
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [organizationId, excludeFirstN, user]);
+
+
 
   useEffect(() => {
     function handleOutside(e) {

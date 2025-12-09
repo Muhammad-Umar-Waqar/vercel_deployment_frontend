@@ -148,6 +148,8 @@ useEffect(() => {
         ? data.venues
         : [];
 
+        console.log("arr", arr)
+
       // If the user-specific endpoint returns objects like { venueId, venueName }
       // keep them as-is: downstream code handles v._id or v.id or v.venueId
       setVenues(arr);
@@ -207,7 +209,7 @@ useEffect(() => {
   if (venues?.length <= 3) return null;
 
   const selectedVenue = visibleVenues.find((v) => String(v._id ?? v.id ?? v) === String(selected));
-  const label = loading ? "Loading venues..." : selectedVenue ? selectedVenue.name ?? selectedVenue.venue_name ?? String(selected) : "Venue";
+  const label = loading ? "Loading venues..." : selectedVenue ? selectedVenue.name ?? selectedVenue.venueName ?? String(selected) : "Venue";
 
   return (
     <div className={className} ref={ref}>
@@ -252,7 +254,7 @@ useEffect(() => {
               ) : visibleVenues && visibleVenues.length > 0 ? (
                 visibleVenues.map((v) => {
                   const id = String(v._id ?? v.id ?? v);
-                  const name = v.name ?? v.venue_name ?? id;
+                  const name = v.name ?? v.venue_name ?? v.venueName ?? id;
                   return (
                     <div
                       key={id}

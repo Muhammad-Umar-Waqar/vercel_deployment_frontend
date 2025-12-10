@@ -89,8 +89,8 @@ export const updateDevice = createAsyncThunk(
       if (!res.ok) return rejectWithValue(data.message || "Failed to update device");
 
       // backend returns { message, device }
-      console.log("data.device", data.device)
-      return data.device;
+      console.log("data.device", data)
+      return (data);
       
     } catch (err) {
       return rejectWithValue(err.message || "Network error");

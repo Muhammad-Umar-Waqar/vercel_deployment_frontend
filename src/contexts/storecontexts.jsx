@@ -888,7 +888,6 @@
 
 // src/contexts/storecontexts.js
 import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 
 const StoreContext = createContext(undefined);
 
@@ -919,7 +918,7 @@ const decodeJwt = (token) => {
 };
 
 export const StoreProvider = ({ children }) => {
-  const navigate = useNavigate();
+
   const [token, setToken] = useState(() => localStorage.getItem("token") || null);
   const [user, setUser] = useState(() => {
     const raw = localStorage.getItem("user");

@@ -300,7 +300,7 @@ export const DeleteManager = createAsyncThunk(
 // update user profile (name, email, password, organization)
 export const UpdateManager = createAsyncThunk(
   "Manager/update",
-  async ({ id, name, email, password, organization, venues }, { rejectWithValue }) => {
+  async ({ id, name, email, password, organization, venues, timer }, { rejectWithValue }) => {
     try {
       const token = getToken();
       if (!token) return rejectWithValue("No authentication token found");
@@ -310,6 +310,7 @@ export const UpdateManager = createAsyncThunk(
       if (email !== undefined) body.email = email;
       if (password !== undefined && password !== "") body.password = password;
       if (organization !== undefined) body.organization = organization;
+      if (timer !== undefined) body.timer = timer;
       if (Array.isArray(venues) && venues.length > 0) body.venues = venues;
 
       

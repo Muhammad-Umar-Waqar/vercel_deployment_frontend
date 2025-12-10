@@ -257,7 +257,7 @@ import {
   Autocomplete,
   Chip,
 } from "@mui/material";
-import { Lock, Mail, User2 } from "lucide-react";
+import { Lock, Mail, Timer, User2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import InputField from "../../Inputs/InputField";
 import PasswordField from "../../Inputs/PasswordField";
@@ -279,6 +279,8 @@ export default function UserEditModal({ handleClose, id }) {
   const { user } = useStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [timer, setTimer] = React.useState("");
+  const [timerError, setTimerError] = React.useState("");
 
   const { ManagerEditModalOpen, Managers, isLoading } = useSelector(
     (s) => s.Manager || {}
@@ -369,12 +371,19 @@ export default function UserEditModal({ handleClose, id }) {
 
   const mgr = (Managers || []).find((m) => String(m._id) === String(id));
   if (mgr) {
+
+
+    console.log("mgr>>", mgr)
     const orgId =
       mgr.organization && typeof mgr.organization === "object"
         ? mgr.organization._id || mgr.organization.id
         : mgr.organization || "";
 
-    setFormData({
+      if (user?.role === "admin") {
+        setTimer(mgr.timer || ""); // mgr.timer can be null
+      }
+    
+      setFormData({
       id: mgr._id,
       name: mgr.name || "",
       current_email: mgr.email || "",
@@ -400,6 +409,29 @@ export default function UserEditModal({ handleClose, id }) {
     }
   }
 }, [ManagerEditModalOpen, id, Managers, dispatch]);
+
+const validateTimer = (value) => {
+  if (!value || typeof value !== "string") return { valid: false, message: "Timer required" };
+  const re = /^(?:[1-9]|[1-5][0-9]|60)(s|m)$/;
+  const match = value.trim().match(re);
+  if (!match) return { valid: false, message: "Use 1–60s or 1–60m" };
+  return { valid: true };
+};
+
+
+const handleTimerChange = (e) => {
+  const val = e.target.value;
+  setTimer(val);
+
+  if (!val) {
+    setTimerError("");
+    return;
+  }
+
+  const { valid, message } = validateTimer(val);
+  setTimerError(valid ? "" : message);
+};
+
 
 
    React.useEffect(() => {
@@ -482,11 +514,21 @@ export default function UserEditModal({ handleClose, id }) {
         venues: venuesPayload,
       };
 
+      // add timer if admin and valid
+      if (user?.role === "admin" && timer && !timerError) {
+        payload.timer = timer;
+      }
+
       console.log("payload>", payload);
       
 
+      
+      // refresh lists depending on current user's role:
+      if (user && user?.role === "admin") {
+        await dispatch(fetchAllManagers()).unwrap();
+      }
       const updated = await dispatch(UpdateManager(payload)).unwrap();
-
+      
       Swal.fire({
         icon: "success",
         title: "Updated",
@@ -628,22 +670,36 @@ export default function UserEditModal({ handleClose, id }) {
 
            {
           role === "admin" ? (
-            <TextField
-              select
-              fullWidth
-              label="Organization"
-              name="organizationId"
-              value={formData.organizationId || ""}
-              onChange={handleOrgChange} // <--- use handler to fetch venues on change
-              sx={{ mt: 2 }}
-            >
-              <MenuItem value="">Select Organization</MenuItem>
-              {(Organizations || []).map((org) => (
-                <MenuItem key={org._id || org.id} value={org._id || org.id}>
-                  {org.name}
-                </MenuItem>
-              ))}
-            </TextField>
+    
+              <>
+                <TextField
+                  select
+                  fullWidth
+                  label="Organization"
+                  name="organizationId"
+                  value={formData.organizationId || ""}
+                  onChange={handleOrgChange} // <--- use handler to fetch venues on change
+                  sx={{ mt: 2 }}
+                >
+                  <MenuItem value="">Select Organization</MenuItem>
+                  {(Organizations || []).map((org) => (
+                    <MenuItem key={org._id || org.id} value={org._id || org.id}>
+                      {org.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <InputField
+                  type="text"
+                  name="timer"
+                  label="Timer"
+                  placeholder="eg: 1s or 1m"
+                  value={timer}
+                  onchange={handleTimerChange}
+                  icon={<Timer />}
+                />
+    {timerError && <p className="mt-1 text-sm text-red-600">{timerError}</p>}
+            </>
           ) : (
             role === "user" && (
               <Autocomplete

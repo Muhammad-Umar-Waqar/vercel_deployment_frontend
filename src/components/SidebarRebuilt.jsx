@@ -1893,7 +1893,7 @@ const SidebarRebuilt = () => {
                 })} */}
 
                             {loading ? (
-              // show four skeleton placeholders
+              // show three skeleton placeholders
               Array.from({ length: 3 }).map((_, idx) => {
                 const key = `skeleton-${idx}`;
                 return (

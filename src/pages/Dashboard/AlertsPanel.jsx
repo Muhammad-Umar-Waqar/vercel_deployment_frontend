@@ -54,7 +54,7 @@ export default function AlertsPanel({ organizationId = null, pollInterval = null
 
   return (
     <div className="flex-shrink-0">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12 md:mb-auto">
         <div className="p-4" style={{ backgroundColor: "#07518D12", borderRadius: "20px" }}>
           <AlertList title="Odour Alert" iconSrc="/odour-alert.svg" items={odourItems} />
         </div>

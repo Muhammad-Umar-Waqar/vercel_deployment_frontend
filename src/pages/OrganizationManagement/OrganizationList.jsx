@@ -193,7 +193,10 @@ const OrganizationList = ({ onOrganizationSelect, selectedOrganization }) => {
         // Mobile: show a minimal header with hamburger. List only appears inside Drawer.
         <>
           <div className="flex items-center justify-between mb-4">
+            
+            <img src="/logo-half.png" className="w-auto h-[30px]"/>
             <h1 className="organization-list-title font-semibold text-gray-800">Organization Management</h1>
+            
             <div>
               <IconButton aria-label="Open organizations" size="small" onClick={() => setDrawerOpen(true)}>
                 <Menu size={20} />

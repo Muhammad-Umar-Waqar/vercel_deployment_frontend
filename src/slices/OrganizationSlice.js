@@ -177,9 +177,6 @@ export const fetchOrganizationByUserID = createAsyncThunk(
 );
 
 
-
-
-
 const OrganizationSlice = createSlice({
   name: "Organization",
   initialState: {

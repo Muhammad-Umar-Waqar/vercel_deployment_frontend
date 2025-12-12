@@ -135,7 +135,9 @@ const formatLastUpdate = (time) => {
     >
      {closeIcon && (
         // only render button when `closeIcon` true (mobile drawer)
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <img src="/iotfiy_logo_rpanel.svg" alt="IOTFIY LOGO" className="h-[30px] w-auto" />
+
           <IconButton
             onClick={() => {
               if (typeof onClose === "function") onClose(); // guard, then call

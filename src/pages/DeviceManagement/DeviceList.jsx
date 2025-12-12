@@ -2581,6 +2581,7 @@ const findCondition = (conditionsArray = [], wantedType) => {
       ) : (
         <>
           <div className="flex items-center justify-between mb-4">
+            <img src="/logo-half.png" className="w-auto h-[30px]"/>
             <h1 className="device-list-title font-semibold text-gray-800">Device Management</h1>
             <IconButton size="small" onClick={() => setDrawerOpen(true)}>
               <Menu size={20} />

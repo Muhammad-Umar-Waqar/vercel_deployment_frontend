@@ -484,6 +484,7 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
       ) : (
         <>
           <div className="flex items-center justify-between mb-4">
+            <img src="/logo-half.png" className="w-auto h-[30px]"/>
             <h1 className="venue-list-title font-semibold text-gray-800">Venue Management</h1>
             <div>
               <IconButton aria-label="Open venues" size="small" onClick={() => setDrawerOpen(true)}>

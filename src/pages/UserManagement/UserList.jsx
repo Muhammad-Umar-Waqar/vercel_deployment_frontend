@@ -578,6 +578,7 @@ const UserList = ({ onUserSelect, selectedUser }) => {
       ) : (
         <>
           <div className="flex items-center justify-between mb-4">
+            <img src="/logo-half.png" className="w-auto h-[30px]"/>
             <h1 className="user-list-title font-semibold text-gray-800">User Management</h1>
             <div>
               <IconButton aria-label="Open users" size="small" onClick={() => setDrawerOpen(true)}>

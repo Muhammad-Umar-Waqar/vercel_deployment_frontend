@@ -704,12 +704,28 @@ const AddDevice = () => {
         {createdDevice?.apiKey && (
           <div className="mt-3 p-3 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-5">
             <strong>API Key:</strong>
-            <div className="flex items-center justify-between ">
+
+
+
+            <div className="flex items-center justify-between">
               <div>
-                <div className="mt-2 text-sm font-mono" title={createdDevice.apiKey}>
+                {/* Mobile: slice 0–15 */}
+                <div
+                  className="mt-2 text-sm font-mono md:hidden"
+                  title={createdDevice.apiKey}
+                >
+                  {createdDevice.apiKey ? `${createdDevice.apiKey.slice(0, 15)}...` : ""}
+                </div>
+
+                {/* md and above: slice 0–25 */}
+                <div
+                  className="mt-2 text-sm font-mono hidden md:block"
+                  title={createdDevice.apiKey}
+                >
                   {createdDevice.apiKey ? `${createdDevice.apiKey.slice(0, 25)}...` : ""}
                 </div>
               </div>
+
               <img
                 src="/copyicon.svg"
                 alt="Copy API KEY Icon"

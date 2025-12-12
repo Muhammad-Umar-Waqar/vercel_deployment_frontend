@@ -30,11 +30,11 @@ export default function DashboardRightPanel({
     >
       {selected ? (
         <VenueDetailsPanel
-        
           venueName={selected?.venueName ?? "Venue"}
           freezerTemperature={selected?.odourAlert ?? false}
           ambientTemperature={selected?.espTemprature ?? 0}
           humidity={selected?.espHumidity ?? 0}
+          espOdour={selected?.espOdour ?? 0}
           batteryLow={selected?.batteryLow ?? selected?.batteryAlert ?? false}
           needMaintenance={selected?.needMaintenance ?? false}
           apiKey={selected?.apiKey}
@@ -46,12 +46,14 @@ export default function DashboardRightPanel({
           odourAlert={selected?.odourAlert}
           temperatureAlert={selected?.temperatureAlert}
           deviceId={selected?.deviceId}
+          lastUpdateTime={selected?.lastUpdateTime}
         />
       ) : (
         <VenueDetailsPanel
           venueName={"Venue"}
           freezerTemperature={false}
           ambientTemperature={0}
+          espOdour={0}
           batteryLow={true}
           needMaintenance={true}
           apiKey={""}
@@ -64,6 +66,7 @@ export default function DashboardRightPanel({
           odourAlert={false}
           temperatureAlert={false}
           deviceId = {""}
+          lastUpdateTime={null}
         />
       )}
     </div>

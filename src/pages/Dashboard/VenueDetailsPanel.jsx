@@ -21,10 +21,12 @@ export default function VenueDetailsPanel({
   closeIcon = false,
   onClose = undefined,
   humidity=0,
+  espOdour=0,
   odourAlert = false,
   temperatureAlert = false,
   humidityAlert = false,
   deviceId = "",
+  lastUpdateTime=null
 }) {
   const dispatch = useDispatch();
   const { user } = useStore();
@@ -105,6 +107,27 @@ const venueId = params.get("venue"); // gives the ID
   const displayTemp = toInt(ambientTemperature);
   const displayHumidity = toInt(humidity);
 
+
+  // helper to format backend timestamp
+const formatLastUpdate = (time) => {
+  if (!time) return null; // handle null
+
+  const date = new Date(time);
+
+  // Example: 11 Dec 2025, 19:11
+  const options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return date.toLocaleString(undefined, options); // uses user's locale
+};
+
+
+
+
   return (
     <div
       className="w-full rounded-lg p-6 shadow-sm space-y-6"
@@ -167,7 +190,8 @@ const venueId = params.get("venue"); // gives the ID
             <img src="/odour-alert.svg" className="h-[70px] w-[35px]" />
           
             <p className="text-md md:text-md lg:text-lg xl:text-xl font-semibold">
-              {freezerTemperature ? "Detected" : "Normal"}
+              {/* {freezerTemperature ? "Detected" : "Normal"} */}
+              {espOdour}%
           </p>
 
             
@@ -283,6 +307,10 @@ const venueId = params.get("venue"); // gives the ID
   </div>
   </div>
 )}
+
+{
+  lastUpdateTime ? <div  className="text-center mt-3 p-2  rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md ">Last Update: {formatLastUpdate(lastUpdateTime)}</div>: ""
+}
 
       </div>
     </div>

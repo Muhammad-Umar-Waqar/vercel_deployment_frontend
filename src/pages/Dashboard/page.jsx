@@ -1786,6 +1786,7 @@ setFreezerDevicesLoading(true);
             humidityAlert={device?.humidityAlert}
             odourAlert={device?.odourAlert}
             temperatureAlert={device?.temperatureAlert}
+            espOdour={device?.espOdour}
           />
         ))}
       </div>

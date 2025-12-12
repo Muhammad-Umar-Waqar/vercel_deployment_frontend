@@ -180,6 +180,7 @@ export default function FreezerDeviceCard({
   humidityAlert = false,
   espHumidity = "",
   espTemprature = "",
+  espOdour = 0,
 }) {
   // helper: convert to finite number and keep integer part (before decimal)
  const toInt = (v) => {
@@ -272,10 +273,13 @@ export default function FreezerDeviceCard({
 
               {/* Ambient Temperature Pill */}
            <div className={`ambient-pill bg-white/20 border border-white/30 flex items-center `}>
-            <img src="/odour-alert.svg" alt="" className="h-[35px] w-[35px] xl:h-[45px] xl:w-[45px]" />
-            <p className="ml-2 text-sm md:text-md text-lg xl:text-xl">
-              {odourAlert ? "Detected" : "Normal"}
+            <img src="/odour-alert.svg" alt="odour alert icon" className="h-[35px] w-[35px] xl:h-[40px] xl:w-[40px]" />
+           <div>
+            <p className="text-sm md:text-md 2xl:text-lg ">
+              {odourAlert ? "Detected" : "Normal"} <span className="text-sm md:text-md 2xl:text-lg">{espOdour || 0}%</span>
             </p>
+            {/* <p className="ml-2 text-sm md:text-md text-lg xl:text-xl"></p> */}
+           </div>
           </div>
 
             </div>

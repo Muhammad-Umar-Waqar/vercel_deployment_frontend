@@ -50,14 +50,14 @@ export default function OrganizationSelect({ value="Organization", onChange, cla
 
   const selectedOrg = Organizations.find((o) => String(o._id ?? o.id ?? o) === String(selected));
   const selectedLabel = orgLoading
-    ? "Loading organizations..."
+    ? "Loading orgs..."
     : selectedOrg
     ? selectedOrg.name ?? selectedOrg.organization_name ?? String(selected)
     : "Select organization";
 
   return (
     <div className={`${className}`} ref={containerRef}>
-      <div className="grid grid-cols-3 items-center gap-4 ">
+      <div className="grid sm:grid-cols-3 items-center gap-4 ">
 
 
 
@@ -87,7 +87,7 @@ export default function OrganizationSelect({ value="Organization", onChange, cla
           {dropdownOpen && (
             <div className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-56 overflow-y-auto">
               {orgLoading ? (
-                <div className="px-4 py-3 text-sm text-gray-500">Loading organizations...</div>
+                <div className="px-4 py-3 text-sm text-gray-500">Loading orgs...</div>
               ) : Organizations && Organizations.length > 0 ? (
                 Organizations.map((org) => {
                   const id = String(org._id ?? org.id ?? org);

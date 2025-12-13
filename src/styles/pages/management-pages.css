@@ -895,6 +895,20 @@
 }
 
 /* ===== 14-INCH LAPTOPS (1024px to 1365px) ===== */
+@media (max-width: 425px) {
+  .device-list-container {
+    padding: 1rem;
+  }
+}
+
+/* ===== 14-INCH LAPTOPS (1024px to 1365px) ===== */
+@media (min-width: 425px) and (max-width: 1024px) {
+  .device-list-container {
+    padding: 1.5rem;
+  }
+}
+
+/* ===== 14-INCH LAPTOPS (1024px to 1365px) ===== */
 @media (min-width: 1024px) and (max-width: 1365px) {
   .device-list-container {
     padding: 1.5rem;
@@ -1346,6 +1360,17 @@
 .venue-list-container,
 .venue-add-container {
   padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .venue-list-container { padding: 0.5rem; }
+}
+@media (min-width: 768px) and (max-width: 1024px) {
+  .venue-list-container { padding: 0.5rem; }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .venue-list-container { padding: 1rem; }
 }
 
 /* Venue Management uses same responsive styles */

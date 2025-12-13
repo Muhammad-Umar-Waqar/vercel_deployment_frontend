@@ -401,6 +401,7 @@ const AddDevice = () => {
 
   const [conditions, setConditions] = useState(defaultConditions);
   const [createdDevice, setCreatedDevice] = useState(null);
+  const [deviceLoading, setDeviceLoading] = useState(false);
 
   const dispatch = useDispatch();
   // organization state
@@ -494,6 +495,8 @@ const AddDevice = () => {
 
     const finalConditions = filtered;
 
+    setDeviceLoading(true);
+
     try {
 
       console.log("formData>AddDevice", formData)
@@ -522,6 +525,8 @@ const AddDevice = () => {
         title: "Create failed",
         text,
       });
+    } finally{
+      setDeviceLoading(false);
     }
   };
 
@@ -582,7 +587,7 @@ const AddDevice = () => {
               }}
             >
               {orgsLoading ? (
-                <MenuItem disabled sx={{ height: ITEM_HEIGHT }}>Loading organizations...</MenuItem>
+                <MenuItem disabled sx={{ height: ITEM_HEIGHT }}>Loading orgs...</MenuItem>
               ) : orgError ? (
                 <MenuItem disabled sx={{ height: ITEM_HEIGHT }}>{String(orgError)}</MenuItem>
               ) : Organizations.length === 0 ? (
@@ -692,12 +697,29 @@ const AddDevice = () => {
 
         {/* Save Button */}
         <div className="mt-6">
-          <button
+          {/* <button
             onClick={handleSaveDevice}
             className="bg-[#1E64D9] hover:bg-[#1557C7] text-white font-semibold py-2.5 px-4 rounded-md w-full cursor-pointer"
           >
             Save
+          </button> */}
+
+          <button
+            onClick={handleSaveDevice}
+            disabled={deviceLoading}
+            className={`
+            w-full py-2.5 px-4 rounded-md font-semibold text-white
+            transition-all
+            ${deviceLoading
+                ? "bg-[#1E64D9]/70 cursor-not-allowed"
+                : "bg-[#1E64D9] hover:bg-[#1557C7] cursor-pointer"}
+             `}
+          >
+            {deviceLoading ? "Saving..." : "Save"}
           </button>
+
+
+
         </div>
 
         {/* API key display */}

@@ -138,7 +138,7 @@ const OrganizationList = ({ onOrganizationSelect, selectedOrganization }) => {
           </thead>
         </table>
 
-        <div className="organization-table-scroll overflow-y-auto pr-1 h-[58vh]">
+        <div className="organization-table-scroll overflow-y-auto pr-1 h-[63vh] sm:h-[58vh]">
           <table className="w-full table-auto text-left">
             <tbody>
               {isLoading && <TableSkeleton rows={4} />}
@@ -162,10 +162,10 @@ const OrganizationList = ({ onOrganizationSelect, selectedOrganization }) => {
                     <td className="organization-table-cell py-2 sm:py-3 px-2 sm:px-4">{index + 1}. {displayName}</td>
                     <td className="organization-table-cell py-2 sm:py-3 px-2 sm:px-4">
                       <div className="flex justify-center gap-2 sm:gap-3" onClick={(e) => e.stopPropagation()}>
-                        <button onClick={() => handleEditOpen(displayName, id)} className="organization-action-btn rounded-full border border-green-500/50 bg-white flex items-center justify-center hover:bg-green-50 cursor-pointer p-[3px]">
+                        <button onClick={() => handleEditOpen(displayName, id)} className="organization-action-btn rounded-full border border-green-500/50 bg-white flex items-center justify-center hover:bg-green-50 cursor-pointer p-[4px]">
                           <Pencil className="text-green-600 organization-action-icon" size={16} />
                         </button>
-                        <button onClick={() => handleDeleteOpen(displayName, id)} className="organization-action-btn rounded-full border border-red-500/50 bg-white flex items-center justify-center hover:bg-red-50 cursor-pointer p-[3px]">
+                        <button onClick={() => handleDeleteOpen(displayName, id)} className="organization-action-btn rounded-full border border-red-500/50 bg-white flex items-center justify-center hover:bg-red-50 cursor-pointer p-[4px]">
                           <Trash className="text-red-600 organization-action-icon"  size={16}/>
                         </button>
                       </div>

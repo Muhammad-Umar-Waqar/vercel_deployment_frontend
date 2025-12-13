@@ -314,14 +314,20 @@ import TableSkeleton from "../../components/skeletons/TableSkeleton";
 import { Drawer, IconButton, useMediaQuery } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { useStore } from "../../contexts/storecontexts";
+import SuspendUserDialog from "../../components/Modals/ManagerManagement/SuspendUserDialog";
 
 const UserList = ({ onUserSelect, selectedUser }) => {
   const [userEmail, setUserEmail] = useState("");
   const [userId, setUserId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
+  const [selectedUserForSuspend, setSelectedUserForSuspend] = useState(null);
+  const [suspending, setSuspending] = useState(false);
+
+
 
   const dispatch = useDispatch();
-  const { Managers, ManagerDeleteModalOpen, ManagerEditModalOpen, isLoading, error } =
+  const { Managers, ManagerDeleteModalOpen, ManagerEditModalOpen, isLoading } =
     useSelector((state) => state.Manager);
 
   // Attempt to locate the logged-in user object in the store (common locations).
@@ -335,9 +341,12 @@ const UserList = ({ onUserSelect, selectedUser }) => {
     // If we have a currentUser, choose which fetch to run:
     // - If admin -> fetch all managers (existing behaviour)
     // - If normal user -> fetch users created by this user (use new thunk)
+    if (!currentUser) return;
+
     if (currentUser && currentUser.role === "admin") {
       dispatch(fetchAllManagers());
     }
+
     if (currentUser?.createdBy === "admin" && currentUser?.role === "user") {
       // For non-admin users, fetch only users created by them
       dispatch(fetchUsersByCreator(currentUser._id));
@@ -397,46 +406,58 @@ const UserList = ({ onUserSelect, selectedUser }) => {
     if (isMobile) setDrawerOpen(false);
   };
 
+  const handleConfirmSuspend = async (reason) => {
+  if (!selectedUserForSuspend) return;
+
+  try {
+    setSuspending(true);
+
+    await dispatch(
+      UpdateManagerStatus({
+        id: selectedUserForSuspend._id,
+        isActive: false,
+        suspensionReason: reason,
+      })
+    ).unwrap();
+
+    setSuspendDialogOpen(false);
+    setSelectedUserForSuspend(null);
+
+    if (isMobile) setDrawerOpen(false);
+
+    Swal.fire({
+      icon: "success",
+      title: "Suspended",
+      text: `${selectedUserForSuspend.email || selectedUserForSuspend.name} is suspended.`,
+    });
+
+    if (currentUser?.role === "admin") dispatch(fetchAllManagers());
+    else dispatch(fetchUsersByCreator(currentUser._id));
+  } catch (err) {
+    Swal.fire({
+      icon: "error",
+      title: "Failed",
+      text: err || "Could not suspend user",
+    });
+  } finally {
+    setSuspending(false);
+  }
+};
+
+
   const handleToggleStatus = async (user) => {
     if (!user || !user._id) return;
 
     if (user.isActive) {
-      const { value: formValues, isConfirmed } = await Swal.fire({
-        title: `Suspend ${user.email || user.name}?`,
-        html:
-          '<textarea id="swal-suspension-reason" class="swal2-textarea" placeholder="Enter suspension reason"></textarea>',
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Suspend",
-        cancelButtonText: "Cancel",
-        preConfirm: () => {
-          const reason = document.getElementById("swal-suspension-reason")?.value?.trim();
-          if (!reason) {
-            Swal.showValidationMessage("Suspension reason is required");
-            return false;
-          }
-          return { suspensionReason: reason };
-        },
-        allowOutsideClick: () => !Swal.isLoading(),
-      });
+          setSelectedUserForSuspend(user);
+        setSuspendDialogOpen(true);
+        return;
+      
+    }
 
-      if (!isConfirmed) return;
 
-      const suspensionReason = formValues.suspensionReason;
-
-      try {
-        Swal.fire({ title: "Suspending...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-        await dispatch(UpdateManagerStatus({ id: user._id, isActive: false, suspensionReason })).unwrap();
-        if (isMobile) setDrawerOpen(false);
-        Swal.fire({ icon: "success", title: "Suspended", text: `${user.email || user.name} is suspended.` });
-        // refresh list
-        if (currentUser && currentUser.role === "admin") dispatch(fetchAllManagers());
-        else if (currentUser && currentUser._id) dispatch(fetchUsersByCreator(currentUser._id));
-      } catch (err) {
-        console.error("UpdateManagerStatus error:", err);
-        Swal.fire({ icon: "error", title: "Failed", text: err || "Could not suspend user" });
-      }
-    } else {
+    
+    else {
       const result = await Swal.fire({
         title: `Activate ${user.email || user.name}?`,
         text: "This will restore the user's active status.",
@@ -460,6 +481,10 @@ const UserList = ({ onUserSelect, selectedUser }) => {
       }
     }
   };
+
+  
+  // use the Managers array provided by the slice
+  const displayUsers = Managers && Managers.length > 0 ? Managers : [];
 
   const renderListMarkup = () => (
     <div className="ListPage user-list-container  bg-white rounded-xl shadow-sm w-full h-full border border-[#E5E7EB]">
@@ -503,7 +528,7 @@ const UserList = ({ onUserSelect, selectedUser }) => {
       ) : displayUsers.length === 0 ? (
         <div className="p-6 text-center text-gray-600">No users found.</div>
       ) : (
-        <div className="user-table-scroll h-[60vh] overflow-y-auto pr-1">
+        <div className="user-table-scroll h-[77vh] sm:h-[60vh] overflow-y-auto md:pr-1">
           <table className="w-full table-auto text-left">
             <thead>
               <tr className="bg-gray-100">
@@ -524,18 +549,18 @@ const UserList = ({ onUserSelect, selectedUser }) => {
                   onClick={(e) => handleRowClick(u, e)}
                 >
                   <td className="user-table-cell py-2 sm:py-3 px-2 sm:px-4">
-                    <div className="font-medium">{u.name || u.email}</div>
+                    <div className="md:font-medium text-xs xs:text-xs sm:text-sm md:text-md  ">{u.name || u.email}</div>
                   </td>
 
           {
             currentUser?.role === "admin" && (
-              <td className="user-table-cell py-2 sm:py-3 px-2 sm:px-4 text-left">
+              <td className="user-table-cell py-2 sm:py-3 px-2 sm:px-4 text-center">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleToggleStatus(u);
                                 }}
-                                className={`inline-block px-3 py-1 rounded text-xs font-semibold focus:outline-none ${
+                                className={`inline-block px-1.5 md:px-3 py-1 rounded text-xs font-semibold focus:outline-none ${
                                   u.isActive
                                     ? "bg-green-100 text-green-800 border border-green-300"
                                     : "bg-red-100 text-red-800 border border-red-300"
@@ -568,8 +593,6 @@ const UserList = ({ onUserSelect, selectedUser }) => {
     </div>
   );
 
-  // use the Managers array provided by the slice
-  const displayUsers = Managers && Managers.length > 0 ? Managers : [];
 
   return (
     <>
@@ -595,6 +618,17 @@ const UserList = ({ onUserSelect, selectedUser }) => {
 
       {ManagerDeleteModalOpen && <UserDeleteModal userEmail={userEmail} handleClose={handleDeleteClose} handleDelete={handleDelete} />}
       {ManagerEditModalOpen && <UserEditModal handleClose={handleEditClose} id={userId} />}
+      <SuspendUserDialog
+      open={suspendDialogOpen}
+      user={selectedUserForSuspend}
+      loading={suspending}
+      onClose={() => {
+        setSuspendDialogOpen(false);
+        setSelectedUserForSuspend(null);
+      }}
+      onConfirm={handleConfirmSuspend}
+    />
+
     </>
   );
 };

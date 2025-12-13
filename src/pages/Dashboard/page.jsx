@@ -1914,6 +1914,7 @@ export default function Dashboard() {
   const [orgNameForTop, setOrgNameForTop] = useState();
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width:768px)");
+  const isDesktopForIcon = useMediaQuery("(min-width:760px)");
   // add near the top of the component:
   const autoSelectedForVenueRef = React.useRef({}); // keys: venueId -> true
   // const [freezerDevicesLoading, setFreezerDevicesLoading] = useState(false);
@@ -2315,7 +2316,12 @@ useEffect(() => {
           <>
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-              <div className="w-[11rem] sm:w-[25rem] md:w-[13rem] lg:w-[20rem] xl:w-[25rem]">
+              {
+                !isDesktopForIcon &&  <img src="/logo-half.png" alt="IOTFIY LOGO" className="w-auto h-[40px]" />
+              }
+              
+
+              <div className=" sm:w-[25rem] md:w-[13rem] lg:w-[20rem] xl:w-[25rem]">
                 {/* <p className="text-sm text-[#64748B] min-w-[250px] font-medium">Organization</p> */}
                 {user?.role === "admin" ? (
                   <OrganizationSelect
@@ -2334,10 +2340,11 @@ useEffect(() => {
                   organizationId={selectedOrgId || user?.organization}
                   value={selectedVenueId}
                   onChange={onVenueChange}
-                  className="mt-1"
+                  className=""
                   excludeFirstN={user?.role === "user" ? 3 : 0}
                 />
               </div>
+              
             </div>
 
             {/* Freezer Device Cards Grid */}
@@ -2380,12 +2387,11 @@ useEffect(() => {
 <div className="flex-1 min-h-0">
   <div className="freezer-cards-container custom-scrollbar">
     {(isInitialDevicesLoad || isContextChanging) ? (
-      Array.from({ length: 4 }).map((_, index) => (
-
-        <DeviceSkeleton key={index} />
-      
-      )
-      )
+ <div className="freezer-cards-grid freezer-cards-container">
+    {Array.from({ length: 4 }).map((_, index) => (
+      <DeviceSkeleton key={index} />
+    ))}
+  </div>
     ) : freezerDevices.length === 0 ? (
       // No devices state (only shown when not loading)
       <div className="flex flex-col items-center justify-center h-full text-[#64748B]">

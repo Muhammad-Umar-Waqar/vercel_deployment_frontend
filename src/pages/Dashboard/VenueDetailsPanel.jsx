@@ -244,11 +244,11 @@ const formatLastUpdate = (time) => {
             <img src="/odour-alert.svg" alt="Alert" className="w-6 h-6 " />
             <span className="text-[#1E293B] text-xs ">{odourAlert? "Alert Det.": "Not Det."}</span>
         </div>
-        <div className={`icon-number-align border border-1 rounded-sm py-0.5 ${temperatureAlert ? "border-red-500": "border-gray-400"}`}>
+        <div className={`icon-number-align border border-1 rounded-sm py-0.5 ${temperatureAlert ? "border-green-500": "border-gray-400"}`}>
             <img src="/temperature-icon.svg" alt="Alert" className="w-6 h-6 " />
             <span className="text-[#1E293B] text-xs ">{temperatureAlert? "Alert Det.": "Not Det."}</span>
         </div>
-        <div className={`icon-number-align border border-1 rounded-sm py-0.5  ${humidityAlert ? "border-red-500": "border-gray-400"}`}>
+        <div className={`icon-number-align border border-1 rounded-sm py-0.5  ${humidityAlert ? "border-green-500": "border-gray-400"}`}>
             <img src="/humidity-alert.svg" alt="Alert" className="w-6 h-6 " />
             <span className="text-[#1E293B] text-xs ">{humidityAlert? "Alert Det.": "Not Det."}</span>
         </div>

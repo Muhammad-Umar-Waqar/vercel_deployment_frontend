@@ -429,7 +429,7 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
         </table>
 
 
-        <div className="venue-table-scroll overflow-y-auto pr-1 h-[58vh]">
+        <div className="venue-table-scroll overflow-y-auto pr-1  h-[65vh] sm:h-[58vh]">
           {loading ? (
             <table className="w-full table-auto text-left">
               <tbody aria-busy={loading} role="status">
@@ -458,10 +458,10 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
                       </td>
                       <td className="venue-table-cell py-2 sm:py-3 px-2 sm:px-4">
                         <div className="flex justify-center gap-2 sm:gap-3" onClick={(e) => e.stopPropagation()}>
-                          <button onClick={() => handleEditOpen(id, displayName)} className=" cursor-pointer venue-action-btn rounded-full border border-green-500/50 bg-white flex items-center justify-center hover:bg-green-50 p-[3px]">
+                          <button onClick={() => handleEditOpen(id, displayName)} className=" cursor-pointer venue-action-btn rounded-full border border-green-500/50 bg-white flex items-center justify-center hover:bg-green-50 p-[4px]">
                             <Pencil className="text-green-600 venue-action-icon " size={16} />
                           </button>
-                          <button onClick={() => handleDelete(id, displayName)} className=" cursor-pointer venue-action-btn rounded-full border border-red-500/50 bg-white flex items-center justify-center hover:bg-red-50 p-[3px]">
+                          <button onClick={() => handleDelete(id, displayName)} className=" cursor-pointer venue-action-btn rounded-full border border-red-500/50 bg-white flex items-center justify-center hover:bg-red-50 p-[4px]">
                             <Trash className="text-red-600 venue-action-icon " size={16} />
                           </button>
                         </div>

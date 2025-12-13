@@ -1,29 +1,49 @@
+import Skeleton from "@mui/material/Skeleton";
+
 export default function DeviceSkeleton() {
   return (
-     <div className="freezer-cards-grid freezer-cards-container">
-    <div className="freezer-card-container">
-      <div className="freezer-card-content animate-pulse">
+    <div className="freezer-card-container freezer-card-skeleton">
+      <div className="freezer-card-content">
+        
         {/* Top section */}
-        <div>
-          <div className="h-3 w-24 bg-gray-300 rounded mb-2"></div>
-          <div className="h-6 w-32 bg-gray-300 rounded"></div>
+        <div className="flex items-center justify-between">
+            <div>
+          <Skeleton variant="text" width={96} height={14} />
+          <Skeleton variant="text" width={128} height={24} />
+          </div>
+
+        
+          <Skeleton variant="text" width={90} height={34} sx={{ borderRadius: "5px" }} />
+        
+
         </div>
 
         {/* Middle */}
-        <div className="flex items-center">
-          <div className="h-10 w-10 bg-gray-300 rounded mr-3"></div>
+        <div className="flex items-center justify-between ">
+            <div className="flex items-center">  
+          <Skeleton variant="circular" width={40} height={40} className="mr-3" />
           <div>
-            <div className="h-3 w-20 bg-gray-300 rounded mb-2"></div>
-            <div className="h-8 w-16 bg-gray-300 rounded"></div>
+            <Skeleton variant="text" width={65} height={14} />
+            <Skeleton variant="text" width={50} height={28} />
           </div>
+            </div>
+
+            <div className="flex items-center">  
+          <Skeleton variant="circular" width={40} height={40} className="mr-3" />
+          <div>
+            <Skeleton variant="text" width={65} height={14} />
+            <Skeleton variant="text" width={50} height={28} />
+          </div>
+            </div>
         </div>
 
         {/* Bottom */}
-        <div className="flex justify-end">
-          <div className="h-4 w-20 bg-gray-300 rounded"></div>
-        </div>
+        {/* <div className="flex justify-between">
+          <Skeleton variant="text" width={80} height={16} />
+          <Skeleton variant="text" width={80} height={16} />
+        </div> */}
+
       </div>
-    </div>
     </div>
   );
 }

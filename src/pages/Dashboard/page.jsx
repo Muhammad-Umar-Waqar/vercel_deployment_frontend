@@ -2139,7 +2139,64 @@ useEffect(() => {
           ? data.devices
           : (data.devices ? [data.devices] : []);
 
-        setFreezerDevices(devices || []);
+        // setFreezerDevices(devices || []);
+
+
+        setFreezerDevices((prevDevices) => {
+  const prevMap = new Map(
+    prevDevices.map(d => [
+      String(d._id ?? d.id ?? d.deviceId),
+      d
+    ])
+  );
+
+  return devices.map((newDevice) => {
+    const id = String(newDevice._id ?? newDevice.id ?? newDevice.deviceId);
+    const oldDevice = prevMap.get(id);
+
+    // New device → add
+    if (!oldDevice) return newDevice;
+
+    // Merge only changed fields
+    return {
+      ...oldDevice,
+
+      ambientTemperature:
+        newDevice.ambientTemperature ?? oldDevice.ambientTemperature,
+
+      freezerTemperature:
+        newDevice.freezerTemperature ?? oldDevice.freezerTemperature,
+
+      espHumidity:
+        newDevice.espHumidity ?? oldDevice.espHumidity,
+
+      espTemprature:
+        newDevice.espTemprature ?? oldDevice.espTemprature,
+
+      espOdour:
+        newDevice.espOdour ?? oldDevice.espOdour,
+
+      temperatureAlert:
+        newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
+
+      humidityAlert:
+        newDevice.humidityAlert ?? oldDevice.humidityAlert,
+
+      odourAlert:
+        newDevice.odourAlert ?? oldDevice.odourAlert,
+
+      batteryLow:
+        newDevice.batteryLow ?? oldDevice.batteryLow,
+
+      refrigeratorAlert:
+        newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
+
+      lastUpdateTime:
+        newDevice.lastUpdateTime ?? oldDevice.lastUpdateTime,
+    };
+  });
+});
+
 
         // Auto-select first device ONLY ON DESKTOP and only once per venue load
         if (isDesktop && devices && devices.length > 0) {
@@ -2155,11 +2212,10 @@ useEffect(() => {
         }
 
         // If mobile (<768px), ensure no auto-selection
-        if (!isDesktop) {
-          // don't stomp an existing user selection if it belongs to some other venue;
-          // since we're fetching specifically for selectedVenueId, it's safe to clear here per requirement
+       if (!isDesktop && !isPolling) {
           setSelectedFreezerDeviceId(null);
         }
+
       } else {
         // error response
         setFreezerDevices([]);

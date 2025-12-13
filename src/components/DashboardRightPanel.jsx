@@ -17,10 +17,19 @@ export default function DashboardRightPanel({
   closeIcon = false,
 }) {
   // compute selected device once
+  // const selected = useMemo(() => {
+  //   if (!selectedFreezerDeviceId) return null;
+  //   return freezerDevices.find((d) => (d._id ?? d.id) === selectedFreezerDeviceId) ?? null;
+  // }, [freezerDevices, selectedFreezerDeviceId]);
+
   const selected = useMemo(() => {
-    if (!selectedFreezerDeviceId) return null;
-    return freezerDevices.find((d) => (d._id ?? d.id) === selectedFreezerDeviceId) ?? null;
-  }, [freezerDevices, selectedFreezerDeviceId]);
+  if (!selectedFreezerDeviceId) return null;
+
+  return freezerDevices.find(
+    d => String(d._id ?? d.id ?? d.deviceId) === String(selectedFreezerDeviceId)
+  ) ?? null;
+}, [freezerDevices, selectedFreezerDeviceId]);
+
 
   console.log("selected", selected);
 

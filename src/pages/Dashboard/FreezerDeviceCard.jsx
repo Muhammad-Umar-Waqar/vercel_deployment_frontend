@@ -190,6 +190,7 @@ export default function FreezerDeviceCard({
 
   // computed display values (only integer part)
   const displayTemp = toInt(espTemprature);
+  const displayOdourPer = toInt(espOdour); 
   const displayHumidity = toInt(espHumidity);
 
   const handleCardClick = () => {
@@ -276,7 +277,7 @@ export default function FreezerDeviceCard({
             <img src="/odour-alert.svg" alt="odour alert icon" className="h-[35px] w-[35px] xl:h-[40px] xl:w-[40px]" />
            <div>
             <p className="text-sm md:text-md 2xl:text-lg ">
-              {odourAlert ? "Detected" : "Normal"} <span className="text-sm md:text-md 2xl:text-lg">{espOdour || 0}%</span>
+              {odourAlert ? "Detected" : "Normal"} <span className="text-sm md:text-md 2xl:text-lg">{displayOdourPer || 0}%</span>
             </p>
             {/* <p className="ml-2 text-sm md:text-md text-lg xl:text-xl"></p> */}
            </div>

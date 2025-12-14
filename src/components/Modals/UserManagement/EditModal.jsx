@@ -537,10 +537,10 @@ const handleTimerChange = (e) => {
 
       closeModal();
 
-      if (user && (String(user._id) === String(updated._id) || user.email === formData.current_email)) {
-        navigate("/logout");
-        return;
-      }
+      // if (user && (String(user._id) === String(updated._id) || user.email === formData.current_email)) {
+      //   navigate("/logout");
+      //   return;
+      // }
     } catch (err) {
       Swal.fire({
         icon: "error",

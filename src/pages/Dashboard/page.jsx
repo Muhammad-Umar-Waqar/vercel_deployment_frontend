@@ -1983,19 +1983,7 @@ const [isContextChanging, setIsContextChanging] = useState(false);
 
 
 
-
-    // inside Dashboard component
 const dispatch = useDispatch();
-// const { Organizations } = useSelector((s) => s.Organization || { Organizations: [] });
-
-// console.log("Organizations", Organizations)
-// useEffect(() => {
-//   if (user?.role !== "admin" && user?._id) {
-//     const res = dispatch(fetchOrganizationByUserID(user._id));
-//     console.log("OrganizationS:", res)
-//   }
-// }, [dispatch, user]);
-
 
 
 // -------------------------
@@ -2038,41 +2026,6 @@ useEffect(() => {
 }, [dispatch, user]);
 
 
-  // -------------------------
-  // EFFECT #2: keep selectedVenueId synced with URL ?venue=
-  // -------------------------
-  // useEffect(() => {
-  //   const sp = new URLSearchParams(location.search)
-  //   const venueFromUrl = sp.get("venue") || ""
-  //   if (venueFromUrl !== selectedVenueId) {
-  //   setHasFetchedForVenue(false);
-  //   setFreezerDevicesLoading(true);
-  //   setSelectedVenueId(venueFromUrl);
-  //   }
-  //   // no dependencies other than location.search so this always runs when URL changes
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [location.search])
-
-//   useEffect(() => {
-//   const sp = new URLSearchParams(location.search)
-//   const venueFromUrl = sp.get("venue") || ""
-
-//   // if venueFromUrl unchanged, nothing to do
-//   if (venueFromUrl === selectedVenueId) return
-
-//   if (!venueFromUrl) {
-//     // No venue in URL — make sure we stop any device-loading UI
-//     // setHasFetchedForVenue(true)
-//     // setFreezerDevicesLoading(false)
-//     setSelectedVenueId("")
-//   } else {
-//     // There *is* a venue in URL — start fetch flow
-//     // setHasFetchedForVenue(false)
-//     // setFreezerDevicesLoading(true)
-//     setSelectedVenueId(venueFromUrl)
-//   }
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-// }, [location.search])
 
 useEffect(() => {
   const sp = new URLSearchParams(location.search)
@@ -2091,12 +2044,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-// if (!selectedVenueId) {
-//   setFreezerDevices([]);
-//   setSelectedFreezerDeviceId(null);
-//   autoSelectedForVenueRef.current = {};
-//   return;
-// }
+
 
  if (!selectedVenueId) {
    setFreezerDevices([]);
@@ -2270,34 +2218,6 @@ useEffect(() => {
   if (!isDesktop) setOpen(true) 
   }
 
-  // const handleBackToDashboard = () => {
-  //   // setShowDetailPage(false)
-  //   setSelectedDevice(null)
-  // }
-
-  // Admin: when org changes, reset venue selection (keeps URL clean)
-  // const onOrganizationChange = (id) => {
-  
-  //    const orgId = id || user?.organization;
-    
-  // // If org hasn't changed, don't clear the venue or modify URL
-  // if (orgId && String(orgId) === String(selectedOrgId)) {
-  //   return;
-  // }
-
-  // // Show loading and mark venue-fetch as not-done for the new org
-  // // setHasFetchedForVenue(false);
-  // // setFreezerDevicesLoading(true);
-  
-  //   setSelectedOrgId(id || user?.organization)
-  //   setSelectedVenueId("")
-  //   // remove ?venue from URL
-  //   const sp = new URLSearchParams(location.search)
-  //   if (sp.get("venue")) {
-  //     sp.delete("venue")
-  //     navigate(location.pathname + (sp.toString() ? `?${sp.toString()}` : ""), { replace: true })
-  //   }
-  // }
 
 
   const onOrganizationChange = (id) => {
@@ -2322,16 +2242,6 @@ useEffect(() => {
       navigate(location.pathname + (sp.toString() ? `?${sp.toString()}` : ""), { replace: true })
     }
   }
-
-  // // Update URL when VenueSelect is used (or you can dispatch to redux)
-  // const onVenueChange = (id) => {
-  //   // setHasFetchedForVenue(false);
-  //   // setFreezerDevicesLoading(true);
-  //   setSelectedVenueId(id)
-  //   const basePath = location.pathname.split("?")[0]
-  //   if (id) navigate(`${basePath}?venue=${id}`, { replace: false })
-  //   else navigate(basePath, { replace: false })
-  // }
 
   const onVenueChange = (id) => {
   setIsContextChanging(true);   // 🔥 ADD THIS
@@ -2399,44 +2309,9 @@ useEffect(() => {
                   className=""
                   excludeFirstN={user?.role === "user" ? 3 : 0}
                 />
-              </div>
-              
+              </div>            
             </div>
 
-            {/* Freezer Device Cards Grid */}
-            {/* <div className="flex-1 min-h-0">
-              <div className="freezer-cards-container custom-scrollbar">
-                {freezerDevices.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-[#64748B]">
-                    <svg className="w-16 h-16 mb-4 text-[#E2E8F0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <p className="text-lg font-medium">No Freezer Devices Found</p>
-                    <p className="text-sm">Add some freezer devices to get started</p>
-                  </div>
-                ) : (
-                  <div className="freezer-cards-grid freezer-cards-container">
-                    {freezerDevices.map((device) => (
-                      <FreezerDeviceCard
-                        key={device._id ?? device.id}
-                        deviceId={device.deviceId}
-                        ambientTemperature={device?.AmbientData?.temperature ?? device.ambientTemperature}
-                        freezerTemperature={device?.FreezerData?.temperature ?? device.freezerTemperature}
-                        batteryLow={device?.batteryAlert ?? device?.batteryLow ?? false}
-                        refrigeratorAlert={device?.refrigeratorAlert ?? false}
-                        onCardSelect={() => handleFreezerDeviceSelect(device._id ?? device.id)}
-                        isSelected={(device._id ?? device.id) === selectedFreezerDeviceId}
-                        espHumidity ={device?.espHumidity}
-                        espTemprature = {device?.espTemprature}
-                        humidityAlert = {device?.humidityAlert}
-                        odourAlert={device?.odourAlert} 
-                        temperatureAlert={device?.temperatureAlert}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div> */}
 
 
 {/* Freezer Device Cards area */}
@@ -2489,38 +2364,6 @@ useEffect(() => {
         {/* )} */}
 
       </div>
-
-      {/* Right Sidebar - Venue Details Panel */}
-      {/* <div className="dashboard-right-panel shadow-sm flex flex-col h-full overflow-y-auto custom-scrollbar p-4 lg:p-6 border-l border-[#E5E7EB]/40 bg-white flex-shrink-0">
-        {selectedFreezerDeviceId ? (
-          (() => {
-            const selected = freezerDevices.find((d) => (d._id ?? d.id) === selectedFreezerDeviceId)
-            return (
-              <VenueDetailsPanel
-                venueName={ "Venue"}
-                freezerTemperature={selected?.AmbientData?.temperature ?? 0}
-                ambientTemperature={selected?.FreezerData?.temperature ?? 0}
-                batteryLow={selected?.batteryLow ?? selected?.batteryAlert ?? false}
-                needMaintenance={selected?.batteryLow ?? false}
-                apiKey={selected?.apiKey}
-                chartData={[]}
-                organizationId={selectedOrgId}
-              />
-            )
-          })()
-        ) : (
-          <VenueDetailsPanel
-            venueName={"Venue"}
-            freezerTemperature={0}
-            ambientTemperature={0}
-            batteryLow={true}
-            needMaintenance={true}
-            apiKey="8dbf5d2a37c4178b4b03e6c49ae3f9e7"
-            chartData={[]}
-            organizationId={selectedOrgId}
-          />
-        )}
-      </div> */}
 
 {isDesktop ? (
         <DashboardRightPanel

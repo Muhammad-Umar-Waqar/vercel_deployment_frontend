@@ -439,7 +439,7 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
           ) : error ? (
             <div className="text-center  py-4 text-gray-500">{(error === "Failed to fetch") && <>No Venues Found</>}</div>
           ) : Venues.length === 0 ? (
-            <div className="text-center py-4">No venues found. Add one to get started.</div>
+            <div className="text-center py-4 text-gray-500">No venues found. Add one to get started.</div>
           ) : (
             <table className="w-full table-auto text-left ">
               <tbody>

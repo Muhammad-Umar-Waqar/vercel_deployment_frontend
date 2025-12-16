@@ -1180,8 +1180,8 @@ const validateTimer = (timer) => {
   // if creator is present and has an organization, preselect it and fetch its venues
   useEffect(() => {
     if (!creator) return;
-
-    if (creator.organization) {
+    
+    if (creator?.role == "user" && creator.organization) {
       setFormData((p) => ({ ...p, organization: creator.organization }));
       dispatch(fetchVenuesByOrganization(creator.organization));
     }
@@ -1323,6 +1323,7 @@ const validateTimer = (timer) => {
         });
 
         dispatchUsers(creator?._id);
+
       } else {
         Swal.fire({
           icon: "error",
@@ -1388,60 +1389,7 @@ const validateTimer = (timer) => {
             </>
           )}
 
-          {/* <div className="relative">
-            <img
-              src="/OrganizationChecklist.svg"
-              alt="org icon"
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-30 h-[25px] w-[25px] pointer-events-none"
-            />
-
-            <FormControl fullWidth>
-              <Select
-                displayEmpty
-                value={formData.organization}
-                onChange={onchange}
-                inputProps={{ name: "organization" }}
-                MenuProps={menuProps}
-                renderValue={(selected) => {
-                  if (!selected) return <span className="text-gray-500">Select Organization</span>;
-                  const org = Organizations.find((o) => (o._id ?? o.id) === selected);
-                  return org?.name ?? selected;
-                }}
-                sx={{
-                  pl: "1.5rem",
-                  height: SELECT_HEIGHT,
-                  backgroundColor: "white",
-                  borderRadius: "0.375rem",
-                }}
-                disabled={!!creator?.organization && creator?.role === "user"}
-              >
-                {(Organizations || []).length === 0 ? (
-                  <MenuItem disabled sx={{ height: ITEM_HEIGHT }}>
-                    No organizations found
-                  </MenuItem>
-                ) : (
-                  Organizations.map((org) => {
-                    const id = org._id ?? org.id;
-                    return (
-                      <MenuItem
-                        key={id}
-                        value={id}
-                        sx={{
-                          height: ITEM_HEIGHT,
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        {org.name}
-                      </MenuItem>
-                    );
-                  })
-                )}
-              </Select>
-            </FormControl>
-          </div> */}
-
-
+  
           {/* Organization select only for admins */}
 {creator?.role === "admin" && (
   <div className="relative">

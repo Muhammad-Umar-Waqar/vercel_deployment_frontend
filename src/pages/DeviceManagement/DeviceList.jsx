@@ -2088,11 +2088,11 @@ const DeviceList = ({ onDeviceSelect, selectedDevice }) => {
   useEffect(() => {
     if (error) {
       console.error("Device error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: String(error),
-      });
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Error",
+    //     text: String(error),
+    //   });
     }
   }, [error]);
 

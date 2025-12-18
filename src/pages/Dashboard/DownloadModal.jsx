@@ -99,21 +99,22 @@ console.log({
       return;
     }
 
-    // If singleDay, set end to end of the same day (23:59:59.999)
-    const start = new Date(startDate);
-    let end;
+   const start = new Date(startDate);
+let end;
 
-    if (singleDay) {
-      end = new Date(start);
-      end.setHours(23, 59, 59, 999);
-    } else {
-      if (!endDate) {
-        setError("Please select an end date or toggle Single Day.");
-        return;
-      }
-      end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
-    }
+if (!singleDay) {
+  if (!endDate) {
+    setError("Please select an end date or toggle Single Day.");
+    return;
+  }
+  end = new Date(endDate);
+} else {
+  end = new Date(start);
+}
+
+// Always set end to end of the day
+end.setHours(23, 59, 59, 999);
+
 
     // convert to ISO strings for flux (RFC3339)
     const startISO = start.toISOString();

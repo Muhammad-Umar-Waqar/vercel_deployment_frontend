@@ -1,7 +1,7 @@
 import AlertsChart from "./AlertsChart";
 import { useDispatch, useSelector } from "react-redux";
 import { useStore } from "../../contexts/storecontexts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import QRCode from "./QrCode";
 import { useLocation } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
@@ -9,6 +9,7 @@ import { IconButton, Skeleton } from "@mui/material";
 import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
 import { Download } from "lucide-react";
 import Swal from "sweetalert2";
+import DownloadModal from "./DownloadModal";
 
 export default function VenueDetailsPanel({
   organizationId = null,
@@ -36,6 +37,7 @@ export default function VenueDetailsPanel({
 const location = useLocation();
 const params = new URLSearchParams(location.search);
 const venueId = params.get("venue"); // gives the ID
+const [downloadOpen, setDownloadOpen] = useState(false);
 
 // const venuesFromSlice = useSelector((state) => state.Venue.Venues || []);
 
@@ -74,16 +76,21 @@ const venueId = params.get("venue"); // gives the ID
 
   const venues = orgAlerts?.venues || [];
  
-  const handleDownload = () => {
-    Swal.fire({
-        icon: "info", // or "warning"
-        title: "Coming Soon!",
-        text: "This feature is not available yet. Stay tuned!",
-        confirmButtonText: "OK"
-      });
-  };
+  // const handleDownload = () => {
+  //   Swal.fire({
+  //       icon: "info", // or "warning"
+  //       title: "Coming Soon!",
+  //       text: "This feature is not available yet. Stay tuned!",
+  //       confirmButtonText: "OK"
+  //     });
+  // };
 
-  const sameId = (a, b) => String(a) === String(b);
+
+const handleDownload = () => {
+  setDownloadOpen(true);
+};
+
+const sameId = (a, b) => String(a) === String(b);
 
    const toInt = (v) => {
     const n = Number(v);
@@ -168,23 +175,7 @@ const formatLastUpdate = (time) => {
         </button>
       </div>
 
-      {/* B. Refrigerator Image */}
-      {/* <div className="relative w-full overflow-hidden mb-4">
-        <img
-          src="/ambient_freezer.svg"
-          alt="Refrigerator"
-          className="w-full h-auto object-cover"
-        />
-        <div className="flex flex-col items-center justify-center absolute top-[30%] left-[8%] ">
-      <h1 className="font-bold text-white text-lg">Freezer</h1>
-      <h1 className="font-bold text-white text-lg">{freezerTemperature}<span className="font-thin text-white">°C</span></h1>
-        </div>
-        <div className="flex flex-col items-center justify-center absolute top-[30%] right-[15%]">
-      <h1 className="font-bold text-[#07518D] text-lg">Ambient</h1>
-      <h1 className="font-bold text-[#07518D]  text-lg">{ambientTemperature}<span className="text-lg font-thin">°C</span></h1>
-        </div>
-      </div> */}
-
+    
       {/* C. Temperature Section */}
       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl">
         <div className="flex flex-col-3 justify-around items-center py-1 ">
@@ -315,6 +306,13 @@ const formatLastUpdate = (time) => {
 }
 
       </div>
+      <DownloadModal
+        open={downloadOpen}
+        onClose={() => setDownloadOpen(false)}
+        measurement={deviceId}
+        bucket="Odour"
+      />
+
     </div>
   );
 }

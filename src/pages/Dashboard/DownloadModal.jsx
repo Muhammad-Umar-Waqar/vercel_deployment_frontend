@@ -112,6 +112,7 @@ console.log({
         return;
       }
       end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
     }
 
     // convert to ISO strings for flux (RFC3339)
@@ -193,7 +194,7 @@ console.log({
             />
             <FormControlLabel
               control={<Checkbox checked={singleDay} onChange={(e) => setSingleDay(e.target.checked)} />}
-              label="Single day (end = end of day)"
+              label="Single day"
             />
             <Box flexGrow={1} py={4} />
             <Button variant="contained" onClick={handleFetch} disabled={loading}>

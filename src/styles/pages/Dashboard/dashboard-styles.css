@@ -221,8 +221,8 @@
 
 @media (min-width: 2224px) {
   .dashboard-right-panel {
-    width: 450px !important;
-    min-width: 450px !important;
+    width: 500px !important;
+    min-width: 500px !important;
     max-width: 560px !important;
     display: flex !important;
     height: 100% !important;

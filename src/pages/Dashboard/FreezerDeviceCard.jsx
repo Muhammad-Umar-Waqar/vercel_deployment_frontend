@@ -471,7 +471,7 @@ export default function FreezerDeviceCard({
                   <div className="freezer-temp-info">
                     <span className={`freezer-label  ${textClass}`}>Humidity</span>
                     <span className={`responsive-value ${textClass}  font-bold sm:semi-bold 2xl:font-bold`}>
-                      9{displayHumidity !== null ? `${displayHumidity}%` : "--"}
+                      {displayHumidity !== null ? `${displayHumidity}%` : "--"}
                     </span>
                   </div>
                 </div>
@@ -482,7 +482,7 @@ export default function FreezerDeviceCard({
                   <div className="freezer-temp-info">
                     <span className={`freezer-label ${textClass} `}>Temperature</span>
                     <span className={`responsive-value ${textClass} font-bold sm:semi-bold  2xl:font-bold  `}>
-                      9{displayTemp !== null ? `${displayTemp}°C` : "--"}
+                      {displayTemp !== null ? `${displayTemp}°C` : "--"}
                     </span>
                   </div>
                 </div>

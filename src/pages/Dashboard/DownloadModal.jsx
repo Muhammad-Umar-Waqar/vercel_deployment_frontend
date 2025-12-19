@@ -437,7 +437,7 @@ end.setHours(23, 59, 59, 999);
 
   return (
     <Dialog open={!!open} onClose={handleClose} maxWidth="lg" fullWidth>
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between py-2">
       <DialogTitle sx={{ fontWeight: "bold",  color: "grey.900" }}>Export data</DialogTitle>
       <img src="/logo-half.png" alt="IOTFIY Logo" className="h-[3rem] md:h-[4rem] w-[5rem] md:w-[6rem] pr-5" />
       </div>

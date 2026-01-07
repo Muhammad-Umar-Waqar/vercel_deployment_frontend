@@ -224,24 +224,59 @@ const formatLastUpdate = (time) => {
         /> */}
       </div>
 
-        <div className="icon-number-align">
+        <div className="flex items-center  justify-center sm:justify-start  gap-4 ">
             <img src="/alert-icon.png" alt="Alert" className="w-4 h-4 mr-1" />
             <span className="text-[#0D5CA4] text-sm font-medium underline  decoration-[#0D5CA4] decoration-[0.5px] ">Alerts Status</span>
         </div>
       
-      <div className="grid grid-cols-3 gap-1 ">
-      
-        <div className={`icon-number-align border border-1 rounded-sm py-0.5 ${odourAlert ? "border-red-500": "border-gray-400"}`}>
+     
+
+      {/* <div className="grid grid-cols-3 gap-1 "> */}
+      <div className="grid md:grid-cols-3 gap-1">
+        <div className={`flex items-center  justify-center md:justify-start  gap-4 border border-1 rounded-sm py-0.5 ${odourAlert ? "border-red-500": "border-gray-400"}`}>
             <img src="/odour-alert.svg" alt="Alert" className="w-6 h-6 " />
-            <span className="text-[#1E293B] text-xs ">{odourAlert? "Alert Det.": "Not Det."}</span>
+            <span className="text-[#1E293B] text-sm sm:text-xs ">   {odourAlert ? (
+        <>
+          <span className="md:hidden">Alert Detected</span>
+          <span className="hidden md:inline">Alert Det.</span>
+        </>
+      ) : (
+              <>
+          <span className="md:hidden">Not Detected</span>
+          <span className="hidden md:inline">Not Det.</span>
+        </>
+      )}</span>
         </div>
-        <div className={`icon-number-align border border-1 rounded-sm py-0.5 ${temperatureAlert ? "border-green-500": "border-gray-400"}`}>
+        <div className={`flex items-center justify-center md:justify-start   gap-4 border border-1 rounded-sm py-0.5 ${temperatureAlert ? "border-green-500": "border-gray-400"}`}>
             <img src="/temperature-icon.svg" alt="Alert" className="w-6 h-6 " />
-            <span className="text-[#1E293B] text-xs ">{temperatureAlert? "Alert Det.": "Not Det."}</span>
+            <span className="text-[#1E293B] text-sm sm:text-xs ">  {temperatureAlert ? (
+        <>
+          <span className="md:hidden">Alert Detected</span>
+          <span className="hidden md:inline">Alert Det.</span>
+        </>
+      ) : (
+               <>
+          <span className="md:hidden">Not Detected</span>
+          <span className="hidden md:inline">Not Det.</span>
+        </>
+      
+      )}</span>
         </div>
-        <div className={`icon-number-align border border-1 rounded-sm py-0.5  ${humidityAlert ? "border-green-500": "border-gray-400"}`}>
+        <div className={`flex items-center  justify-center md:justify-start  gap-4 border border-1 rounded-sm py-0.5  ${humidityAlert ? "border-green-500": "border-gray-400"}`}>
             <img src="/humidity-alert.svg" alt="Alert" className="w-6 h-6 " />
-            <span className="text-[#1E293B] text-xs ">{humidityAlert? "Alert Det.": "Not Det."}</span>
+            <span className="text-[#1E293B] text-sm sm:text-xs ">
+              {humidityAlert ? (
+        <>
+          <span className="md:hidden">Alert Detected</span>
+          <span className="hidden md:inline">Alert Det.</span>
+        </>
+      ) : (
+               <>
+          <span className="md:hidden">Not Detected</span>
+          <span className="hidden md:inline">Not Det.</span>
+        </>
+      )}
+            </span>
         </div>
       </div>
         

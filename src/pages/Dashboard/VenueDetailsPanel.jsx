@@ -224,9 +224,10 @@ const formatLastUpdate = (time) => {
         /> */}
       </div>
 
-        <div className="flex items-center  justify-center sm:justify-start  gap-4 ">
-            <img src="/alert-icon.png" alt="Alert" className="w-4 h-4 mr-1" />
-            <span className="text-[#0D5CA4] text-sm font-medium underline  decoration-[#0D5CA4] decoration-[0.5px] ">Alerts Status</span>
+        <div className="flex items-end  justify-center sm:justify-start   ">
+            <img src="/yellow-alert.svg" alt="Alert" className="w-auto h-[1.5rem]" />
+        <span className=" font-bold text-xs text-black block sm:hidden">Status</span>
+            {/* <span className="text-[#0D5CA4] text-sm font-medium underline  decoration-[#0D5CA4] decoration-[0.5px] ">Alerts Status</span> */}
         </div>
       
      
@@ -235,7 +236,7 @@ const formatLastUpdate = (time) => {
       <div className="grid md:grid-cols-3 gap-1">
         <div className={`flex items-center  justify-center md:justify-start  gap-4 border border-1 rounded-sm py-0.5 ${odourAlert ? "border-red-500": "border-gray-400"}`}>
             <img src="/odour-alert.svg" alt="Alert" className="w-6 h-6 " />
-            <span className="text-[#1E293B] text-sm sm:text-xs ">   {odourAlert ? (
+            <span className="text-[#1E293B] text-sm sm:text-xs ">{odourAlert ? (
         <>
           <span className="md:hidden">Alert Detected</span>
           <span className="hidden md:inline">Alert Det.</span>

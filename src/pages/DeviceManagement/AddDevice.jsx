@@ -676,7 +676,7 @@ const AddDevice = () => {
                   </select>
                 </div>
 
-                <div className="relative flex-[1]">
+                <div className="relative flex-[0.6] sm:flex-[1]">
                   <input
                     type="number"
                     placeholder={cond.type === "temperature" ? "25" : "50"}

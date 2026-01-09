@@ -418,7 +418,7 @@ useEffect(() => {
               }
               
 
-              <div className=" sm:w-[25rem] md:w-[13rem] lg:w-[20rem] xl:w-[25rem]">
+              <div className="  sm:w-[25rem] md:w-[13rem] lg:w-[20rem] xl:w-[25rem]">
                 {/* <p className="text-sm text-[#64748B] min-w-[250px] font-medium">Organization</p> */}
                 {user?.role === "admin" ? (
                   <OrganizationSelect
@@ -432,7 +432,7 @@ useEffect(() => {
                 </>} 
               </div>
 
-              <div className="flex items-center ">
+              <div className="flex items-center  ml-5 sm:ml-auto  ">
                 <VenueSelect
                   organizationId={selectedOrgId || user?.organization}
                   value={selectedVenueId}

@@ -213,7 +213,8 @@ useEffect(() => {
 
   return (
     <div className={className} ref={ref}>
-      <div className="grid grid-cols-2 items-center gap-4 w-[6rem] sm:w-[14rem] md:w-[10rem] lg:w-[15rem] xl:w-[20rem]  ">
+      {/* <div className="grid grid-cols-2 items-center gap-4 w-[6rem] sm:w-[14rem] md:w-[10rem] lg:w-[15rem] xl:w-[20rem]  "> */}
+          <div className="grid grid-cols-2 items-center gap-4 sm:w-[14rem] md:w-[10rem] lg:w-[15rem] xl:w-[20rem]">
         {/* <label className="text-left font-medium text-gray-700">Venue</label> */}
 
         <div className="relative col-span-2 ">
@@ -222,9 +223,9 @@ useEffect(() => {
             tabIndex={0}
             onKeyDown={handleKeyboard}
             onClick={() => !loading && organizationId && setDropdownOpen((s) => !s)}
-            className={`sm:rounded-full flex items-center justify-between pr-2 pl-3 py-2 border cursor-pointer bg-[#0D5CA4] text-white select-none  ${selectedVenue ? "rounded-full" : "rounded-xl"}`}
+            className={`sm:rounded-full flex items-center justify-between pr-2 pl-3 py-2 border cursor-pointer bg-[#0D5CA4] text-white select-none  rounded-full`}
           >
-            <span className="text-white truncate max-w-[70%]">{label}</span>
+            <span className="text-white truncate w-[90%] sm:max-w-[70%]">{label}</span>
           <svg
           className={`w-6 h-6 ml-2 bg-white rounded-full p-[2px] transform ${
             dropdownOpen ? "rotate-180" : "rotate-0"

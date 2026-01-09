@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllOrganizations } from "../../slices/OrganizationSlice";
@@ -57,7 +56,7 @@ export default function OrganizationSelect({ value="Organization", onChange, cla
 
   return (
     <div className={`${className}`} ref={containerRef}>
-      <div className="grid sm:grid-cols-3 items-center gap-4 ">
+      <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 ml-2 md:ml-auto   ">
 
 
 
@@ -71,7 +70,8 @@ export default function OrganizationSelect({ value="Organization", onChange, cla
               selectedOrg ? "rounded-full" : "rounded-xl"
             }`}
           >
-            <span className="text-gray-600 text-sm truncate max-w-[70%]">{selectedLabel}</span>
+            {/* <span className="text-gray-600 text-sm truncate max-w-[70%]">{selectedLabel}</span> */}
+            <span className="text-gray-600 text-sm truncate w-[90%] sm:max-w-[70%]">{selectedLabel}</span>
             <svg
               className={`w-4 h-4 text-gray-500 ml-2 transform ${dropdownOpen ? "rotate-180" : "rotate-0"}`}
               fill="none"

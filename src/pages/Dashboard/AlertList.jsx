@@ -28,10 +28,10 @@ export default function AlertList({ title = "Alert", iconSrc = null, items = [] 
       <div className="h-0.5 w-full mb-3" style={{ backgroundColor: "#07518D" }} />
 
       {/* List */}
-      <div className="space-y-0.5 h-[200px] overflow-y-auto custom-scrollbar pr-2 pb-2">
+      <div className="space-y-0.5 max-h-[30vh] md:max-h-[10vh] 2xl:min-h-[16vh] 3xl:min-h-[20vh] overflow-y-auto custom-scrollbar pr-2 pb-2">
         {items.length === 0 ? (
-          <div className="text-center py-4 text-[#64748B]">
-            🎉 No {title.toLowerCase()}! All devices are operating normally.
+          <div className="text-center py-4 text-[#64748B] text-sm">
+            🎉 All devices are operating normally.
           </div>
         ) : (
           items.map((item) => {

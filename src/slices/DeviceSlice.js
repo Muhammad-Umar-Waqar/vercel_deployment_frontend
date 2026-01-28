@@ -31,13 +31,46 @@ export const fetchAllDevices = createAsyncThunk(
 );
 
 // in your DeviceSlice (or where createDevice is defined)
+// export const createDevice = createAsyncThunk(
+//   "Devices/create",
+//   async ({ deviceId, venueId, conditions = [] }, { rejectWithValue }) => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       console.log("TOKEN>>> FROM DEVICE SLICE:>>", token);
+
+//       if (!token) return rejectWithValue({ message: "No authentication token found" });
+
+//       const res = await fetch(`${BASE}/device/add`, {
+//         method: "POST",
+//         credentials: "include",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//         body: JSON.stringify({ deviceId, venueId, conditions }),
+//       });
+
+//       const data = await res.json();
+//       if (!res.ok) {
+//         // return the server-provided message if available
+//         return rejectWithValue(data || { message: data.message || "Failed to create device" });
+//       }
+
+//       // backend returns { message, device }
+//       return data.device;
+//     } catch (err) {
+//       return rejectWithValue({ message: err.message || "Network error" });
+//     }
+//   }
+// );
+
+
+
 export const createDevice = createAsyncThunk(
   "Devices/create",
-  async ({ deviceId, venueId, conditions = [] }, { rejectWithValue }) => {
+  async ({ deviceId, venueId, deviceType, conditions = [] }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      console.log("TOKEN>>> FROM DEVICE SLICE:>>", token);
-
       if (!token) return rejectWithValue({ message: "No authentication token found" });
 
       const res = await fetch(`${BASE}/device/add`, {
@@ -47,12 +80,11 @@ export const createDevice = createAsyncThunk(
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ deviceId, venueId, conditions }),
+        body: JSON.stringify({ deviceId, venueId, deviceType, conditions }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        // return the server-provided message if available
         return rejectWithValue(data || { message: data.message || "Failed to create device" });
       }
 
@@ -65,11 +97,45 @@ export const createDevice = createAsyncThunk(
 );
 
 
+// update device 
+// export const updateDevice = createAsyncThunk(
+//   "Devices/update",
+//   async ({ id, deviceId, venueId, conditions = [] }, { rejectWithValue }) => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       if (!token) return rejectWithValue("No authentication token found");
+
+//       const res = await fetch(`${BASE}/device/update/${id}`, {
+//         method: "PUT",
+//         credentials: "include",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//         // IMPORTANT: include id inside body to match your updated backend
+//         body: JSON.stringify({ id, deviceId, venueId, conditions }),
+//       });
+
+//       const data = await res.json();
+//       if (!res.ok) return rejectWithValue(data.message || "Failed to update device");
+
+//       // backend returns { message, device }
+//       console.log("data.device", data)
+//       return (data);
+      
+//     } catch (err) {
+//       return rejectWithValue(err.message || "Network error");
+//     }
+//   }
+// );
+
+
+
 
 // update device 
 export const updateDevice = createAsyncThunk(
   "Devices/update",
-  async ({ id, deviceId, venueId, conditions = [] }, { rejectWithValue }) => {
+  async ({ id, deviceId, venueId, deviceType, conditions = [] }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) return rejectWithValue("No authentication token found");
@@ -81,22 +147,21 @@ export const updateDevice = createAsyncThunk(
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        // IMPORTANT: include id inside body to match your updated backend
-        body: JSON.stringify({ id, deviceId, venueId, conditions }),
+        // include deviceType if provided
+        body: JSON.stringify({ id, deviceId, venueId, deviceType, conditions }),
       });
 
       const data = await res.json();
-      if (!res.ok) return rejectWithValue(data.message || "Failed to update device");
+      if (!res.ok) return rejectWithValue(data.message || data || "Failed to update device");
 
-      // backend returns { message, device }
-      console.log("data.device", data)
-      return (data);
-      
+      // backend returns { message, device } or custom shape
+      return data;
     } catch (err) {
       return rejectWithValue(err.message || "Network error");
     }
   }
 );
+
 
 
 // delete device

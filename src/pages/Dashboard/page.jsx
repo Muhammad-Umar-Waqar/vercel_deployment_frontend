@@ -209,6 +209,7 @@ useEffect(() => {
       // if the request was aborted this will throw and be caught below
       const data = await res.json();
 
+      console.log("Devices:::", data);
       if (!mounted) return;
 
       if (res.ok) {
@@ -231,8 +232,11 @@ useEffect(() => {
     const id = String(newDevice._id ?? newDevice.id ?? newDevice.deviceId);
     const oldDevice = prevMap.get(id);
 
+    console.log("NewDevice:>", newDevice);
+
     // New device → add
     if (!oldDevice) return newDevice;
+
 
     // Merge only changed fields
     return {
@@ -253,23 +257,35 @@ useEffect(() => {
       espOdour:
         newDevice.espOdour ?? oldDevice.espOdour,
 
-      temperatureAlert:
-        newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
+      // temperatureAlert:
+      //   newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
 
-      humidityAlert:
-        newDevice.humidityAlert ?? oldDevice.humidityAlert,
+      // humidityAlert:
+      //   newDevice.humidityAlert ?? oldDevice.humidityAlert,
 
-      odourAlert:
-        newDevice.odourAlert ?? oldDevice.odourAlert,
+      // odourAlert:
+      //   newDevice.odourAlert ?? oldDevice.odourAlert,
 
-      batteryLow:
-        newDevice.batteryLow ?? oldDevice.batteryLow,
+      // batteryLow:
+      //   newDevice.batteryLow ?? oldDevice.batteryLow,
 
-      refrigeratorAlert:
-        newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
+      // refrigeratorAlert:
+      //   newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
 
-      lastUpdateTime:
-        newDevice.lastUpdateTime ?? oldDevice.lastUpdateTime,
+      espAQI: newDevice.espAQI ?? oldDevice.espAQI,
+      espGL: newDevice.espGL ?? oldDevice.espGL,
+
+      temperatureAlert: newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
+      humidityAlert: newDevice.humidityAlert ?? oldDevice.humidityAlert,
+      odourAlert: newDevice.odourAlert ?? oldDevice.odourAlert,
+
+      // add specialized alerts:
+      aqiAlert: newDevice.aqiAlert ?? oldDevice.aqiAlert,
+      glAlert: newDevice.glAlert ?? oldDevice.glAlert,
+
+      batteryLow: newDevice.batteryLow ?? oldDevice.batteryLow,
+      refrigeratorAlert: newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
+      lastUpdateTime: newDevice.lastUpdateTime ?? oldDevice.lastUpdateTime,
     };
   });
 });
@@ -467,22 +483,48 @@ useEffect(() => {
       // Devices present
       <div className="freezer-cards-grid freezer-cards-container">
         {freezerDevices.map((device) => (
+          // <FreezerDeviceCard
+          //   key={device._id ?? device.id}
+          //   deviceId={device.deviceId}
+          //   ambientTemperature={device?.AmbientData?.temperature ?? device.ambientTemperature}
+          //   freezerTemperature={device?.FreezerData?.temperature ?? device.freezerTemperature}
+          //   batteryLow={device?.batteryAlert ?? device?.batteryLow ?? false}
+          //   refrigeratorAlert={device?.refrigeratorAlert ?? false}
+          //   onCardSelect={() => handleFreezerDeviceSelect(device._id ?? device.id)}
+          //   isSelected={(device._id ?? device.id) === selectedFreezerDeviceId}
+          //   espHumidity={device?.espHumidity}
+          //   espTemprature={device?.espTemprature}
+          //   humidityAlert={device?.humidityAlert}
+          //   odourAlert={device?.odourAlert}
+          //   temperatureAlert={device?.temperatureAlert}
+          //   espOdour={device?.espOdour}
+          // />
+
           <FreezerDeviceCard
-            key={device._id ?? device.id}
-            deviceId={device.deviceId}
-            ambientTemperature={device?.AmbientData?.temperature ?? device.ambientTemperature}
-            freezerTemperature={device?.FreezerData?.temperature ?? device.freezerTemperature}
-            batteryLow={device?.batteryAlert ?? device?.batteryLow ?? false}
-            refrigeratorAlert={device?.refrigeratorAlert ?? false}
-            onCardSelect={() => handleFreezerDeviceSelect(device._id ?? device.id)}
-            isSelected={(device._id ?? device.id) === selectedFreezerDeviceId}
-            espHumidity={device?.espHumidity}
-            espTemprature={device?.espTemprature}
-            humidityAlert={device?.humidityAlert}
-            odourAlert={device?.odourAlert}
-            temperatureAlert={device?.temperatureAlert}
-            espOdour={device?.espOdour}
-          />
+              key={device._id ?? device.id}
+              deviceId={device.deviceId}
+              ambientTemperature={device?.AmbientData?.temperature ?? device.ambientTemperature}
+              freezerTemperature={device?.FreezerData?.temperature ?? device.freezerTemperature}
+              batteryLow={device?.batteryAlert ?? device?.batteryLow ?? false}
+              refrigeratorAlert={device?.refrigeratorAlert ?? false}
+              onCardSelect={() => handleFreezerDeviceSelect(device._id ?? device.id)}
+              isSelected={(device._id ?? device.id) === selectedFreezerDeviceId}
+              espHumidity={device?.espHumidity}
+              espTemprature={device?.espTemprature}
+              temperatureAlert = {device?.temperatureAlert}
+              humidityAlert={device?.humidityAlert}
+              odourAlert={device?.odourAlert}
+              espOdour={device?.espOdour}
+              // NEW:
+              deviceType={device?.deviceType}
+              espAQI={device?.espAQI}
+              aqiAlert={device?.aqiAlert}
+              espGL={device?.espGL}
+              glAlert={device?.glAlert}
+            />
+
+
+
         ))}
       </div>
     )}
@@ -497,21 +539,39 @@ useEffect(() => {
       </div>
 
 {isDesktop ? (
-        <DashboardRightPanel
-      freezerDevices={freezerDevices}
-      selectedFreezerDeviceId={selectedFreezerDeviceId}
-      selectedOrgId={selectedOrgId}
+    //     <DashboardRightPanel
+    //   freezerDevices={freezerDevices}
+    //   selectedFreezerDeviceId={selectedFreezerDeviceId}
+    //   selectedOrgId={selectedOrgId}
       
-    />  
+    // />  
+
+    <DashboardRightPanel
+  freezerDevices={freezerDevices}
+  selectedFreezerDeviceId={selectedFreezerDeviceId}
+  selectedOrgId={selectedOrgId}
+  pollInterval={POLL_MS}
+/>
+
     ) : (
       <Drawer open={open} onClose={toggleDrawer(false)} anchor="right">
-        <DashboardRightPanel
+        {/* <DashboardRightPanel
       freezerDevices={freezerDevices}
       selectedFreezerDeviceId={selectedFreezerDeviceId}
       selectedOrgId={selectedOrgId}
       closeIcon={true}
        onClose={toggleDrawer(false)}
-    />
+    /> */}
+
+    <DashboardRightPanel
+  freezerDevices={freezerDevices}
+  selectedFreezerDeviceId={selectedFreezerDeviceId}
+  selectedOrgId={selectedOrgId}
+  closeIcon={true}
+  onClose={toggleDrawer(false)}
+  pollInterval={POLL_MS}
+/>
+
       </Drawer>
     )}
     </div>

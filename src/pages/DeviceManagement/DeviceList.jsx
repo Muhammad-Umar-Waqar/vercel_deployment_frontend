@@ -3398,10 +3398,10 @@ import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
 
 const DEVICE_TYPE_META = {
   "": { label: "All", color: "default" },
-  OMD: { label: "Odour (OMD)", color: "warning" },
-  TMD: { label: "Temperature (TMD)", color: "primary" },
-  AQIMD: { label: "Air Quality (AQIMD)", color: "success" },
-  GLMD: { label: "Leakage (GLMD)", color: "error" },
+  OMD: { label: "Odour", color: "warning" },
+  TMD: { label: "Temperature", color: "primary" },
+  AQIMD: { label: "Air Quality", color: "success" },
+  GLMD: { label: "Leakage", color: "error" },
 };
 
 export default function DeviceList({ onDeviceSelect, selectedDevice }) {
@@ -3490,6 +3490,8 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
     }
   };
 
+
+  
   // Edit flow - populate fields from backend device
   const handleEdit = (device) => {
     const currentDeviceId = device.deviceId || "";
@@ -3695,6 +3697,22 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
   // UI render
   const renderListMarkup = () => (
     <div className="ListPage device-list-container bg-white rounded-xl shadow-sm w-full h-full border border-[#E5E7EB] p-4">
+            {isDesktop ? (
+         <h1 className="organization-list-title font-semibold text-gray-800 mb-4">Device Management</h1>
+       ) : (
+           <div className="flex justify-end">
+           <IconButton
+             onClick={() => {
+               setDrawerOpen(!drawerOpen); // guard, then call
+             }}
+             edge="start"
+             aria-label="close-details"
+             size="small"
+           >
+             <CloseIcon />
+           </IconButton>
+         </div>
+       )}
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-3">
           <Typography variant="h6" component="div">Device List</Typography>

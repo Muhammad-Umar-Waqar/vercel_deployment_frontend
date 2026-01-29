@@ -628,14 +628,14 @@ export default function FreezerDeviceCard({
         };
       case "AQIMD":
         return {
-          label: displayAQI !== null ? `${displayAQI}` : "--",
-          icon: <Wind size={20} className="text-white/90" />,
+          label: displayAQI !== null ? `${displayAQI} AQI` : "--",
+          icon: <Wind size={20} className="text-yellow-900" />,
           alt: "AQI",
         };
       case "GLMD":
         return {
           label: `${displayGass !== null ? displayGass : 0}%`,
-          icon: <Zap size={20} className="text-white/90" />,
+          icon: <Zap size={20} className="text-pink-900" />,
           alt: "Gas",
         };
       default:
@@ -698,7 +698,7 @@ export default function FreezerDeviceCard({
                 <div className="freezer-temp-info">
                   <span className={`freezer-label ${textClass}`}>Temperature</span>
                   <span className={`responsive-value ${textClass} font-bold`}>
-                    {displayTemp !== null ? `${displayTemp}°C` : "--"}
+                    {displayTemp !== null ? `${displayTemp}°C` : "0°C"}
                   </span>
                 </div>
               </div>

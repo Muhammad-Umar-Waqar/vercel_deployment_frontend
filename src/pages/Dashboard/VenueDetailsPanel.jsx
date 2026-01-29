@@ -694,7 +694,7 @@ export default function VenueDetailsPanel({
   venueName = "Karim Korangi Branch",
   deviceType = null,           // OMD / TMD / AQIMD / GLMD
   espTemprature = 0,
-  ambientTemperature = 25,
+  ambientTemperature = 0,
   espHumidity = 0,
   batteryLow = true,
   needMaintenance = true,

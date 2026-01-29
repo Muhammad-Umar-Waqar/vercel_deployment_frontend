@@ -934,7 +934,13 @@ export default function VenueDetailsPanel({
         {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
       </div>
 
-      <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} />
+      {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
+            <DownloadModal
+        open={downloadOpen}
+        onClose={() => setDownloadOpen(false)}
+        measurement={deviceId}
+        bucket="Odour"
+      />
     </div>
   );
 }

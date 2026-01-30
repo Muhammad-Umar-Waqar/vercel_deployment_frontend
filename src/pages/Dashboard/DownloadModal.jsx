@@ -301,8 +301,22 @@ export default function DownloadModal({
   onClose,
   measurement = null,
   bucket = import.meta.env.VITE_INFLUX_BUCKET,
-  fields = ["temperature", "humidity", "NH3", "H2S", "odor"],
+  // fields = ["temperature", "humidity", "NH3", "H2S", "odor"],
+  deviceType = ""
 }) {
+  const DEVICE_FIELDS_MAP = {
+  OMD: ["temperature", "humidity", "NH3", "H2S", "odor"],
+
+  GLMD: ["leakage", "temperature", "humidity"],
+
+  TMD: ["temperature", "humidity"],
+
+  AQIMD: ["AQI", "temperature", "humidity"],
+};
+
+const fields = DEVICE_FIELDS_MAP[deviceType] || [];
+
+
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [singleDay, setSingleDay] = useState(false);

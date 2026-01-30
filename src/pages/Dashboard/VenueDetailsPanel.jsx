@@ -725,11 +725,14 @@ export default function VenueDetailsPanel({
   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
   const globalVenues = useSelector((state) => state.Venue.Venues || []);
   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-
+  
+  
+  
   useEffect(() => {
     if (orgId && !orgVenues.length) {
       dispatch(fetchVenuesByOrganization(orgId));
     }
+   
   }, [orgId, orgVenues.length, dispatch]);
 
   // helpers
@@ -815,6 +818,9 @@ export default function VenueDetailsPanel({
     // fallback: show temp & humidity
     return [ tempMetric, humMetric ];
   })();
+
+   console.log("deviceType", deviceType);
+
 
   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
   const statusClass = (flag, color = "green") => {
@@ -934,7 +940,15 @@ export default function VenueDetailsPanel({
         {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
       </div>
 
-      <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} />
+      {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
+      {/* deviceType: 'GLMD' 'TMD' 'OMD' 'AQIMD' */}
+            <DownloadModal
+            open={downloadOpen}
+            onClose={() => setDownloadOpen(false)}
+            measurement={deviceId}
+            bucket="Odour"
+            deviceType={deviceType}
+      />
     </div>
   );
 }

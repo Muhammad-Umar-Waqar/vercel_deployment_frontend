@@ -518,7 +518,7 @@
 
 
 
-// src/pages/Dashboard/FreezerDeviceCard.jsx
+// // src/pages/Dashboard/FreezerDeviceCard.jsx
 import "../../styles/global/fonts.css";
 import "../../styles/pages/Dashboard/freezer-cards-responsive.css";
 import { Wind, Zap } from "lucide-react"; // lucide icons for AQI and Gas
@@ -735,3 +735,14 @@ FreezerDeviceCard.propTypes = {
   espGL: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   glAlert: PropTypes.bool,
 };
+
+
+
+
+
+
+
+
+
+
+

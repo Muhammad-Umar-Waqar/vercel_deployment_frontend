@@ -14,6 +14,8 @@ import { Drawer, useMediaQuery } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrganizationByUserID } from "../../slices/OrganizationSlice";
 import DeviceSkeleton from "./DeviceSkeleton"
+import AQIDeviceCard from "./AQIDeviceCard"
+// import AQIDeviceCard from "./AQIDeviceCard"
 
 
 const mockFreezerDevices = [
@@ -461,75 +463,102 @@ useEffect(() => {
 
 
 
-{/* Freezer Device Cards area */}
-<div className="flex-1 min-h-0">
-  <div className="freezer-cards-container custom-scrollbar">
-    {(isInitialDevicesLoad || isContextChanging) ? (
- <div className="freezer-cards-grid freezer-cards-container">
-    {Array.from({ length: 4 }).map((_, index) => (
-      <DeviceSkeleton key={index} />
-    ))}
-  </div>
-    ) : freezerDevices.length === 0 ? (
-      // No devices state (only shown when not loading)
-      <div className="flex flex-col items-center justify-center h-full text-[#64748B]">
-        <svg className="w-16 h-16 mb-4 text-[#E2E8F0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-        <p className="text-lg font-medium">No Freezer Devices Found</p>
-        <p className="text-sm">Add some freezer devices to get started</p>
-      </div>
-    ) : (
-      // Devices present
+      {/* Freezer Device Cards area */}
+      <div className="flex-1 min-h-0">
+        <div className="freezer-cards-container custom-scrollbar">
+          {(isInitialDevicesLoad || isContextChanging) ? (
       <div className="freezer-cards-grid freezer-cards-container">
-        {freezerDevices.map((device) => (
-          // <FreezerDeviceCard
-          //   key={device._id ?? device.id}
-          //   deviceId={device.deviceId}
-          //   ambientTemperature={device?.AmbientData?.temperature ?? device.ambientTemperature}
-          //   freezerTemperature={device?.FreezerData?.temperature ?? device.freezerTemperature}
-          //   batteryLow={device?.batteryAlert ?? device?.batteryLow ?? false}
-          //   refrigeratorAlert={device?.refrigeratorAlert ?? false}
-          //   onCardSelect={() => handleFreezerDeviceSelect(device._id ?? device.id)}
-          //   isSelected={(device._id ?? device.id) === selectedFreezerDeviceId}
-          //   espHumidity={device?.espHumidity}
-          //   espTemprature={device?.espTemprature}
-          //   humidityAlert={device?.humidityAlert}
-          //   odourAlert={device?.odourAlert}
-          //   temperatureAlert={device?.temperatureAlert}
-          //   espOdour={device?.espOdour}
-          // />
+          {Array.from({ length: 4 }).map((_, index) => (
+            <DeviceSkeleton key={index} />
+          ))}
+        </div>
+          ) : freezerDevices.length === 0 ? (
+            // No devices state (only shown when not loading)
+            <div className="flex flex-col items-center justify-center h-full text-[#64748B]">
+              <svg className="w-16 h-16 mb-4 text-[#E2E8F0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <p className="text-lg font-medium">No Freezer Devices Found</p>
+              <p className="text-sm">Add some freezer devices to get started</p>
+            </div>
+          ) : (
+            // Devices present
+            <div className="freezer-cards-grid freezer-cards-container">
+              {/* {freezerDevices.map((device) => (
+          
+                <FreezerDeviceCard
+                    key={device._id ?? device.id}
+                    deviceId={device.deviceId}
+                    ambientTemperature={device?.AmbientData?.temperature ?? device.ambientTemperature}
+                    freezerTemperature={device?.FreezerData?.temperature ?? device.freezerTemperature}
+                    batteryLow={device?.batteryAlert ?? device?.batteryLow ?? false}
+                    refrigeratorAlert={device?.refrigeratorAlert ?? false}
+                    onCardSelect={() => handleFreezerDeviceSelect(device._id ?? device.id)}
+                    isSelected={(device._id ?? device.id) === selectedFreezerDeviceId}
+                    espHumidity={device?.espHumidity}
+                    espTemprature={device?.espTemprature}
+                    temperatureAlert = {device?.temperatureAlert}
+                    humidityAlert={device?.humidityAlert}
+                    odourAlert={device?.odourAlert}
+                    espOdour={device?.espOdour}
+                    // NEW:
+                    deviceType={device?.deviceType}
+                    espAQI={device?.espAQI}
+                    aqiAlert={device?.aqiAlert}
+                    espGL={device?.espGL}
+                    glAlert={device?.glAlert}
+                  />
 
-          <FreezerDeviceCard
-              key={device._id ?? device.id}
-              deviceId={device.deviceId}
-              ambientTemperature={device?.AmbientData?.temperature ?? device.ambientTemperature}
-              freezerTemperature={device?.FreezerData?.temperature ?? device.freezerTemperature}
-              batteryLow={device?.batteryAlert ?? device?.batteryLow ?? false}
-              refrigeratorAlert={device?.refrigeratorAlert ?? false}
-              onCardSelect={() => handleFreezerDeviceSelect(device._id ?? device.id)}
-              isSelected={(device._id ?? device.id) === selectedFreezerDeviceId}
-              espHumidity={device?.espHumidity}
-              espTemprature={device?.espTemprature}
-              temperatureAlert = {device?.temperatureAlert}
-              humidityAlert={device?.humidityAlert}
-              odourAlert={device?.odourAlert}
-              espOdour={device?.espOdour}
-              // NEW:
-              deviceType={device?.deviceType}
-              espAQI={device?.espAQI}
-              aqiAlert={device?.aqiAlert}
-              espGL={device?.espGL}
-              glAlert={device?.glAlert}
-            />
 
 
+              ))} */}
 
-        ))}
+              {freezerDevices.map((device) => {
+  const idKey = device._id ?? device.id ?? device.deviceId;
+  const commonProps = {
+    key: idKey,
+    deviceId: device.deviceId,
+    ambientTemperature: device?.AmbientData?.temperature ?? device.ambientTemperature,
+    freezerTemperature: device?.FreezerData?.temperature ?? device.freezerTemperature,
+    onCardSelect: () => handleFreezerDeviceSelect(idKey),
+    isSelected: String(idKey) === String(selectedFreezerDeviceId),
+    espHumidity: device?.espHumidity,
+    espTemprature: device?.espTemprature,
+    temperatureAlert: device?.temperatureAlert,
+    humidityAlert: device?.humidityAlert,
+    odourAlert: device?.odourAlert,
+    espOdour: device?.espOdour,
+  };
+
+  if (device?.deviceType === "AQIMD") {
+    // render the dedicated AQI card
+    return (
+      <AQIDeviceCard
+        {...commonProps}
+        espAQI={device?.espAQI}
+        aqiAlert={device?.aqiAlert}
+      />
+    );
+  }
+
+  // non-AQI types use the existing FreezerDeviceCard
+  return (
+    <FreezerDeviceCard
+      {...commonProps}
+      deviceType={device?.deviceType}
+      espAQI={device?.espAQI}
+      aqiAlert={device?.aqiAlert}
+      espGL={device?.espGL}
+      glAlert={device?.glAlert}
+      batteryLow={device?.batteryLow}
+      refrigeratorAlert={device?.refrigeratorAlert}
+    />
+  );
+})}
+            </div>
+          )}
+        </div>
       </div>
-    )}
-  </div>
-</div>
 
             <AlertsPanel organizationId={selectedOrgId} pollInterval={POLL_MS} />
             {/* <AlertsPanel organizationId={selectedOrgId} pollInterval={2 * 1000} /> */}

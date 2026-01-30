@@ -273,7 +273,7 @@ export default function AQIDeviceCard({
                     <span className="text-3xl font-bold leading-none">
                       {intPart}
                     </span>
-                    <span className="text-md font-bold ml-0.5 leading-none">
+                    <span className="text-md font-bold  leading-none">
                       .{decPart}
                     </span>
                   </div>

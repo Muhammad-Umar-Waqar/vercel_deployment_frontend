@@ -271,7 +271,7 @@ export default function AQIDeviceCard({
               (() => {
                 const [intPart, decPart = '0'] = Number(aqi).toFixed(1).split('.');
                 return (
-                  <div className="flex items-end">
+                  <div className="flex items-end mb-2">
                     <span className="text-3xl font-bold leading-none">
                       {intPart}
                     </span>

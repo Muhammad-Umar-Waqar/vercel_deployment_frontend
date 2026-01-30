@@ -248,6 +248,8 @@ export default function AQIDeviceCard({
   espHumidity = null,
   isSelected = false,
   onCardSelect,
+  humidityAlert = false,
+  temperatureAlert = false,
   // you can pass other props if needed
 }) {
   const aqi = espAQI ?? null;
@@ -291,7 +293,11 @@ export default function AQIDeviceCard({
               <div className="flex flex-col items-center ">
                 <div className="text-xs">Temperature</div>
                 <div className="text-sm text-right font-semibold">{espTemprature ?? "--"}°C</div>
-                <img src="/temperature-green-alert.svg" alt="" className="w-[3rem] rounded-3px" />
+               {
+                temperatureAlert ? 
+                  <img src="/humidity-red-alert.svg" alt="" className="w-[3rem] rounded-3px" />: 
+                  <img src="/temperature-green-alert.svg" alt="" className="w-[3rem] rounded-3px" />
+               } 
               </div>
 
             </div>
@@ -300,7 +306,11 @@ export default function AQIDeviceCard({
               <div className="flex flex-col items-center ">
                 <div className="text-xs">Humidity</div>
                 <div className="text-sm text-right font-semibold">{espHumidity ?? "--"}%</div>
-                <img src="/humidity-red-alert.svg" alt="" className="w-[3rem] rounded-3px" />
+                 {
+                humidityAlert ? 
+                <img src="/humidity-red-alert.svg" alt="" className="w-[3rem] rounded-3px" /> :
+                <img src="/temperature-green-alert.svg" alt="" className="w-[3rem] rounded-3px" /> 
+               }
               </div>
             </div>
           </div>

@@ -15,6 +15,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchOrganizationByUserID } from "../../slices/OrganizationSlice";
 import DeviceSkeleton from "./DeviceSkeleton"
 import AQIDeviceCard from "./AQIDeviceCard"
+import TemperatureHumidityDeviceCard from "./TemperatureHumidityDeviceCard"
+import OdourDeviceCard from "./OdourDeviceCard"
+import GasLeakageDeviceCard from "./GasLeakageDeviceCard"
 // import AQIDeviceCard from "./AQIDeviceCard"
 
 
@@ -52,6 +55,7 @@ export default function Dashboard() {
   // const [hasFetchedForVenue, setHasFetchedForVenue] = useState(true);
 const [isInitialDevicesLoad, setIsInitialDevicesLoad] = useState(true);
 const [isContextChanging, setIsContextChanging] = useState(false);
+const [pollHitTime, setPollHitTime] = useState(Date.now());
 
   // -------------------------
   // helpers (pure utility, no hooks inside)
@@ -196,6 +200,8 @@ useEffect(() => {
   const signal = controller.signal;
 
   const fetchDevices = async (isPolling = false) => {
+    const hitTime = Date.now();      // 🔥 API HIT TIME
+  setPollHitTime(hitTime);
     // setFreezerDevicesLoading(true);
     try {
       const res = await fetch(`${BASE}/device/device-by-venue/${selectedVenueId}`, {
@@ -514,20 +520,20 @@ useEffect(() => {
               ))} */}
 
               {freezerDevices.map((device) => {
-  const idKey = device._id ?? device.id ?? device.deviceId;
-  const commonProps = {
-    key: idKey,
-    deviceId: device.deviceId,
-    ambientTemperature: device?.AmbientData?.temperature ?? device.ambientTemperature,
-    freezerTemperature: device?.FreezerData?.temperature ?? device.freezerTemperature,
-    onCardSelect: () => handleFreezerDeviceSelect(idKey),
-    isSelected: String(idKey) === String(selectedFreezerDeviceId),
-    espHumidity: device?.espHumidity,
-    espTemprature: device?.espTemprature,
-    temperatureAlert: device?.temperatureAlert,
-    humidityAlert: device?.humidityAlert,
-    odourAlert: device?.odourAlert,
-    espOdour: device?.espOdour,
+              const idKey = device._id ?? device.id ?? device.deviceId;
+              const commonProps = {
+                key: idKey,
+                deviceId: device.deviceId,
+                ambientTemperature: device?.AmbientData?.temperature ?? device.ambientTemperature,
+                freezerTemperature: device?.FreezerData?.temperature ?? device.freezerTemperature,
+                onCardSelect: () => handleFreezerDeviceSelect(idKey),
+                isSelected: String(idKey) === String(selectedFreezerDeviceId),
+                espHumidity: device?.espHumidity,
+                espTemprature: device?.espTemprature,
+                temperatureAlert: device?.temperatureAlert,
+                humidityAlert: device?.humidityAlert,
+                odourAlert: device?.odourAlert,
+                espOdour: device?.espOdour,
   };
 
   if (device?.deviceType === "AQIMD") {
@@ -541,20 +547,52 @@ useEffect(() => {
     );
   }
 
+   if (device?.deviceType === "TMD") {
+    // render the dedicated AQI card
+    return (
+      <TemperatureHumidityDeviceCard
+        {...commonProps}
+        pollHitTime={pollHitTime}
+      />
+    );
+  }
+
+
+  if (device?.deviceType === "OMD") {
+  return (
+    <OdourDeviceCard
+      {...commonProps}
+      espOdour={device?.espOdour}
+      odourAlert={device?.odourAlert}
+    />
+  );
+}
+
+if (device?.deviceType === "GLMD") {
+  return (
+    <GasLeakageDeviceCard
+      {...commonProps}
+      espGL={device?.espGL}
+      glAlert={device?.glAlert}
+    />
+  );
+}
+
+
   // non-AQI types use the existing FreezerDeviceCard
   return (
     <FreezerDeviceCard
-      {...commonProps}
-      deviceType={device?.deviceType}
-      espAQI={device?.espAQI}
-      aqiAlert={device?.aqiAlert}
-      espGL={device?.espGL}
-      glAlert={device?.glAlert}
-      batteryLow={device?.batteryLow}
-      refrigeratorAlert={device?.refrigeratorAlert}
-    />
-  );
-})}
+            {...commonProps}
+            deviceType={device?.deviceType}
+            espAQI={device?.espAQI}
+            aqiAlert={device?.aqiAlert}
+            espGL={device?.espGL}
+            glAlert={device?.glAlert}
+            batteryLow={device?.batteryLow}
+            refrigeratorAlert={device?.refrigeratorAlert}
+          />
+        );
+      })}
             </div>
           )}
         </div>

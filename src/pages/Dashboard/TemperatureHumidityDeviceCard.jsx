@@ -567,7 +567,7 @@ const timeOfDay =
             <div className="flex items-center">
                 <span
                   aria-hidden
-                  className={`inline-block h-3 w-3 rounded-full mr-2 shadow-sm ${isOnline ? "bg-green-500" : "bg-gray-300"}`}
+                  className={`inline-block h-1.5 w-1.5 rounded-full mr-2 shadow-sm ${isOnline ? "bg-green-500" : "bg-gray-300"}`}
                   style={{ boxShadow: isOnline ? "0 0 6px rgba(34,197,94,0.45)" : "none" }}
                 />
             <div className="text-xs text-gray-500">Device ID</div>

@@ -423,12 +423,19 @@ export default function TemperatureHumidityDeviceCard({
   isSelected = false,
   onCardSelect,
   lastUpdateTime = null,
-  pollHitTime={pollHitTime}
+  pollHitTime={pollHitTime},
+   isOnline = false,         // NEW
+  lastUpdateISO = null,
+  
 }) {
   const toNumberOrNull = (v) => {
     const n = Number(v);
     return Number.isFinite(n) ? n : null;
   };
+
+    // format last update for title/tooltip
+  const lastUpdateStr = lastUpdateISO ? new Date(lastUpdateISO).toLocaleString() : "";
+
 
   const temp = toNumberOrNull(espTemprature);
   const hum = toNumberOrNull(espHumidity);
@@ -536,11 +543,44 @@ const timeOfDay =
         {/* LEFT: icons + meter */}
         <div className="h-full flex flex-col justify-between flex-shrink-0 min-w-[140px] w-1/3">
         {/* <div className="flex flex-col justify-between flex-shrink-0 "> */}
-          <div>
+          {/* <div>
             <div className="text-xs text-gray-500">Device ID</div>
             <div className="text-lg font-bold truncate">{deviceId}</div>
             
+          </div> */}
+
+
+      {/* <div>
+        <div className="text-xs text-gray-500">Device ID</div>
+        <div className="text-lg font-bold truncate flex items-center" title={lastUpdateISO ? new Date(lastUpdateISO).toLocaleString() : ""}>
+          <span
+            aria-hidden
+            className={`inline-block h-3 w-3 rounded-full mr-2 shadow-sm ${isOnline ? "bg-green-500" : "bg-gray-300"}`}
+            style={{ boxShadow: isOnline ? "0 0 6px rgba(34,197,94,0.45)" : "none" }}
+          />
+          <span className="truncate">{deviceId}</span>
+        </div>
+      </div> */}
+
+
+   <div title={lastUpdateStr}>
+            <div className="flex items-center">
+                <span
+                  aria-hidden
+                  className={`inline-block h-3 w-3 rounded-full mr-2 shadow-sm ${isOnline ? "bg-green-500" : "bg-gray-300"}`}
+                  style={{ boxShadow: isOnline ? "0 0 6px rgba(34,197,94,0.45)" : "none" }}
+                />
+            <div className="text-xs text-gray-500">Device ID</div>
+            </div>
+            <div className="text-lg font-bold">{deviceId}</div>
           </div>
+          
+
+
+
+
+
+
 
           {/* icons row - force no wrap and don't allow it to push other content */}
           <div className="flex items-center justify-start gap-3 mt-2 flex-nowrap overflow-hidden   border-b-2 border-[#C3C1C1] pb-2 ">
@@ -631,5 +671,7 @@ TemperatureHumidityDeviceCard.propTypes = {
   lastUpdateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onCardSelect: PropTypes.func,
   isSelected: PropTypes.bool,
+  isOnline: PropTypes.bool,
+  lastUpdateISO: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 

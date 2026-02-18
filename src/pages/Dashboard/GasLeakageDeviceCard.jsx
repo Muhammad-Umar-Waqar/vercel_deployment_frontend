@@ -15,12 +15,15 @@ export default function GasLeakageDeviceCard({
   espTemprature = null,
   temperatureAlert = false,
   humidityAlert = false,
+  isOnline = false,
+  lastUpdateISO = null,
 }) {
   const toInt = (v) => {
     const n = Number(v);
     return Number.isFinite(n) ? Math.trunc(n) : null;
   };
-
+  
+  
   const displayGas = toInt(espGL);
   const displayHumidity = toInt(espHumidity);
   const displayTemp = toInt(espTemprature);
@@ -48,6 +51,11 @@ export default function GasLeakageDeviceCard({
     ? "shadow-lg transition-transform duration-300 ease-out"
     : "transition-transform duration-300";
 
+    
+        // format last update for title/tooltip
+  const lastUpdateStr = lastUpdateISO ? new Date(lastUpdateISO).toLocaleString() : "";
+
+  
   return (
     <div
       onClick={handleCardClick}
@@ -58,14 +66,29 @@ export default function GasLeakageDeviceCard({
 
         {/* Top Section */}
         <div className="device-id-section">
-          <div className="flex flex-col items-start">
-            <span className={`device-id-label `}>Device ID</span>
+          {/* <div className="flex flex-col items-start">
+            <span className={`device-id-label `}>Device ID</span> */}
             {/* <h3 className={`responsive-value-deviceId `}>
               {deviceId}
             </h3> */}
 
+            {/* <div className="text-lg font-bold">{deviceId}</div>
+          </div> */}
+
+
+          <div title={lastUpdateStr}>
+            <div className="flex items-center">
+                <span
+                  aria-hidden
+                  className={`inline-block h-3 w-3 rounded-full mr-2 shadow-sm ${isOnline ? "bg-green-500" : "bg-gray-300"}`}
+                  style={{ boxShadow: isOnline ? "0 0 6px rgba(34,197,94,0.45)" : "none" }}
+                />
+            <div className="text-xs text-gray-500">Device ID</div>
+            </div>
             <div className="text-lg font-bold">{deviceId}</div>
           </div>
+          
+
 
           {/* Gas Pill */}
             
@@ -138,4 +161,7 @@ GasLeakageDeviceCard.propTypes = {
   espTemprature: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   temperatureAlert: PropTypes.bool,
   humidityAlert: PropTypes.bool,
+  isOnline: PropTypes.bool,
+  lastUpdateISO: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+
 };

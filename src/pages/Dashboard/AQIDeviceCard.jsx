@@ -241,6 +241,8 @@ function getAQIStatus(aqi) {
   return { label: "Hazardous", color: "bg-violet-300", textColor: "text-violet-900" };
 }
 
+
+
 export default function AQIDeviceCard({
   deviceId,
   espAQI = null,
@@ -250,19 +252,42 @@ export default function AQIDeviceCard({
   onCardSelect,
   humidityAlert = false,
   temperatureAlert = false,
+   isOnline = false,        // NEW
+  lastUpdateISO = null,
   // you can pass other props if needed
 }) {
   const aqi = espAQI ?? null;
   const aqiStatus = getAQIStatus(aqi);
 
+  // format last update for title/tooltip
+  const lastUpdateStr = lastUpdateISO ? new Date(lastUpdateISO).toLocaleString() : "";
+
   return (
     <div onClick={onCardSelect} className={`freezer-card-container   rounded-4xl  bg-white ${isSelected ? "shadow-lg" : ""} min-h-[160px]`} >
       <div className="flex  h-full justify-between px-4">
         <div className="h-full flex flex-col  justify-around items-between">
-          <div>
+          <div title={lastUpdateStr}>
+            <div className="flex items-center">
+                <span
+                  aria-hidden
+                  className={`inline-block h-3 w-3 rounded-full mr-2 shadow-sm ${isOnline ? "bg-green-500" : "bg-gray-300"}`}
+                  style={{ boxShadow: isOnline ? "0 0 6px rgba(34,197,94,0.45)" : "none" }}
+                />
             <div className="text-xs text-gray-500">Device ID</div>
+            </div>
             <div className="text-lg font-bold">{deviceId}</div>
           </div>
+          
+
+          {/* <div>
+  <div className="text-xs text-gray-500">Device ID</div>
+  <div className="text-lg font-bold flex items-center" title={lastUpdateStr}>
+
+  
+    <span>{deviceId}</span>
+  </div>
+</div> */}
+
 
           <div className="flex items-center justify-between ">
             <div className=" border-b-2  border-gray-300 w-full  ">
@@ -340,4 +365,6 @@ AQIDeviceCard.propTypes = {
   espHumidity: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   isSelected: PropTypes.bool,
   onCardSelect: PropTypes.func,
+  isOnline: PropTypes.bool,
+  lastUpdateISO: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };

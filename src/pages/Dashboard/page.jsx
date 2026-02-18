@@ -19,6 +19,8 @@ import TemperatureHumidityDeviceCard from "./TemperatureHumidityDeviceCard"
 import OdourDeviceCard from "./OdourDeviceCard"
 import GasLeakageDeviceCard from "./GasLeakageDeviceCard"
 // import AQIDeviceCard from "./AQIDeviceCard"
+import { InfluxDB } from "@influxdata/influxdb-client";
+
 
 
 const mockFreezerDevices = [
@@ -53,9 +55,13 @@ export default function Dashboard() {
   const autoSelectedForVenueRef = React.useRef({}); // keys: venueId -> true
   // const [freezerDevicesLoading, setFreezerDevicesLoading] = useState(false);
   // const [hasFetchedForVenue, setHasFetchedForVenue] = useState(true);
-const [isInitialDevicesLoad, setIsInitialDevicesLoad] = useState(true);
-const [isContextChanging, setIsContextChanging] = useState(false);
-const [pollHitTime, setPollHitTime] = useState(Date.now());
+  const [isInitialDevicesLoad, setIsInitialDevicesLoad] = useState(true);
+  const [isContextChanging, setIsContextChanging] = useState(false);
+  const [pollHitTime, setPollHitTime] = useState(Date.now());
+// inside component top-level state declarations:
+const [deviceOnlineMap, setDeviceOnlineMap] = useState({});       // { [deviceId]: boolean }
+const [deviceLastUpdateMap, setDeviceLastUpdateMap] = useState({}); // { [deviceId]: lastISOstring }
+
 
   // -------------------------
   // helpers (pure utility, no hooks inside)
@@ -69,7 +75,7 @@ const [pollHitTime, setPollHitTime] = useState(Date.now());
     }
     return devices
   }
-  
+
 
   const findOrganizationById = (orgs, id) => {
     for (const org of orgs) {
@@ -118,249 +124,249 @@ const [pollHitTime, setPollHitTime] = useState(Date.now());
 
 
 
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
 
-// -------------------------
-// determine polling interval
-// -------------------------
-const getPollingInterval = () => {
-  if (!user?.timer) return 5 * 60 * 1000; // default 5 minutes
+  // -------------------------
+  // determine polling interval
+  // -------------------------
+  const getPollingInterval = () => {
+    if (!user?.timer) return 5 * 60 * 1000; // default 5 minutes
 
-  const match = /^(\d+)(s|m)$/.exec(user.timer.trim());
-  if (!match) return 5 * 60 * 1000; // fallback if invalid format
+    const match = /^(\d+)(s|m)$/.exec(user.timer.trim());
+    if (!match) return 5 * 60 * 1000; // fallback if invalid format
 
-  const value = parseInt(match[1], 10);
-  const unit = match[2];
+    const value = parseInt(match[1], 10);
+    const unit = match[2];
 
-  if (unit === "s") {
-    return Math.min(Math.max(value, 0), 60) * 1000; // 0-60s
-  } else if (unit === "m") {
-    return Math.min(Math.max(value, 0), 60) * 60 * 1000; // 0-60m
+    if (unit === "s") {
+      return Math.min(Math.max(value, 0), 60) * 1000; // 0-60s
+    } else if (unit === "m") {
+      return Math.min(Math.max(value, 0), 60) * 60 * 1000; // 0-60m
+    }
+
+    return 5 * 60 * 1000; // fallback
   }
 
-  return 5 * 60 * 1000; // fallback
-}
-
-const POLL_MS = getPollingInterval();
+  const POLL_MS = getPollingInterval();
 
 
 
-useEffect(() => {
-  if (user?.role !== "admin" && user?._id) {
-    dispatch(fetchOrganizationByUserID(user._id))
-      .unwrap()
-      .then((org) => {
-        console.log("Organization object:", org); // this is your actual organization
-        setOrgNameForTop(org?.name); 
-      })
-      .catch((err) => {
-        console.log("Failed to fetch organization:", err);
-      });
-  }
-}, [dispatch, user]);
+  useEffect(() => {
+    if (user?.role !== "admin" && user?._id) {
+      dispatch(fetchOrganizationByUserID(user._id))
+        .unwrap()
+        .then((org) => {
+          console.log("Organization object:", org); // this is your actual organization
+          setOrgNameForTop(org?.name);
+        })
+        .catch((err) => {
+          console.log("Failed to fetch organization:", err);
+        });
+    }
+  }, [dispatch, user]);
 
 
 
-useEffect(() => {
-  const sp = new URLSearchParams(location.search)
-  const venueFromUrl = sp.get("venue") || ""
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search)
+    const venueFromUrl = sp.get("venue") || ""
 
-  if (venueFromUrl === selectedVenueId) return
+    if (venueFromUrl === selectedVenueId) return
 
-  setIsContextChanging(true);   // 🔥 ADD THIS
+    setIsContextChanging(true);   // 🔥 ADD THIS
 
-  if (!venueFromUrl) {
-    setSelectedVenueId("")
-  } else {
-    setSelectedVenueId(venueFromUrl)
-  }
-}, [location.search])
-
-
-useEffect(() => {
+    if (!venueFromUrl) {
+      setSelectedVenueId("")
+    } else {
+      setSelectedVenueId(venueFromUrl)
+    }
+  }, [location.search])
 
 
- if (!selectedVenueId) {
-   setFreezerDevices([]);
-   setSelectedFreezerDeviceId(null);
-   autoSelectedForVenueRef.current = {};
-   // no venue -> no loading; mark fetch as completed so spinner stops
-  //  setFreezerDevicesLoading(false);
-  //  setHasFetchedForVenue(true);
-   return;
- }
-
-// IMPORTANT FIX:
-// setFreezerDevicesLoading(true);
-
-  let mounted = true;
-  let intervalId = null;
-  const controller = new AbortController();
-  const signal = controller.signal;
-
-  const fetchDevices = async (isPolling = false) => {
-    const hitTime = Date.now();      // 🔥 API HIT TIME
-  setPollHitTime(hitTime);
-    // setFreezerDevicesLoading(true);
-    try {
-      const res = await fetch(`${BASE}/device/device-by-venue/${selectedVenueId}`, {
-        method: "GET",
-        credentials: "include",
-        signal,
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      });
-
-      // if the request was aborted this will throw and be caught below
-      const data = await res.json();
-
-      console.log("Devices:::", data);
-      if (!mounted) return;
-
-      if (res.ok) {
-        const devices = Array.isArray(data.devices)
-          ? data.devices
-          : (data.devices ? [data.devices] : []);
-
-        // setFreezerDevices(devices || []);
+  useEffect(() => {
 
 
-        setFreezerDevices((prevDevices) => {
-  const prevMap = new Map(
-    prevDevices.map(d => [
-      String(d._id ?? d.id ?? d.deviceId),
-      d
-    ])
-  );
-
-  return devices.map((newDevice) => {
-    const id = String(newDevice._id ?? newDevice.id ?? newDevice.deviceId);
-    const oldDevice = prevMap.get(id);
-
-    console.log("NewDevice:>", newDevice);
-
-    // New device → add
-    if (!oldDevice) return newDevice;
-
-
-    // Merge only changed fields
-    return {
-      ...oldDevice,
-
-      ambientTemperature:
-        newDevice.ambientTemperature ?? oldDevice.ambientTemperature,
-
-      freezerTemperature:
-        newDevice.freezerTemperature ?? oldDevice.freezerTemperature,
-
-      espHumidity:
-        newDevice.espHumidity ?? oldDevice.espHumidity,
-
-      espTemprature:
-        newDevice.espTemprature ?? oldDevice.espTemprature,
-
-      espOdour:
-        newDevice.espOdour ?? oldDevice.espOdour,
-
-      // temperatureAlert:
-      //   newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
-
-      // humidityAlert:
-      //   newDevice.humidityAlert ?? oldDevice.humidityAlert,
-
-      // odourAlert:
-      //   newDevice.odourAlert ?? oldDevice.odourAlert,
-
-      // batteryLow:
-      //   newDevice.batteryLow ?? oldDevice.batteryLow,
-
-      // refrigeratorAlert:
-      //   newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
-
-      espAQI: newDevice.espAQI ?? oldDevice.espAQI,
-      espGL: newDevice.espGL ?? oldDevice.espGL,
-
-      temperatureAlert: newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
-      humidityAlert: newDevice.humidityAlert ?? oldDevice.humidityAlert,
-      odourAlert: newDevice.odourAlert ?? oldDevice.odourAlert,
-
-      // add specialized alerts:
-      aqiAlert: newDevice.aqiAlert ?? oldDevice.aqiAlert,
-      glAlert: newDevice.glAlert ?? oldDevice.glAlert,
-
-      batteryLow: newDevice.batteryLow ?? oldDevice.batteryLow,
-      refrigeratorAlert: newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
-      lastUpdateTime: newDevice.lastUpdateTime ?? oldDevice.lastUpdateTime,
-    };
-  });
-});
-
-
-        // Auto-select first device ONLY ON DESKTOP and only once per venue load
-        if (isDesktop && devices && devices.length > 0) {
-          // hasn't been auto-selected yet for this venue?
-          if (!autoSelectedForVenueRef.current[selectedVenueId]) {
-            const firstId = devices[0]._id ?? devices[0].id ?? devices[0].deviceId;
-            if (firstId) {
-              setSelectedFreezerDeviceId(String(firstId));
-              // mark that we auto-selected for this venue so we don't repeat
-              autoSelectedForVenueRef.current[selectedVenueId] = true;
-            }
-          }
-        }
-
-        // If mobile (<768px), ensure no auto-selection
-       if (!isDesktop && !isPolling) {
-          setSelectedFreezerDeviceId(null);
-        }
-
-      } else {
-        // error response
-        setFreezerDevices([]);
-        setSelectedFreezerDeviceId(null);
-        console.error("Device fetch error:", data?.message);
-      }
-    } catch (err) {
-      if (!mounted) return;
-      if (err.name === "AbortError") {
-        // request was aborted — no-op
-        return;
-      }
-      console.error("Device fetch error:", err);
+    if (!selectedVenueId) {
       setFreezerDevices([]);
       setSelectedFreezerDeviceId(null);
-    } finally{
-      // setFreezerDevicesLoading(false);
-      // setHasFetchedForVenue(true);
-       if (!isPolling) {
-    setIsInitialDevicesLoad(false);
-    setIsContextChanging(false);
-  }
+      autoSelectedForVenueRef.current = {};
+      // no venue -> no loading; mark fetch as completed so spinner stops
+      //  setFreezerDevicesLoading(false);
+      //  setHasFetchedForVenue(true);
+      return;
     }
-  };
 
-  fetchDevices(false); // initial / venue change fetch
+    // IMPORTANT FIX:
+    // setFreezerDevicesLoading(true);
 
-  intervalId = setInterval(() => {
-    fetchDevices(true); // polling fetch
-  }, POLL_MS);
+    let mounted = true;
+    let intervalId = null;
+    const controller = new AbortController();
+    const signal = controller.signal;
 
-  return () => {
-    mounted = false;
-    if (intervalId) clearInterval(intervalId);
-    controller.abort(); // cancel pending fetch
-  };
-  // intentionally not including selectedFreezerDeviceId to avoid effect loop when we set it
-}, [selectedVenueId, token, isDesktop]);
+    const fetchDevices = async (isPolling = false) => {
+      const hitTime = Date.now();      // 🔥 API HIT TIME
+      setPollHitTime(hitTime);
+      // setFreezerDevicesLoading(true);
+      try {
+        const res = await fetch(`${BASE}/device/device-by-venue/${selectedVenueId}`, {
+          method: "GET",
+          credentials: "include",
+          signal,
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+
+        // if the request was aborted this will throw and be caught below
+        const data = await res.json();
+
+        console.log("Devices:::", data);
+        if (!mounted) return;
+
+        if (res.ok) {
+          const devices = Array.isArray(data.devices)
+            ? data.devices
+            : (data.devices ? [data.devices] : []);
+
+          // setFreezerDevices(devices || []);
+
+
+          setFreezerDevices((prevDevices) => {
+            const prevMap = new Map(
+              prevDevices.map(d => [
+                String(d._id ?? d.id ?? d.deviceId),
+                d
+              ])
+            );
+
+            return devices.map((newDevice) => {
+              const id = String(newDevice._id ?? newDevice.id ?? newDevice.deviceId);
+              const oldDevice = prevMap.get(id);
+
+              console.log("NewDevice:>", newDevice);
+
+              // New device → add
+              if (!oldDevice) return newDevice;
+
+
+              // Merge only changed fields
+              return {
+                ...oldDevice,
+
+                ambientTemperature:
+                  newDevice.ambientTemperature ?? oldDevice.ambientTemperature,
+
+                freezerTemperature:
+                  newDevice.freezerTemperature ?? oldDevice.freezerTemperature,
+
+                espHumidity:
+                  newDevice.espHumidity ?? oldDevice.espHumidity,
+
+                espTemprature:
+                  newDevice.espTemprature ?? oldDevice.espTemprature,
+
+                espOdour:
+                  newDevice.espOdour ?? oldDevice.espOdour,
+
+                // temperatureAlert:
+                //   newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
+
+                // humidityAlert:
+                //   newDevice.humidityAlert ?? oldDevice.humidityAlert,
+
+                // odourAlert:
+                //   newDevice.odourAlert ?? oldDevice.odourAlert,
+
+                // batteryLow:
+                //   newDevice.batteryLow ?? oldDevice.batteryLow,
+
+                // refrigeratorAlert:
+                //   newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
+
+                espAQI: newDevice.espAQI ?? oldDevice.espAQI,
+                espGL: newDevice.espGL ?? oldDevice.espGL,
+
+                temperatureAlert: newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
+                humidityAlert: newDevice.humidityAlert ?? oldDevice.humidityAlert,
+                odourAlert: newDevice.odourAlert ?? oldDevice.odourAlert,
+
+                // add specialized alerts:
+                aqiAlert: newDevice.aqiAlert ?? oldDevice.aqiAlert,
+                glAlert: newDevice.glAlert ?? oldDevice.glAlert,
+
+                batteryLow: newDevice.batteryLow ?? oldDevice.batteryLow,
+                refrigeratorAlert: newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
+                lastUpdateTime: newDevice.lastUpdateTime ?? oldDevice.lastUpdateTime,
+              };
+            });
+          });
+
+
+          // Auto-select first device ONLY ON DESKTOP and only once per venue load
+          if (isDesktop && devices && devices.length > 0) {
+            // hasn't been auto-selected yet for this venue?
+            if (!autoSelectedForVenueRef.current[selectedVenueId]) {
+              const firstId = devices[0]._id ?? devices[0].id ?? devices[0].deviceId;
+              if (firstId) {
+                setSelectedFreezerDeviceId(String(firstId));
+                // mark that we auto-selected for this venue so we don't repeat
+                autoSelectedForVenueRef.current[selectedVenueId] = true;
+              }
+            }
+          }
+
+          // If mobile (<768px), ensure no auto-selection
+          if (!isDesktop && !isPolling) {
+            setSelectedFreezerDeviceId(null);
+          }
+
+        } else {
+          // error response
+          setFreezerDevices([]);
+          setSelectedFreezerDeviceId(null);
+          console.error("Device fetch error:", data?.message);
+        }
+      } catch (err) {
+        if (!mounted) return;
+        if (err.name === "AbortError") {
+          // request was aborted — no-op
+          return;
+        }
+        console.error("Device fetch error:", err);
+        setFreezerDevices([]);
+        setSelectedFreezerDeviceId(null);
+      } finally {
+        // setFreezerDevicesLoading(false);
+        // setHasFetchedForVenue(true);
+        if (!isPolling) {
+          setIsInitialDevicesLoad(false);
+          setIsContextChanging(false);
+        }
+      }
+    };
+
+    fetchDevices(false); // initial / venue change fetch
+
+    intervalId = setInterval(() => {
+      fetchDevices(true); // polling fetch
+    }, POLL_MS);
+
+    return () => {
+      mounted = false;
+      if (intervalId) clearInterval(intervalId);
+      controller.abort(); // cancel pending fetch
+    };
+    // intentionally not including selectedFreezerDeviceId to avoid effect loop when we set it
+  }, [selectedVenueId, token, isDesktop]);
 
   // -------------------------
   // simple handlers (kept minimal)
   // -------------------------
 
-   const toggleDrawer = (newOpen) => () => {
+  const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
@@ -368,24 +374,24 @@ useEffect(() => {
   const handleFreezerDeviceSelect = (deviceId) => {
     console.log("Card Selected")
     setSelectedFreezerDeviceId(deviceId)
-  if (!isDesktop) setOpen(true) 
+    if (!isDesktop) setOpen(true)
   }
 
 
 
   const onOrganizationChange = (id) => {
-  
-     const orgId = id || user?.organization;
-    
-  // If org hasn't changed, don't clear the venue or modify URL
-  if (orgId && String(orgId) === String(selectedOrgId)) {
-    return;
-  }
 
-  // Show loading and mark venue-fetch as not-done for the new org
-  // setHasFetchedForVenue(false);
-  // setFreezerDevicesLoading(true);
-    setIsContextChanging(true);  
+    const orgId = id || user?.organization;
+
+    // If org hasn't changed, don't clear the venue or modify URL
+    if (orgId && String(orgId) === String(selectedOrgId)) {
+      return;
+    }
+
+    // Show loading and mark venue-fetch as not-done for the new org
+    // setHasFetchedForVenue(false);
+    // setFreezerDevicesLoading(true);
+    setIsContextChanging(true);
     setSelectedOrgId(id || user?.organization)
     setSelectedVenueId("")
     // remove ?venue from URL
@@ -397,17 +403,120 @@ useEffect(() => {
   }
 
   const onVenueChange = (id) => {
-    
-  if (String(id) === String(selectedVenueId)) return;
-  setIsContextChanging(true);   // 🔥 ADD THIS
 
-  setSelectedVenueId(id)
-  const basePath = location.pathname.split("?")[0]
-  if (id) navigate(`${basePath}?venue=${id}`, { replace: false })
-  else navigate(basePath, { replace: false })
-}
+    if (String(id) === String(selectedVenueId)) return;
+    setIsContextChanging(true);   // 🔥 ADD THIS
 
-  
+    setSelectedVenueId(id)
+    const basePath = location.pathname.split("?")[0]
+    if (id) navigate(`${basePath}?venue=${id}`, { replace: false })
+    else navigate(basePath, { replace: false })
+  }
+
+
+  // NEW EFFECT: poll Influx for the last timestamp of all devices (non-blocking)
+useEffect(() => {
+  let mounted = true;
+  const controller = new AbortController();
+  const signal = controller.signal;
+  let intervalId = null;
+
+  // if no devices, clear state
+  if (!freezerDevices || freezerDevices.length === 0) {
+    setDeviceOnlineMap({});
+    setDeviceLastUpdateMap({});
+    return () => {};
+  }
+
+  // Influx envs (same names used in DownloadModal)
+  const influxUrl = import.meta.env.VITE_INFLUX_URL;
+  const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
+  const influxOrg = import.meta.env.VITE_INFLUX_ORG;
+  const influxBucket = import.meta.env.VITE_INFLUX_BUCKET;
+
+  // Skip if Influx not configured — don't block main UI
+  if (!influxUrl || !influxToken || !influxOrg || !influxBucket) {
+    console.warn("Influx env vars not set; skipping LED polling.");
+    return () => {};
+  }
+
+  const client = new InfluxDB({ url: influxUrl, token: influxToken });
+  const queryApi = client.getQueryApi(influxOrg);
+
+  const runQueryForAllDevices = async () => {
+    try {
+      // gather measurement names (assumes measurement names === deviceId)
+      const deviceIds = freezerDevices.map(d => String(d._id ?? d.id ?? d.deviceId)).filter(Boolean);
+      if (!deviceIds.length) return;
+
+      // build a filter "r._measurement == "id1" or r._measurement == "id2" ..."
+      const measureFilter = deviceIds.map(id => `r._measurement == "${id}"`).join(" or ");
+
+      // Use a relative range which covers recent data (here we use 30d - safe fallback)
+      // last() will return the last record per "group" (we'll group by _measurement implicitly)
+      const flux = `
+from(bucket: "${influxBucket}")
+  |> range(start: -30d)
+  |> filter(fn: (r) => ${measureFilter})
+  |> last()
+  |> keep(columns: ["_measurement", "_time"])
+`;
+
+      // NOTE: collectRows returns an array of rows; each row should have _measurement and _time
+      const rows = await queryApi.collectRows(flux);
+
+      if (!mounted) return;
+
+      // build maps
+      const lastMap = {};
+      for (const r of rows) {
+        // r._measurement and r._time expected
+        const m = r._measurement || r.measurement || r._measurement;
+        const t = r._time || r._time; // can be string or Date; we'll keep ISO
+        if (!m) continue;
+        // Normalize time to ISO string
+        const timeISO = (typeof t === "string") ? t : (t instanceof Date ? t.toISOString() : String(t));
+        lastMap[String(m)] = timeISO;
+      }
+
+      // compute online/offline from threshold (1.5 hours)
+      const thresholdMs = Date.now() - 1.5 * 60 * 60 * 1000; // now - 1.5 hours
+
+      const onlineMap = {};
+      deviceIds.forEach((id) => {
+        const timeISO = lastMap[id];
+        if (!timeISO) {
+          onlineMap[id] = false;
+        } else {
+          const ts = new Date(timeISO).getTime();
+          onlineMap[id] = Number.isFinite(ts) && ts >= thresholdMs;
+        }
+      });
+
+      // update state in a single set to minimize re-renders
+      setDeviceLastUpdateMap(prev => ({ ...prev, ...lastMap }));
+      setDeviceOnlineMap(prev => ({ ...prev, ...onlineMap }));
+
+    } catch (err) {
+      // do not throw; only log. This should not affect device rendering.
+      if (err.name === "AbortError") return;
+      console.error("Influx LED polling error:", err);
+    }
+  };
+
+  // Run immediately (but non-blocking) then start interval
+  runQueryForAllDevices();
+  intervalId = setInterval(() => {
+    runQueryForAllDevices();
+  }, POLL_MS); // reuse existing poll interval or change if you prefer
+
+  return () => {
+    mounted = false;
+    if (intervalId) clearInterval(intervalId);
+    controller.abort();
+  };
+}, [freezerDevices, POLL_MS]); // re-run when devices list changes
+
 
   // -------------------------
   // render states for loading / error
@@ -433,64 +542,64 @@ useEffect(() => {
     <div className="flex w-full flex-row h-full font-inter rounded-md bg-[#F5F6FA]">
       {/* Main Content Area */}
       <div className="flex-1 min-w-0 space-y-6 overflow-y-auto custom-scrollbar dashboard-main-content bg-white shadow-sm border border-[#E5E7EB]/30 p-4 lg:p-6">
-        
-          <>
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-              {
-                !isDesktopForIcon &&  <img src="/logo-half.png" alt="IOTFIY LOGO" className="w-auto h-[40px]" />
-              }
-              
 
-              <div className="  sm:w-[25rem] md:w-[13rem] lg:w-[20rem] xl:w-[25rem]">
-                {/* <p className="text-sm text-[#64748B] min-w-[250px] font-medium">Organization</p> */}
-                {user?.role === "admin" ? (
-                  <OrganizationSelect
-                    value={selectedOrgId}
-                    onChange={onOrganizationChange}
-                    className="mt-1"
-                  />
-                ): <>
-                  <p className="text-gray-500">Organization</p>
-                  <h3 className="text-gray-700 font-bold capitalize">{orgNameForTop || ""}</h3>
-                </>} 
-              </div>
+        <>
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            {
+              !isDesktopForIcon && <img src="/logo-half.png" alt="IOTFIY LOGO" className="w-auto h-[40px]" />
+            }
 
-              <div className="flex items-center  ml-5 sm:ml-auto  ">
-                <VenueSelect
-                  organizationId={selectedOrgId || user?.organization}
-                  value={selectedVenueId}
-                  onChange={onVenueChange}
-                  className=""
-                  excludeFirstN={user?.role === "user" ? 3 : 0}
+
+            <div className="  sm:w-[25rem] md:w-[13rem] lg:w-[20rem] xl:w-[25rem]">
+              {/* <p className="text-sm text-[#64748B] min-w-[250px] font-medium">Organization</p> */}
+              {user?.role === "admin" ? (
+                <OrganizationSelect
+                  value={selectedOrgId}
+                  onChange={onOrganizationChange}
+                  className="mt-1"
                 />
-              </div>            
+              ) : <>
+                <p className="text-gray-500">Organization</p>
+                <h3 className="text-gray-700 font-bold capitalize">{orgNameForTop || ""}</h3>
+              </>}
             </div>
 
-
-
-      {/* Freezer Device Cards area */}
-      <div className="flex-1 min-h-0">
-        <div className="freezer-cards-container custom-scrollbar">
-          {(isInitialDevicesLoad || isContextChanging) ? (
-      <div className="freezer-cards-grid freezer-cards-container">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <DeviceSkeleton key={index} />
-          ))}
-        </div>
-          ) : freezerDevices.length === 0 ? (
-            // No devices state (only shown when not loading)
-            <div className="flex flex-col items-center justify-center h-full text-[#64748B]">
-              <svg className="w-16 h-16 mb-4 text-[#E2E8F0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <p className="text-lg font-medium">No Freezer Devices Found</p>
-              <p className="text-sm">Add some freezer devices to get started</p>
+            <div className="flex items-center  ml-5 sm:ml-auto  ">
+              <VenueSelect
+                organizationId={selectedOrgId || user?.organization}
+                value={selectedVenueId}
+                onChange={onVenueChange}
+                className=""
+                excludeFirstN={user?.role === "user" ? 3 : 0}
+              />
             </div>
-          ) : (
-            // Devices present
-            <div className="freezer-cards-grid freezer-cards-container">
-              {/* {freezerDevices.map((device) => (
+          </div>
+
+
+
+          {/* Freezer Device Cards area */}
+          <div className="flex-1 min-h-0">
+            <div className="freezer-cards-container custom-scrollbar">
+              {(isInitialDevicesLoad || isContextChanging) ? (
+                <div className="freezer-cards-grid freezer-cards-container">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <DeviceSkeleton key={index} />
+                  ))}
+                </div>
+              ) : freezerDevices.length === 0 ? (
+                // No devices state (only shown when not loading)
+                <div className="flex flex-col items-center justify-center h-full text-[#64748B]">
+                  <svg className="w-16 h-16 mb-4 text-[#E2E8F0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <p className="text-lg font-medium">No Freezer Devices Found</p>
+                  <p className="text-sm">Add some freezer devices to get started</p>
+                </div>
+              ) : (
+                // Devices present
+                <div className="freezer-cards-grid freezer-cards-container">
+                  {/* {freezerDevices.map((device) => (
           
                 <FreezerDeviceCard
                     key={device._id ?? device.id}
@@ -519,110 +628,124 @@ useEffect(() => {
 
               ))} */}
 
-              {freezerDevices.map((device) => {
-              const idKey = device._id ?? device.id ?? device.deviceId;
-              const commonProps = {
-                key: idKey,
-                deviceId: device.deviceId,
-                ambientTemperature: device?.AmbientData?.temperature ?? device.ambientTemperature,
-                freezerTemperature: device?.FreezerData?.temperature ?? device.freezerTemperature,
-                onCardSelect: () => handleFreezerDeviceSelect(idKey),
-                isSelected: String(idKey) === String(selectedFreezerDeviceId),
-                espHumidity: device?.espHumidity,
-                espTemprature: device?.espTemprature,
-                temperatureAlert: device?.temperatureAlert,
-                humidityAlert: device?.humidityAlert,
-                odourAlert: device?.odourAlert,
-                espOdour: device?.espOdour,
-  };
-
-  if (device?.deviceType === "AQIMD") {
-    // render the dedicated AQI card
-    return (
-      <AQIDeviceCard
-        {...commonProps}
-        espAQI={device?.espAQI}
-        aqiAlert={device?.aqiAlert}
-      />
-    );
-  }
-
-   if (device?.deviceType === "TMD") {
-    // render the dedicated AQI card
-    return (
-      <TemperatureHumidityDeviceCard
-        {...commonProps}
-        pollHitTime={pollHitTime}
-      />
-    );
-  }
+                  {freezerDevices.map((device) => {
+                    // const idKey = device._id ?? device.id ?? device.deviceId;
+                    // const isOnline = Boolean(deviceOnlineMap[String(idKey)]); // default false if not found
+                    // const lastUpdateISO = deviceLastUpdateMap[String(idKey)] || null;
 
 
-  if (device?.deviceType === "OMD") {
-  return (
-    <OdourDeviceCard
-      {...commonProps}
-      espOdour={device?.espOdour}
-      odourAlert={device?.odourAlert}
-    />
-  );
-}
+                    // keep Mongo _id for React key/selection behaviour
+                    const idKey = device._id ?? device.id ?? device.deviceId;
 
-if (device?.deviceType === "GLMD") {
-  return (
-    <GasLeakageDeviceCard
-      {...commonProps}
-      espGL={device?.espGL}
-      glAlert={device?.glAlert}
-    />
-  );
-}
+                    // use device.deviceId (Influx measurement) to look up the LED state
+                    const influxKey = String(device.deviceId);
+                    const isOnline = Boolean(deviceOnlineMap[influxKey]); // deviceOnlineMap keys are deviceId
+                    const lastUpdateISO = deviceLastUpdateMap[influxKey] || null;
+                    
+                    const commonProps = {
+                      key: idKey,
+                      deviceId: device.deviceId,
+                      ambientTemperature: device?.AmbientData?.temperature ?? device.ambientTemperature,
+                      freezerTemperature: device?.FreezerData?.temperature ?? device.freezerTemperature,
+                      onCardSelect: () => handleFreezerDeviceSelect(idKey),
+                      isSelected: String(idKey) === String(selectedFreezerDeviceId),
+                      espHumidity: device?.espHumidity,
+                      espTemprature: device?.espTemprature,
+                      temperatureAlert: device?.temperatureAlert,
+                      humidityAlert: device?.humidityAlert,
+                      odourAlert: device?.odourAlert,
+                      espOdour: device?.espOdour,
+                      isOnline,
+                      lastUpdateISO,
+                    };
+
+                    if (device?.deviceType === "AQIMD") {
+                      // render the dedicated AQI card
+                      return (
+                        <AQIDeviceCard
+                          {...commonProps}
+                          espAQI={device?.espAQI}
+                          aqiAlert={device?.aqiAlert}
+                        />
+                      );
+                    }
+
+                    if (device?.deviceType === "TMD") {
+                      // render the dedicated AQI card
+                      return (
+                        <TemperatureHumidityDeviceCard
+                          {...commonProps}
+                          pollHitTime={pollHitTime}
+                        />
+                      );
+                    }
 
 
-  // non-AQI types use the existing FreezerDeviceCard
-  return (
-    <FreezerDeviceCard
-            {...commonProps}
-            deviceType={device?.deviceType}
-            espAQI={device?.espAQI}
-            aqiAlert={device?.aqiAlert}
-            espGL={device?.espGL}
-            glAlert={device?.glAlert}
-            batteryLow={device?.batteryLow}
-            refrigeratorAlert={device?.refrigeratorAlert}
-          />
-        );
-      })}
+                    if (device?.deviceType === "OMD") {
+                      return (
+                        <OdourDeviceCard
+                          {...commonProps}
+                          espOdour={device?.espOdour}
+                          odourAlert={device?.odourAlert}
+                        />
+                      );
+                    }
+
+                    if (device?.deviceType === "GLMD") {
+                      return (
+                        <GasLeakageDeviceCard
+                          {...commonProps}
+                          espGL={device?.espGL}
+                          glAlert={device?.glAlert}
+                        />
+                      );
+                    }
+
+
+                    // non-AQI types use the existing FreezerDeviceCard
+                    return (
+                      <FreezerDeviceCard
+                        {...commonProps}
+                        deviceType={device?.deviceType}
+                        espAQI={device?.espAQI}
+                        aqiAlert={device?.aqiAlert}
+                        espGL={device?.espGL}
+                        glAlert={device?.glAlert}
+                        batteryLow={device?.batteryLow}
+                        refrigeratorAlert={device?.refrigeratorAlert}
+                      />
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-            <AlertsPanel organizationId={selectedOrgId} pollInterval={POLL_MS} />
-            {/* <AlertsPanel organizationId={selectedOrgId} pollInterval={2 * 1000} /> */}
-          </>
+          <AlertsPanel organizationId={selectedOrgId} pollInterval={POLL_MS} />
+          {/* <AlertsPanel organizationId={selectedOrgId} pollInterval={2 * 1000} /> */}
+        </>
         {/* )} */}
 
       </div>
 
-{isDesktop ? (
-    //     <DashboardRightPanel
-    //   freezerDevices={freezerDevices}
-    //   selectedFreezerDeviceId={selectedFreezerDeviceId}
-    //   selectedOrgId={selectedOrgId}
-      
-    // />  
+      {isDesktop ? (
+        //     <DashboardRightPanel
+        //   freezerDevices={freezerDevices}
+        //   selectedFreezerDeviceId={selectedFreezerDeviceId}
+        //   selectedOrgId={selectedOrgId}
 
-    <DashboardRightPanel
-  freezerDevices={freezerDevices}
-  selectedFreezerDeviceId={selectedFreezerDeviceId}
-  selectedOrgId={selectedOrgId}
-  pollInterval={POLL_MS}
-/>
+        // />  
 
-    ) : (
-      <Drawer open={open} onClose={toggleDrawer(false)} anchor="right">
-        {/* <DashboardRightPanel
+        <DashboardRightPanel
+          freezerDevices={freezerDevices}
+          selectedFreezerDeviceId={selectedFreezerDeviceId}
+          selectedOrgId={selectedOrgId}
+          pollInterval={POLL_MS}
+        />
+
+      ) : (
+        <Drawer open={open} onClose={toggleDrawer(false)} anchor="right">
+          {/* <DashboardRightPanel
       freezerDevices={freezerDevices}
       selectedFreezerDeviceId={selectedFreezerDeviceId}
       selectedOrgId={selectedOrgId}
@@ -630,17 +753,17 @@ if (device?.deviceType === "GLMD") {
        onClose={toggleDrawer(false)}
     /> */}
 
-    <DashboardRightPanel
-  freezerDevices={freezerDevices}
-  selectedFreezerDeviceId={selectedFreezerDeviceId}
-  selectedOrgId={selectedOrgId}
-  closeIcon={true}
-  onClose={toggleDrawer(false)}
-  pollInterval={POLL_MS}
-/>
+          <DashboardRightPanel
+            freezerDevices={freezerDevices}
+            selectedFreezerDeviceId={selectedFreezerDeviceId}
+            selectedOrgId={selectedOrgId}
+            closeIcon={true}
+            onClose={toggleDrawer(false)}
+            pollInterval={POLL_MS}
+          />
 
-      </Drawer>
-    )}
+        </Drawer>
+      )}
     </div>
   )
 }

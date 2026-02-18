@@ -235,7 +235,7 @@ function getAQIStatus(aqi) {
   const v = Number(aqi);
   if (v <= 50) return { label: "Good", color: "bg-emerald-200", textColor: "text-emerald-800" };
   if (v <= 100) return { label: "Moderate", color: "bg-yellow-200", textColor: "text-yellow-800" };
-  if (v <= 150) return { label: "Sensitive", color: "bg-yellow-600", textColor: "text-yellow-900" };
+  if (v <= 150) return { label: "Sensitive", color: "bg-yellow-500", textColor: "text-yellow-900" };
   if (v <= 200) return { label: "Unhealthy", color: "bg-rose-200", textColor: "text-rose-800" };
   if (v <= 300) return { label: "Severe", color: "bg-pink-300", textColor: "text-pink-900" };
   return { label: "Hazardous", color: "bg-violet-300", textColor: "text-violet-900" };

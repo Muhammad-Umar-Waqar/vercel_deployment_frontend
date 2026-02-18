@@ -470,8 +470,8 @@ const timeOfDay =
     return Math.round(pct);
   };
 
-  const tempKnob = knobPosPercent(temp);
-  const humKnob = knobPosPercent(hum, 0, 100);
+  // const tempKnob = knobPosPercent(temp);
+  // const humKnob = knobPosPercent(hum, 0, 100);
 
   const cardSelectedClass = isSelected ? "shadow-lg transform scale-[1.01]" : "";
 
@@ -575,7 +575,7 @@ const timeOfDay =
 {/* 
          <TemperatureRangeMeter value={temp !== null ? Math.round(temp) : 0} /> */}
 
-<TemperatureRangeMeter value={temp !== null ? Math.round(temp) : 0} />
+        <TemperatureRangeMeter value={temp !== null ? Math.round(temp) : 0} />
 
 
         </div>
@@ -588,7 +588,7 @@ const timeOfDay =
             <div className="">
               <div className="text-sm text-gray-500">Temperature</div>
               <div className="text-3xl font-bold">
-                {temp !== null ? `${Math.round(temp)}` : "--"} <span className="font-normal">°C</span>
+                {temp !== null ? `${Math.round(temp)}` : "--"}<span className="font-normal">°C</span>
               </div>
               {/* status bar below temperature */}
               <div className=" mt-2">

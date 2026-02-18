@@ -446,11 +446,18 @@ useEffect(() => {
   const runQueryForAllDevices = async () => {
     try {
       // gather measurement names (assumes measurement names === deviceId)
-      const deviceIds = freezerDevices.map(d => String(d._id ?? d.id ?? d.deviceId)).filter(Boolean);
+      // const deviceIds = freezerDevices.map(d => String(d._id ?? d.id ?? d.deviceId)).filter(Boolean);
+      // use deviceId only for Influx queries
+const deviceIds = freezerDevices.map(d => String(d.deviceId).trim()).filter(Boolean);
+console.log("LED DEBUG: deviceIds for influx:", deviceIds);
+
       if (!deviceIds.length) return;
 
       // build a filter "r._measurement == "id1" or r._measurement == "id2" ..."
       const measureFilter = deviceIds.map(id => `r._measurement == "${id}"`).join(" or ");
+
+      console.log("LED DEBUG: measureFilter =", measureFilter);
+
 
       // Use a relative range which covers recent data (here we use 30d - safe fallback)
       // last() will return the last record per "group" (we'll group by _measurement implicitly)
@@ -462,9 +469,12 @@ from(bucket: "${influxBucket}")
   |> keep(columns: ["_measurement", "_time"])
 `;
 
+
+console.log("LED DEBUG: flux query:\n", flux);
+
       // NOTE: collectRows returns an array of rows; each row should have _measurement and _time
       const rows = await queryApi.collectRows(flux);
-
+      console.log("LED DEBUG: influx rows:", rows);
       if (!mounted) return;
 
       // build maps
@@ -479,9 +489,14 @@ from(bucket: "${influxBucket}")
         lastMap[String(m)] = timeISO;
       }
 
+      console.log("LED DEBUG: lastMap (measurement -> _time):", lastMap);
+
+
       // compute online/offline from threshold (1.5 hours)
       const thresholdMs = Date.now() - 1.5 * 60 * 60 * 1000; // now - 1.5 hours
 
+      console.log("LED DEBUG: thresholdMs (ms) =", thresholdMs, " =>", new Date(thresholdMs).toISOString());
+      
       const onlineMap = {};
       deviceIds.forEach((id) => {
         const timeISO = lastMap[id];
@@ -495,6 +510,8 @@ from(bucket: "${influxBucket}")
 
       // update state in a single set to minimize re-renders
       setDeviceLastUpdateMap(prev => ({ ...prev, ...lastMap }));
+      console.log("LED DEBUG: onlineMap computed:", onlineMap);
+
       setDeviceOnlineMap(prev => ({ ...prev, ...onlineMap }));
 
     } catch (err) {
@@ -641,7 +658,7 @@ from(bucket: "${influxBucket}")
                     const influxKey = String(device.deviceId);
                     const isOnline = Boolean(deviceOnlineMap[influxKey]); // deviceOnlineMap keys are deviceId
                     const lastUpdateISO = deviceLastUpdateMap[influxKey] || null;
-                    
+
                     const commonProps = {
                       key: idKey,
                       deviceId: device.deviceId,

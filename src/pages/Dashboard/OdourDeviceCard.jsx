@@ -21,6 +21,11 @@ export default function OdourDeviceCard({
     return Number.isFinite(n) ? Math.trunc(n) : null;
   };
 
+
+  console.log("OdourCard props:", { deviceId, isOnline, lastUpdateISO });
+
+
+  
   const displayTemp = toInt(espTemprature);
   const displayHumidity = toInt(espHumidity);
   const displayOdour = toInt(espOdour);

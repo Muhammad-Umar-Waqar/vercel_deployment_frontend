@@ -432,7 +432,7 @@ useEffect(() => {
   const influxUrl = import.meta.env.VITE_INFLUX_URL;
   const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
   const influxOrg = import.meta.env.VITE_INFLUX_ORG;
-  const influxBucket = import.meta.env.VITE_INFLUX_BUCKET;
+  const influxBucket = "Odour";
 
   // Skip if Influx not configured — don't block main UI
   if (!influxUrl || !influxToken || !influxOrg || !influxBucket) {

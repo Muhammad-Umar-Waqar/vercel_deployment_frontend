@@ -209,7 +209,7 @@ import PropTypes from "prop-types";
 
 export default function TemperatureRangeMeter({
   value = 0,
-  min = 0,
+  min = 16,
   max = 40,
 }) {
   const numericValue = Number(value);

@@ -463,12 +463,12 @@ const timeOfDay =
   const statusColorClass = (hasAlert) =>
     hasAlert ? "bg-rose-300" : "bg-emerald-200";
 
-  const knobPosPercent = (value, min = -10, max = 50) => {
-    if (value === null) return 0;
-    const clamped = Math.max(min, Math.min(max, value));
-    const pct = ((clamped - min) / (max - min)) * 100;
-    return Math.round(pct);
-  };
+  // const knobPosPercent = (value, min = -10, max = 50) => {
+  //   if (value === null) return 0;
+  //   const clamped = Math.max(min, Math.min(max, value));
+  //   const pct = ((clamped - min) / (max - min)) * 100;
+  //   return Math.round(pct);
+  // };
 
   // const tempKnob = knobPosPercent(temp);
   // const humKnob = knobPosPercent(hum, 0, 100);

@@ -870,10 +870,12 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
             onChange={(e) => setVenueName(e.target.value)}
           />
 
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="edit-org-select-label">Organization (assign venue)</InputLabel>
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id="demo-simple-select-label">Organization</InputLabel>
             <Select
-              labelId="edit-org-select-label"
+              labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                 label="Organization"
               value={orgId || ""}
               onChange={(e) => setOrgId(e.target.value)}
             >

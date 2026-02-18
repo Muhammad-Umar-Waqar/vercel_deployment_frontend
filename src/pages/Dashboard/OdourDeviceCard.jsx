@@ -91,7 +91,7 @@ export default function OdourDeviceCard({
               {/* <h3 className={`responsive-value-deviceId `}>{deviceId}</h3> */}
               <div className="text-lg font-bold">{deviceId}</div>
             </div>
-            <div className="ambient-pill bg-white/20 border border-white/30 flex items-center">
+            <div className={`ambient-pill ${odourAlert? "bg-rose-700/20": "bg-white/20"} border border-white/30 flex items-center`}>
               <img src={devicePill.img} alt={devicePill.alt} className="h-[2rem] w-[2rem] py-1" />
               <div>
                 <p className="responsive-value-status">{devicePill.label}</p>

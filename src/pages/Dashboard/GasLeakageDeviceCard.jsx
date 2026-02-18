@@ -2,7 +2,7 @@
 
 import "../../styles/global/fonts.css";
 import "../../styles/pages/Dashboard/freezer-cards-responsive.css";
-import { Zap } from "lucide-react";
+import { Wind, Zap } from "lucide-react";
 import PropTypes from "prop-types";
 
 export default function GasLeakageDeviceCard({
@@ -35,14 +35,14 @@ export default function GasLeakageDeviceCard({
   if (glAlert) alertStatus = "gas";
   else if (hasTempOrHum) alertStatus = "other";
 
-  const textClass = alertStatus !== "none" ? "text-white" : "text-black";
+  // const textClass = alertStatus !== "none" ? "text-white" : "text-black";
 
-  const bgClass =
-    alertStatus === "gas"
-      ? "bg-[#F59E0B]" // amber
-      : alertStatus === "other"
-      ? "bg-green-400"
-      : "bg-white";
+  // const bgClass =
+  //   alertStatus === "gas"
+  //     ? "bg-[#F59E0B]" // amber
+  //     : alertStatus === "other"
+  //     ? "bg-green-400"
+  //     : "bg-white";
 
   const selectedClass = isSelected
     ? "shadow-lg transition-transform duration-300 ease-out"
@@ -68,9 +68,10 @@ export default function GasLeakageDeviceCard({
           </div>
 
           {/* Gas Pill */}
-          <div className="ambient-pill bg-white/20 border border-white/30 flex items-center">
+            
+          <div className={`ambient-pill ${glAlert? "bg-rose-700/20": "bg-white/20"} border border-white/30 flex items-center `}>
             <div className="px-2">
-              <Zap size={20} className={"text-amber-600"} />
+              <Wind size={22} className={"text-orange-500 my-1"} />
             </div>
             <p className="responsive-value-status">
               {displayGas !== null ? `${displayGas}%` : "--"}
@@ -91,7 +92,7 @@ export default function GasLeakageDeviceCard({
                   {displayHumidity !== null ? `${displayHumidity}%` : "--"}
                 </span>
                    <p className={`h-2 w-[2.7rem] rounded-full ${humidityAlert ? "bg-rose-300" :  "bg-[#BAEACC]"}`}/>
-               
+              
               </div>
             </div>
 
@@ -113,7 +114,7 @@ export default function GasLeakageDeviceCard({
         </div>
 
         {/* Bottom Alert */}
-        {glAlert && (
+        {/* {glAlert && (
           <div className="bg-gray-100 -m-4 w-[calc(100%+2rem)] py-1 px-5 flex items-center justify-between">
             <h4 className="">Alert</h4>
             <div className="flex items-center">
@@ -121,7 +122,7 @@ export default function GasLeakageDeviceCard({
               <Zap size={20} className="text-amber-600" />
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

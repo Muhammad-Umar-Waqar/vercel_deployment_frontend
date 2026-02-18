@@ -791,6 +791,16 @@ export default function VenueDetailsPanel({
       alertFlag: !!humidityAlert,
       color: "green"
     };
+    if (String(deviceType) === "TMD") {
+  return [
+    {
+      ...tempMetric,
+      color: "red",  
+    },
+    humMetric,
+  ];
+}
+
     if (String(deviceType) === "OMD") {
       return [
         { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
@@ -803,7 +813,7 @@ export default function VenueDetailsPanel({
     }
     if (String(deviceType) === "AQIMD") {
       return [
-        { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "purple" },
+        { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
         tempMetric,
         humMetric,
       ];

@@ -71,7 +71,7 @@ export default function GasLeakageDeviceCard({
             
           <div className={`ambient-pill ${glAlert? "bg-rose-700/20": "bg-white/20"} border border-white/30 flex items-center `}>
             <div className="px-2">
-              <Wind size={22} className={"text-orange-500 my-1"} />
+              <Wind size={24} className={"text-orange-500 my-1"} />
             </div>
             <p className="responsive-value-status">
               {displayGas !== null ? `${displayGas}%` : "--"}

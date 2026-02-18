@@ -188,7 +188,7 @@
 }
 
 .ambient-pill {
-  border: solid black 0.5px;
+  border: solid rgba(0, 0, 0, 0.272) 0.5px;
   border-radius: 9999px;
   padding: 0 0.5rem 0 0.1rem;
   font-size: 0.55rem;

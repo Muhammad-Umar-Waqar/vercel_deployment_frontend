@@ -196,6 +196,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 // src/pages/management/AddVenue.jsx
 import { useState, useEffect } from "react";
 import { Box as LucideBox } from "lucide-react"; // keep your lucide Box name
@@ -398,9 +408,9 @@ const AddVenue = () => {
 
         {/* Priority using MUI checkboxes (mutually exclusive selection) */}
         <div>
-          <label className="block text-sm font-medium mb-2">Priority</label>
+          {/* <label className="block text-sm font-medium mb-2">Priority</label> */}
 
-          <div className="flex gap-2 items-center">
+          {/* <div className="flex gap-2 items-center"> */}
             {/* <FormControlLabel
               control={
                 <Checkbox
@@ -428,7 +438,7 @@ const AddVenue = () => {
               label="High"
             /> */}
 
-<FormControlLabel
+{/* <FormControlLabel
   control={
     <Checkbox
       checked={form.priority === "high"}
@@ -443,17 +453,17 @@ const AddVenue = () => {
     />
   }
   label="High"
-/>
+/> */}
 
             
-          </div>
+          {/* </div> */}
 
           {/* <Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
             Saved locally — affects order in selects on this browser only.
           </Typography> */}
 
           {/* Show current high and allow removing it */}
-          {currentHighId ? (
+          {/* {currentHighId ? (
             <div className="mt-3 flex items-center justify-between gap-3">
               <div>
                 <div className="text-xs text-gray-600">Current high priority</div>
@@ -463,7 +473,7 @@ const AddVenue = () => {
                 Remove high priority
               </Button>
             </div>
-          ) : null}
+          ) : null} */}
         </div>
 
         <button

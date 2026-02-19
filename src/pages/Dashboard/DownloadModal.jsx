@@ -1026,6 +1026,17 @@ const fields = Object.keys(
   const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
   const influxOrg = import.meta.env.VITE_INFLUX_ORG;
 
+  console.log({
+  influxUrl,
+  influxOrg,
+  bucket,
+  measurement,
+  // startISO,
+  // endISO
+});
+
+
+
   const queryInflux = async (startISO, endISO) => {
     if (!influxUrl || !influxToken || !influxOrg) {
       throw new Error("Influx env vars are not set (VITE_INFLUX_URL/TOKEN/ORG).");
@@ -1047,15 +1058,6 @@ from(bucket: "${bucket}")
   |> keep(columns: ["_time", ${fields.map((f) => `"${f}"`).join(", ")}])
   |> sort(columns: ["_time"])
 `;
-console.log({
-  influxUrl,
-  influxOrg,
-  bucket,
-  measurement,
-  startISO,
-  endISO
-});
-
 
     // collect rows (array of objects)
     const result = await queryApi.collectRows(flux);
@@ -1271,9 +1273,15 @@ end.setHours(23, 59, 59, 999);
           >
             <TableCell>{new Date(r.time).toLocaleString()}</TableCell>
             {fields.map((f) => (
+              // <TableCell key={f} align="right">
+              //   {r[f] !== undefined ? r[f] : ""}
+              // </TableCell>
               <TableCell key={f} align="right">
-                {r[f] !== undefined ? r[f] : ""}
-              </TableCell>
+              {r[f] !== undefined
+                ? `${r[f]} ${DEVICE_FIELDS_CONFIG[deviceType][f]?.unit || ""}`
+                : ""}
+            </TableCell>
+
             ))}
           </TableRow>
         ))}

@@ -219,13 +219,7 @@ const handleLogin = async (email, password) => {
         {/* Right (Images) Section */}
         <div style={{backgroundColor:'#EAEAEA'}} className=" h-full hidden md:flex flex-col items-center justify-between p-4"> {/* Changed to flex-col and justify-between for image placement */}
           {/* Top Image */}
-          <div className="w-full flex justify-end p-4"> {/* Aligned to top right */}
-            <img
-              src={'login-right-top-image.png'}
-              className="h-16 w-auto object-contain" 
-              alt="Top Right Illustration"
-            />
-          </div>
+          
 
           {/* Main Image */}
           <div className="flex-grow flex items-center justify-center p-4"> {/* Takes remaining space */}

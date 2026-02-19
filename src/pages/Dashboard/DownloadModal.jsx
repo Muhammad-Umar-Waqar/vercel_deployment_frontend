@@ -1115,37 +1115,76 @@ end.setHours(23, 59, 59, 999);
     }
   };
 
-  const downloadCsv = () => {
-    if (!rows.length) {
-      setError("No data to download. Fetch data first.");
-      return;
-    }
-    // build CSV
-    // const header = ["time", ...fields];
-    const header = [
-  "time",
-  ...fields.map(
-    (f) => DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f
-  ),
-];
+  
 
-    const csvRows = [header.join(",")];
-    for (const r of rows) {
-      const line = [r.time, ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f]))];
-      // escape commas/quotes simple way
-      csvRows.push(line.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","));
-    }
-    const csv = csvRows.join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    const startPart = startDate ? new Date(startDate).toISOString().slice(0, 10) : "start";
-    const endPart = (singleDay ? startPart : endDate ? new Date(endDate).toISOString().slice(0, 10) : "end");
-    a.download = `influx_${measurement}_${startPart}_to_${endPart}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+//   const downloadCsv = () => {
+//     if (!rows.length) {
+//       setError("No data to download. Fetch data first.");
+//       return;
+//     }
+//     // build CSV
+//     // const header = ["time", ...fields];
+//     const header = [
+//   "time",
+//   ...fields.map(
+//     (f) => DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f
+//   ),
+// ];
+
+//     const csvRows = [header.join(",")];
+//     for (const r of rows) {
+//       const line = [r.time, ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f]))];
+//       // escape commas/quotes simple way
+//       csvRows.push(line.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","));
+//     }
+//     const csv = csvRows.join("\n");
+//     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+//     const url = URL.createObjectURL(blob);
+//     const a = document.createElement("a");
+//     a.href = url;
+//     const startPart = startDate ? new Date(startDate).toISOString().slice(0, 10) : "start";
+//     const endPart = (singleDay ? startPart : endDate ? new Date(endDate).toISOString().slice(0, 10) : "end");
+//     a.download = `influx_${measurement}_${startPart}_to_${endPart}.csv`;
+//     a.click();
+//     URL.revokeObjectURL(url);
+//   };
+
+
+const downloadCsv = () => {
+  if (!rows.length) {
+    setError("No data to download. Fetch data first.");
+    return;
+  }
+
+  // build header (quoted & escaped like values)
+  const headerFields = ["time", ...fields.map((f) => DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f)];
+  const escape = (v) => `"${String(v).replace(/"/g, '""')}"`;
+  const headerRow = headerFields.map(escape).join(",");
+
+  // build body rows
+  const csvRows = [headerRow];
+  for (const r of rows) {
+    const line = [r.time, ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f]))];
+    csvRows.push(line.map((v) => escape(v)).join(","));
+  }
+
+  const csvBody = csvRows.join("\n");
+
+  // Prepend UTF-8 BOM so Excel/Windows detects UTF-8 and shows characters like "₃" correctly.
+  const BOM = "\uFEFF";
+  const blob = new Blob([BOM + csvBody], { type: "text/csv;charset=utf-8;" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const startPart = startDate ? new Date(startDate).toISOString().slice(0, 10) : "start";
+  const endPart = (singleDay ? startPart : endDate ? new Date(endDate).toISOString().slice(0, 10) : "end");
+  a.download = `influx_${measurement}_${startPart}_to_${endPart}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+
 
   const handleClose = () => {
     // reset if you prefer
@@ -1273,14 +1312,14 @@ end.setHours(23, 59, 59, 999);
           >
             <TableCell>{new Date(r.time).toLocaleString()}</TableCell>
             {fields.map((f) => (
-              // <TableCell key={f} align="right">
-              //   {r[f] !== undefined ? r[f] : ""}
-              // </TableCell>
               <TableCell key={f} align="right">
-              {r[f] !== undefined
-                ? `${r[f]} ${DEVICE_FIELDS_CONFIG[deviceType][f]?.unit || ""}`
-                : ""}
-            </TableCell>
+                {r[f] !== undefined ? r[f] : ""}
+              </TableCell>
+            //   <TableCell key={f} align="right">
+            //   {r[f] !== undefined
+            //     ? `${r[f]} ${DEVICE_FIELDS_CONFIG[deviceType][f]?.unit || ""}`
+            //     : ""}
+            // </TableCell>
 
             ))}
           </TableRow>

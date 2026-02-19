@@ -3605,7 +3605,9 @@ from(bucket: "${influxBucket}")
         const lastMap = {};
         for (const r of rows) {
           const m = r._measurement || r.measurement || r._measurement;
-          const t = r._time || r._time;
+          // const t = r._time || r._time;
+          const t = r._time ?? r.time ?? null;
+
           if (!m) continue;
           const timeISO = typeof t === "string" ? t : t instanceof Date ? t.toISOString() : String(t);
           lastMap[String(m)] = timeISO;

@@ -603,6 +603,9 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
   const { Organizations = [], isLoading: orgsLoading } = useSelector((state) => state.Organization || {});
   const { user } = useStore();
 
+  // const [orgFilter, setOrgFilter] = useState(""); // existing
+  const [originalOrgId, setOriginalOrgId] = useState(""); // NEW: track venue's org before edit
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [venueName, setVenueName] = useState("");
@@ -614,6 +617,23 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
 
   const isDesktop = useMediaQuery("(min-width:768px)");
   const isMobile = !isDesktop;
+
+
+    // Listen for cross-tab/component updates and refresh the current view
+  useEffect(() => {
+    const handler = () => {
+      if (orgFilter) {
+        dispatch(fetchVenuesByOrganization(orgFilter)).catch(() => {});
+      } else {
+        dispatch(fetchAllVenues()).catch(() => {});
+      }
+    };
+    window.addEventListener("venue:updated", handler);
+    return () => window.removeEventListener("venue:updated", handler);
+  }, [dispatch, orgFilter]);
+
+
+
 
   useEffect(() => {
     dispatch(fetchAllVenues());
@@ -641,18 +661,45 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
 
     if (!result.isConfirmed) return;
 
-    try {
-      await dispatch(deleteVenue(id)).unwrap();
-      if (isMobile) setDrawerOpen(false);
+    // try {
+    //   await dispatch(deleteVenue(id)).unwrap();
+    //   if (isMobile) setDrawerOpen(false);
 
-      Swal.fire({
-        title: "Deleted!",
-        text: `${name} has been deleted.`,
-        icon: "success",
-        timer: 1400,
-        showConfirmButton: false,
-      });
-    } catch (err) {
+    //   Swal.fire({
+    //     title: "Deleted!",
+    //     text: `${name} has been deleted.`,
+    //     icon: "success",
+    //     timer: 1400,
+    //     showConfirmButton: false,
+    //   });
+    // } 
+    
+
+    try {
+  await dispatch(deleteVenue(id)).unwrap();
+
+  // 1️⃣ Refresh global list
+  dispatch(fetchAllVenues()).catch(() => {});
+
+  // 2️⃣ If currently filtered by org, refresh that org cache
+  if (orgFilter) {
+    dispatch(fetchVenuesByOrganization(orgFilter)).catch(() => {});
+  }
+
+  // 3️⃣ Notify other listeners
+  window.dispatchEvent(new Event("venue:updated"));
+
+  if (isMobile) setDrawerOpen(false);
+
+  Swal.fire({
+    title: "Deleted!",
+    text: `${name} has been deleted.`,
+    icon: "success",
+    timer: 1400,
+    showConfirmButton: false,
+  });
+    }
+    catch (err) {
       console.error(err);
       if (isMobile) setDrawerOpen(false);
       Swal.fire({ title: "Error!", text: err?.toString() || "Failed to delete venue", icon: "error" });
@@ -673,6 +720,7 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
       }
     }
     setOrgId(initialOrg);
+    setOriginalOrgId(initialOrg)
     setEditOpen(true);
   };
 
@@ -681,6 +729,7 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
     setVenueId(null);
     setVenueName("");
     setOrgId("");
+       setOriginalOrgId("");
   };
 
   const handleEditSave = async () => {
@@ -691,9 +740,12 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
       const payload = { id: venueId, name };
       if (orgId) payload.organizationId = orgId;
 
-      await dispatch(updateVenue(payload)).unwrap();
+      
+      // call update and capture returned updated venue
+      const updated = await dispatch(updateVenue(payload)).unwrap();
 
       handleEditClose();
+      
       Swal.fire({
         title: "Updated!",
         text: `Venue updated to ${name}.`,
@@ -701,6 +753,35 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
         timer: 1400,
         showConfirmButton: false,
       });
+
+      // determine new organization id from returned updated object (be defensive)
+      const newOrgId =
+        (updated && (updated.organization?._id ?? updated.organization ?? updated.organizationId)) ||
+        orgId ||
+        "";
+
+
+        // Refresh caches:
+      // 1) refresh global list (optional but keeps global Venues in sync)
+      dispatch(fetchAllVenues()).catch(() => {});
+
+      // 2) refresh original org list (if present)
+      if (originalOrgId) {
+        dispatch(fetchVenuesByOrganization(originalOrgId)).catch(() => {});
+      }
+
+      // 3) refresh new org list (if different from original)
+      if (newOrgId && newOrgId !== originalOrgId) {
+        dispatch(fetchVenuesByOrganization(newOrgId)).catch(() => {});
+      }
+
+      // notify other listeners
+      window.dispatchEvent(new Event("venue:updated"));
+
+      // clear originalOrgId (reset)
+      setOriginalOrgId("");
+
+
     } catch (err) {
       console.error(err);
       Swal.fire({ title: "Error!", text: err?.toString() || "Failed to update venue", icon: "error" });

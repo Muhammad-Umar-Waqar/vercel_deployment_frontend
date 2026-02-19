@@ -211,7 +211,7 @@ import { useState, useEffect } from "react";
 import { Box as LucideBox } from "lucide-react"; // keep your lucide Box name
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
-import { createVenue, fetchAllVenues } from "../../slices/VenueSlice";
+import { createVenue, fetchAllVenues, fetchVenuesByOrganization  } from "../../slices/VenueSlice";
 import { fetchAllOrganizations } from "../../slices/OrganizationSlice";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
@@ -310,7 +310,16 @@ const AddVenue = () => {
 
 
       // refresh list + notify selects in the same tab
+     // refresh list + notify selects in the same tab
       await dispatch(fetchAllVenues());
+
+      // ALSO refresh the per-organization cache so VenueList (when filtered) updates immediately
+      if (organization) {
+        // dispatch the per-org fetch so venuesByOrg[organization] contains the new venue
+        dispatch(fetchVenuesByOrganization(organization)).catch(() => {});
+      }
+
+      // notify other listeners (keeps your existing event)
       window.dispatchEvent(new Event("venue:updated"));
 
       // update local view of current high
@@ -478,7 +487,7 @@ const AddVenue = () => {
 
         <button
           type="submit"
-          className={`w-full bg-[#1E64D9] hover:bg-[#1557C7] text-white font-semibold py-2.5 px-4 rounded-md transition duration-300 shadow-md ${
+          className={`w-full bg-[#1E64D9] cursor-pointer hover:bg-[#1557C7] text-white font-semibold py-2.5 px-4 rounded-md transition duration-300 shadow-md ${
             formLoading ? "opacity-70 cursor-not-allowed" : ""
           }`}
           disabled={formLoading}

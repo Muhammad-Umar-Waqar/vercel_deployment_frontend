@@ -26,9 +26,10 @@ import ResetPassword from './pages/Authentication/ResetPassword';
 import PublicRoute from './Routes/PublicRoute';
 import NotFound from './pages/NotFound';
 import UserCreatedByAdminRoute from './Routes/UserCreatedByAdminRoute';
-
+import { OrgVenueProvider } from "./contexts/OrgVenueContext";
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+       <OrgVenueProvider>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
           <BrowserRouter>
@@ -99,6 +100,7 @@ createRoot(document.getElementById('root')).render(
           </BrowserRouter>
       </PersistGate>
     </Provider>
+    </OrgVenueProvider>
   </StrictMode>
 );
 

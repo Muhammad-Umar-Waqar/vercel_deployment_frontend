@@ -668,6 +668,295 @@
 
 
 
+// Fully working code but Single Day Functionlity is not here
+// // src/pages/Dashboard/VenueDetailsPanel.jsx
+// import AlertsChart from "./AlertsChart";
+// import { useDispatch, useSelector } from "react-redux";
+// import { useStore } from "../../contexts/storecontexts";
+// import { useEffect, useState } from "react";
+// import QRCode from "./QrCode";
+// import { useLocation } from "react-router-dom";
+// import CloseIcon from '@mui/icons-material/Close';
+// import { IconButton, Skeleton } from "@mui/material";
+// import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
+// import { Download, Cloud, Zap } from "lucide-react";
+// import Swal from "sweetalert2";
+// import DownloadModal from "./DownloadModal";
+
+// export default function VenueDetailsPanel({
+//   organizationId = null,
+//   venueName = "Karim Korangi Branch",
+//   deviceType = null,           // OMD / TMD / AQIMD / GLMD
+//   espTemprature = 0,
+//   ambientTemperature = 0,
+//   espHumidity = 0,
+//   batteryLow = true,
+//   needMaintenance = true,
+//   apiKey = "",
+//   closeIcon = false,
+//   onClose = undefined,
+//   odourAlert = false,
+//   temperatureAlert = false,
+//   humidityAlert = false,
+//   aqiAlert = false,
+//   glAlert = false,
+//   deviceId = "",
+//   espOdour = 0,
+//   espAQI = null,
+//   espGL = null,
+//   lastUpdateTime = null
+// }) {
+//   const dispatch = useDispatch();
+//   const { user } = useStore();
+//   const orgId = organizationId || user?.organization || null;
+
+//   const location = useLocation();
+//   const params = new URLSearchParams(location.search);
+//   const venueId = params.get("venue"); // gives the ID
+//   const [downloadOpen, setDownloadOpen] = useState(false);
+
+//   // --- select cached venues for this org
+//   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
+//   const globalVenues = useSelector((state) => state.Venue.Venues || []);
+//   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
+  
+  
+  
+//   useEffect(() => {
+//     if (orgId && !orgVenues.length) {
+//       dispatch(fetchVenuesByOrganization(orgId));
+//     }
+   
+//   }, [orgId, orgVenues.length, dispatch]);
+
+//   // helpers
+//   const sameId = (a, b) => String(a) === String(b);
+//   const toInt = (v) => {
+//     const n = Number(v);
+//     return Number.isFinite(n) ? Math.trunc(n) : null;
+//   };
+
+//   // computed display values
+//   const displayTemp = toInt(espTemprature ?? ambientTemperature);
+//   const displayHumidity = toInt(espHumidity);
+//   const displayOdour = toInt(espOdour);
+//   const displayAQI = espAQI === null || espAQI === undefined ? null : toInt(espAQI);
+//   const displayGL = espGL === null || espGL === undefined ? null : toInt(espGL);
+
+//   // find venue name fallback
+//   const currentVenueSlice =
+//     venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
+
+//   const displayVenueName =
+//     currentVenueSlice?.name ||
+//     currentVenueSlice?.venueName ||
+//     venueName ||
+//     "Venue";
+
+//   const handleDownload = () => setDownloadOpen(true);
+
+//   const formatLastUpdate = (time) => {
+//     if (!time) return null;
+//     const date = new Date(time);
+//     const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
+//     return date.toLocaleString(undefined, options);
+//   };
+
+//   // Build the set of metrics to display based on deviceType
+//   // Each metric: { key, label, unit, value, img, lucideIcon, alertFlag }
+//   const metrics = (() => {
+//     const tempMetric = {
+//       key: "temperature",
+//       label: "Temperature",
+//       unit: "°C",
+//       value: displayTemp !== null ? displayTemp : "--",
+//       img: "/temperature-icon.svg",
+//       lucideIcon: null,
+//       alertFlag: !!temperatureAlert,
+//       color: "green"
+//     };
+//     const humMetric = {
+//       key: "humidity",
+//       label: "Humidity",
+//       unit: "%",
+//       value: displayHumidity !== null ? displayHumidity : "--",
+//       img: "/humidity-alert.svg",
+//       lucideIcon: null,
+//       alertFlag: !!humidityAlert,
+//       color: "green"
+//     };
+//     if (String(deviceType) === "TMD") {
+//   return [
+//     {
+//       ...tempMetric,
+//       color: "red",  
+//     },
+//     humMetric,
+//   ];
+// }
+
+//     if (String(deviceType) === "OMD") {
+//       return [
+//         { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
+//         tempMetric,
+//         humMetric,
+//       ];
+//     }
+//     if (String(deviceType) === "TMD") {
+//       return [ tempMetric, humMetric ];
+//     }
+//     if (String(deviceType) === "AQIMD") {
+//       return [
+//         { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
+//         tempMetric,
+//         humMetric,
+//       ];
+//     }
+//     if (String(deviceType) === "GLMD") {
+//       return [
+//         { key: "gas", label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} />, alertFlag: !!glAlert, color: "red" },
+//         tempMetric,
+//         humMetric,
+//       ];
+//     }
+//     // fallback: show temp & humidity
+//     return [ tempMetric, humMetric ];
+//   })();
+
+//    console.log("deviceType", deviceType);
+
+
+//   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
+//   const statusClass = (flag, color = "green") => {
+//     if (flag) {
+//       if (color === "red") return "border-red-500";
+//       if (color === "purple") return "border-purple-600";
+//       return "border-green-500";
+//     }
+//     return "border-gray-300";
+//   };
+
+//   return (
+//     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
+//       {closeIcon && (
+//         <div className="flex justify-between items-center">
+//           <img src="/iotfiy_logo_rpanel.svg" alt="IOTFIY LOGO" className="h-[30px] w-auto" />
+//           <IconButton onClick={() => typeof onClose === "function" && onClose()} edge="start" aria-label="close-details" size="small">
+//             <CloseIcon />
+//           </IconButton>
+//         </div>
+//       )}
+
+//       {/* Header */}
+//       <div className="flex justify-between items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
+//         <div>
+//           <p className="text-sm text-[#64748B] font-medium">Device ID</p>
+//           <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70} />}</h2>
+//           <div className="text-xs text-gray-600">{displayVenueName}</div>
+//         </div>
+
+//         <button
+//           onClick={handleDownload}
+//           className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer "
+//           aria-label="Download"
+//         >
+//           <span className="leading-none">Download</span>
+//           <Download className="w-3.5 h-3.5" />
+//         </button>
+//       </div>
+
+//       {/* Middle section: render exactly 3 columns if metrics length === 3, otherwise render each metric evenly */}
+//       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
+//         <div
+//           className={`flex items-center justify-between gap-4 ${metrics.length === 2 ? "sm:justify-around" : ""}`}
+//         >
+//           {metrics.map((m) => (
+//             <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+//               <div className="mb-2">
+//                 {m.img ? (
+//                   <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+//                 ) : m.lucideIcon ? (
+//                   <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+//                 ) : (
+//                   <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
+//                 )}
+//               </div>
+//               <div className="text-sm text-gray-600">{m.label}</div>
+//               <div className="text-xl font-semibold">
+//                 {m.value ?? "--"}{m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* Status badges: render only the same metrics (keeps your desktop grid classes intact) */}
+//       <div className={`grid ${metrics.length === 2 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-2 md:grid-cols-2"} gap-2`}>
+//         {metrics.map((m) => {
+//           // pick color and flag
+//           const flag = !!m.alertFlag;
+//           const color = m.color ?? "green";
+//           return (
+//             <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
+//               {m.img ? (
+//                 <img src={m.img} alt={m.label} className="w-6 h-6" />
+//               ) : m.lucideIcon ? (
+//                 <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
+//               ) : (
+//                 <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />
+//               )}
+//               <div>
+//                 <div className="text-xs text-gray-600">{m.label}</div>
+//                 <div className="text-sm font-medium">{statusText(flag)}</div>
+//               </div>
+//             </div>
+//           );
+//         })}
+//       </div>
+
+//       {/* API key / QR */}
+//       <div>
+//         {apiKey ? (
+//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
+//             <div className="flex items-center justify-between">
+//               <div>
+//                 <strong>API Key:</strong>
+//                 <div className="mt-2 text-sm" title={apiKey}>
+//                   {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
+//                 </div>
+//               </div>
+
+//               <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || "http://localhost:5173"} />
+//             </div>
+//           </div>
+//         ) : (
+//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
+//             <div className="flex items-center justify-between">
+//               <div>
+//                 <Skeleton variant="text" width={50} height={20} className="mb-2" />
+//                 <Skeleton variant="text" width={120} height={20} className="mb-2" />
+//               </div>
+//               <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: "10%" }} />
+//             </div>
+//           </div>
+//         )}
+
+//         {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
+//       </div>
+
+//       {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
+//       {/* deviceType: 'GLMD' 'TMD' 'OMD' 'AQIMD' */}
+//             <DownloadModal
+//             open={downloadOpen}
+//             onClose={() => setDownloadOpen(false)}
+//             measurement={deviceId}
+//             bucket="Odour"
+//             deviceType={deviceType}
+//       />
+//     </div>
+//   );
+// }
+
 
 
 

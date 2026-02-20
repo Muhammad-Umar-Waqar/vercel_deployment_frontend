@@ -1432,16 +1432,29 @@ export default function DownloadModal({
   const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
   const influxOrg = import.meta.env.VITE_INFLUX_ORG;
 
-  // When the modal opens, default to Single Day + today's date in Start date
+  // // When the modal opens, default to Single Day + today's date in Start date
+  // useEffect(() => {
+  //   if (open) {
+  //     setSingleDay(true);
+  //     setStartDate(dayjs()); // Dayjs object for the DatePicker (AdapterDayjs)
+  //     setEndDate(null);
+  //     setRows([]);
+  //     setError("");
+  //   }
+  // }, [open]);
+
   useEffect(() => {
-    if (open) {
-      setSingleDay(true);
-      setStartDate(dayjs()); // Dayjs object for the DatePicker (AdapterDayjs)
-      setEndDate(null);
-      setRows([]);
-      setError("");
-    }
-  }, [open]);
+  if (open) {
+    setSingleDay(true);
+    // startOf('day') ensures the day begins at 00:00:00.000 local time
+    const todayStart = dayjs().startOf("day");
+    setStartDate(todayStart);
+    // keep endDate null in the UI — we'll compute end-of-day when querying
+    setEndDate(null);
+    setRows([]);
+    setError("");
+  }
+}, [open]);
 
   // Helper to accept Dayjs or Date or ISO and return a real Date
   const getDateFrom = (d) => {
@@ -1477,51 +1490,129 @@ from(bucket: "${bucket}")
     return result;
   };
 
-  const handleFetch = async () => {
-    setError("");
-    setRows([]);
-    if (!startDate) {
-      setError("Please select a start date.");
+//   const handleFetch = async () => {
+//     setError("");
+//     setRows([]);
+//     if (!startDate) {
+//       setError("Please select a start date.");
+//       return;
+//     }
+
+//     // const start = getDateFrom(startDate);
+//     // let end;
+
+//     // if (!singleDay) {
+//     //   if (!endDate) {
+//     //     setError("Please select an end date or toggle Single Day.");
+//     //     return;
+//     //   }
+//     //   end = getDateFrom(endDate);
+//     // } else {
+//     //   end = new Date(start); // single day => same as start
+//     // }
+
+//     // // Always set end to end of day
+//     // end.setHours(23, 59, 59, 999);
+
+
+//     // convert Dayjs or Date to Date
+// const startRaw = getDateFrom(startDate);
+// if (!startRaw) {
+//   setError("Please select a start date.");
+//   return;
+// }
+
+// // ensure start is at 00:00:00.000 local time
+// const start = new Date(startRaw);
+// start.setHours(0, 0, 0, 0);
+
+// let end;
+// if (!singleDay) {
+//   const endRaw = getDateFrom(endDate);
+//   if (!endRaw) {
+//     setError("Please select an end date or toggle Single Day.");
+//     return;
+//   }
+//   end = new Date(endRaw);
+//   // ensure end is end of that day
+//   end.setHours(23, 59, 59, 999);
+// } else {
+//   // single day: end is end of start's day
+//   end = new Date(start);
+//   end.setHours(23, 59, 59, 999);
+// }
+
+
+//     const startISO = start.toISOString();
+//     const endISO = end.toISOString();
+//     setLoading(true);
+//     try {
+//       const data = await queryInflux(startISO, endISO);
+//       const normalized = data.map((r) => ({
+//         time: r._time || r.time || r._time,
+//         ...fields.reduce((acc, f) => {
+//           acc[f] = r[f] !== undefined ? r[f] : "";
+//           return acc;
+//         }, {}),
+//       }));
+//       setRows(normalized);
+//       if (!normalized.length) setError("No data found for the selected range.");
+//     } catch (err) {
+//       setError("Failed to fetch data: " + (err.message || err));
+//       console.error(err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+
+const handleFetch = async () => {
+  setError("");
+  setRows([]);
+
+  if (!startDate) {
+    setError("Please select a start date.");
+    return;
+  }
+
+  let startDayjs = dayjs(startDate).startOf("day");
+  let endDayjs;
+
+  if (!singleDay) {
+    if (!endDate) {
+      setError("Please select an end date or toggle Single Day.");
       return;
     }
+    endDayjs = dayjs(endDate).endOf("day");
+  } else {
+    endDayjs = dayjs(startDate).endOf("day");
+  }
 
-    const start = getDateFrom(startDate);
-    let end;
+  const startISO = startDayjs.toISOString();
+  const endISO = endDayjs.toISOString();
 
-    if (!singleDay) {
-      if (!endDate) {
-        setError("Please select an end date or toggle Single Day.");
-        return;
-      }
-      end = getDateFrom(endDate);
-    } else {
-      end = new Date(start); // single day => same as start
-    }
+  setLoading(true);
 
-    // Always set end to end of day
-    end.setHours(23, 59, 59, 999);
+  try {
+    const data = await queryInflux(startISO, endISO);
 
-    const startISO = start.toISOString();
-    const endISO = end.toISOString();
-    setLoading(true);
-    try {
-      const data = await queryInflux(startISO, endISO);
-      const normalized = data.map((r) => ({
-        time: r._time || r.time || r._time,
-        ...fields.reduce((acc, f) => {
-          acc[f] = r[f] !== undefined ? r[f] : "";
-          return acc;
-        }, {}),
-      }));
-      setRows(normalized);
-      if (!normalized.length) setError("No data found for the selected range.");
-    } catch (err) {
-      setError("Failed to fetch data: " + (err.message || err));
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const normalized = data.map((r) => ({
+      time: r._time,
+      ...fields.reduce((acc, f) => {
+        acc[f] = r[f] !== undefined ? r[f] : "";
+        return acc;
+      }, {}),
+    }));
+
+    setRows(normalized);
+    if (!normalized.length) setError("No data found for the selected range.");
+  } catch (err) {
+    setError("Failed to fetch data: " + (err.message || err));
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const downloadCsv = () => {
     if (!rows.length) {
@@ -1570,12 +1661,28 @@ from(bucket: "${bucket}")
       <DialogContent>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Box display="flex" gap={2} alignItems="center" flexWrap="wrap" mb={2} mt={2}>
-            <DatePicker
+            {/* <DatePicker
               label="Start date"
               value={startDate}
               onChange={(d) => setStartDate(d)}
               renderInput={(params) => <TextField {...params} size="small" />}
-            />
+            /> */}
+
+            <DatePicker
+  label="Start date"
+  value={startDate}
+  onChange={(d) => {
+    // d is a Dayjs object — force it to start of day
+    const sd = d ? d.startOf("day") : null;
+    setStartDate(sd);
+    // if single-day, mirror endDate so UI remains consistent
+    if (singleDay) {
+      setEndDate(sd);
+    }
+  }}
+  renderInput={(params) => <TextField {...params} size="small" />}
+/>
+
             <DatePicker
               label="End date"
               value={endDate}
@@ -1583,10 +1690,32 @@ from(bucket: "${bucket}")
               disabled={singleDay}
               renderInput={(params) => <TextField {...params} size="small" />}
             />
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox checked={singleDay} onChange={(e) => setSingleDay(e.target.checked)} />}
               label="Single day"
-            />
+            /> */}
+            <FormControlLabel
+  control={
+    <Checkbox
+      checked={singleDay}
+      onChange={(e) => {
+        const checked = e.target.checked;
+        setSingleDay(checked);
+        if (checked) {
+          // if we already have a startDate use its start-of-day
+          if (startDate) {
+            setEndDate(startDate.startOf ? startDate.startOf("day") : dayjs(startDate).startOf("day"));
+          } else {
+            // fallback to today start
+            setEndDate(dayjs().startOf("day"));
+            setStartDate(dayjs().startOf("day"));
+          }
+        }
+      }}
+    />
+  }
+  label="Single day"
+/>
             <Box flexGrow={1} py={4} />
             <Button variant="contained" onClick={handleFetch} disabled={loading}>
               Show data

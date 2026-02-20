@@ -165,6 +165,9 @@ export function OrgVenueProvider({ children }) {
   // set organization; if org changes, clear venue automatically
   const setOrganization = useCallback((orgOrIdOrNull) => {
     setState((prev) => {
+      if (!orgOrIdOrNull) {
+      return { organization: null, venue: null };
+    }
       const newOrg = normalizeOrg(orgOrIdOrNull);
       const orgChanged = prev.organization && newOrg && prev.organization.id !== newOrg.id;
       return {

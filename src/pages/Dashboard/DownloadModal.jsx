@@ -1415,6 +1415,9 @@ export default function DownloadModal({
       AQI: { label: "Air Quality Index", unit: "AQI" },
       temperature: { label: "Temperature (°C)", unit: "°C" },
       humidity: { label: "Humidity (%)", unit: "%" },
+      PM25: { label: "PM2.5 (ug/m³)", unit: "ug/m³" },
+      PM10: { label: "PM10 (ug/m³)", unit: "ug/m³" },
+      Status: { label: "Status", unit: "" },
     },
   };
 
@@ -1620,12 +1623,23 @@ const handleFetch = async () => {
       return;
     }
 
+    // Helper function to format time in local timezone (same as table display)
+    const formatTimeForCSV = (timeValue) => {
+      if (!timeValue) return "";
+      // Convert UTC ISO string to local timezone using the same format as table display
+      const date = new Date(timeValue);
+      // Use toLocaleString() to match exactly what's shown in the table
+      return date.toLocaleString();
+    };
+
     const headerFields = ["time", ...fields.map((f) => DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f)];
     const escape = (v) => `"${String(v).replace(/"/g, '""')}"`;
     const headerRow = headerFields.map(escape).join(",");
     const csvRows = [headerRow];
     for (const r of rows) {
-      const line = [r.time, ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f]))];
+      // Use local timezone formatted time instead of raw UTC ISO string
+      const localTime = formatTimeForCSV(r.time);
+      const line = [localTime, ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f]))];
       csvRows.push(line.map((v) => escape(v)).join(","));
     }
     const csvBody = csvRows.join("\n");

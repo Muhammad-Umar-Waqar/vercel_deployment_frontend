@@ -1415,6 +1415,7 @@ export default function DownloadModal({
       AQI: { label: "Air Quality Index", unit: "AQI" },
       temperature: { label: "Temperature (°C)", unit: "°C" },
       humidity: { label: "Humidity (%)", unit: "%" },
+      PM10: { label: "PM10 (ug/m³)", unit: "ug/m³" },
       PM25: { label: "PM2.5 (ug/m³)", unit: "ug/m³" },
       PM10: { label: "PM10 (ug/m³)", unit: "ug/m³" },
       Status: { label: "Status", unit: "" },

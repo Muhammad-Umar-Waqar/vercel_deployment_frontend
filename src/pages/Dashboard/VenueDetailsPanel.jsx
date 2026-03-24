@@ -1152,6 +1152,7 @@ export default function VenueDetailsPanel({
           alertFlag: false,
           color: "green",
         },
+        
       ];
     }
 

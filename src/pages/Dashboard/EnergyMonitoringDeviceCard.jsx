@@ -213,21 +213,21 @@ function formatPower(v) {
 
   if (n >= 1_000_000) {
     const [intPart, decPart] = (n / 1_000_000).toFixed(3).split(".");
-    return { intPart, decPart, unit: "MWh" };
+    return { intPart, decPart, unit: "MW" };
   }
 
   if (n >= 100_000) {
     const [intPart, decPart] = (n / 1000).toFixed(2).split(".");
-    return { intPart, decPart, unit: "kWh" };
+    return { intPart, decPart, unit: "kW" };
   }
 
   if (n >= 1000) {
     const [intPart, decPart] = (n / 1000).toFixed(3).split(".");
-    return { intPart, decPart, unit: "kWh" };
+    return { intPart, decPart, unit: "kW" };
   }
 
   const [intPart, decPart] = n.toFixed(2).split(".");
-  return { intPart, decPart, unit: "Wh" };
+  return { intPart, decPart, unit: "W" };
 }
 
 const EnergyMonitoringDeviceCard = React.memo(function EnergyMonitoringDeviceCard({

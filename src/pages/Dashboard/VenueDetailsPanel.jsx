@@ -33,7 +33,7 @@
 //   const { user } = useStore();
 //   const orgId = organizationId || user?.organization || null;
 
-  
+
 // const location = useLocation();
 // const params = new URLSearchParams(location.search);
 // const venueId = params.get("venue"); // gives the ID
@@ -75,7 +75,7 @@
 //   }, [orgId, orgVenues.length, dispatch]);
 
 //   const venues = orgAlerts?.venues || [];
- 
+
 //   // const handleDownload = () => {
 //   //   Swal.fire({
 //   //       icon: "info", // or "warning"
@@ -157,7 +157,7 @@
 //           </IconButton>
 //         </div>
 //       )}
-      
+
 //       {/* A. Venue Info Section */}
 //       <div className="flex justify-between items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
 //         <div>
@@ -175,25 +175,25 @@
 //         </button>
 //       </div>
 
-    
+
 //       {/* C. Temperature Section */}
 //       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl">
 //         <div className="flex flex-col-3 justify-around items-center py-1 ">
 //           <div className="flex flex-col-2 items-center justify-center ">
 //             <img src="/odour-alert.svg" className="h-[70px] w-[35px]" />
-          
+
 //             <p className="text-md md:text-md lg:text-lg xl:text-xl font-semibold">
 //               {/* {freezerTemperature ? "Detected" : "Normal"} */}
 //               {espOdour}%
 //           </p>
 
-            
+
 //           </div>
 
 //           <div className="flex flex-col-2 items-center justify-center ">
 //             <img src="/temperature-icon.svg" className="h-[60px] w-[35px]" />
 //             <div className="flex flex-col items-end justify-end">
-              
+
 //               <p className="text-sm md:text-md lg:text-lg 2xl:text-2xl font-semibold">
 //                 {displayTemp}
 //                 <span className="xs:text-sm md:text-md 2xl:text-lg font-thin">C</span>
@@ -204,7 +204,7 @@
 //            <div className="flex flex-col-2 items-center justify-center">
 //             <img src="/humidity-alert.svg" className="h-[60px] w-[35px]" />
 //             <div className="flex flex-col items-end justify-end">
-             
+
 //               <p className="text-sm md:text-md lg:text-lg 2xl:text-2xl font-semibold">
 //                 {displayHumidity}
 //                 <span className="xs:text-sm md:text-md  2xl:text-lg font-thin">%</span>
@@ -229,8 +229,8 @@
 //         <span className=" font-bold text-xs text-black block sm:hidden">Status</span>
 //             {/* <span className="text-[#0D5CA4] text-sm font-medium underline  decoration-[#0D5CA4] decoration-[0.5px] ">Alerts Status</span> */}
 //         </div>
-      
-     
+
+
 
 //       {/* <div className="grid grid-cols-3 gap-1 "> */}
 //       <div className="grid md:grid-cols-3 gap-1">
@@ -260,7 +260,7 @@
 //           <span className="md:hidden">Not Detected</span>
 //           <span className="hidden md:inline">Not Det.</span>
 //         </>
-      
+
 //       )}</span>
 //         </div>
 //         <div className={`flex items-center  justify-center md:justify-start  gap-4 border border-1 rounded-sm py-0.5  ${humidityAlert ? "border-green-500": "border-gray-400"}`}>
@@ -280,9 +280,9 @@
 //             </span>
 //         </div>
 //       </div>
-        
 
-        
+
+
 //       {/* D. Alerts Chart */}
 //       {/* <div className="mb-6">
 //         {venues.length > 0 ? (
@@ -719,14 +719,14 @@
 //   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
 //   const globalVenues = useSelector((state) => state.Venue.Venues || []);
 //   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-  
-  
-  
+
+
+
 //   useEffect(() => {
 //     if (orgId && !orgVenues.length) {
 //       dispatch(fetchVenuesByOrganization(orgId));
 //     }
-   
+
 //   }, [orgId, orgVenues.length, dispatch]);
 
 //   // helpers
@@ -1017,14 +1017,14 @@ export default function VenueDetailsPanel({
   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
   const globalVenues = useSelector((state) => state.Venue.Venues || []);
   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-  
-  
-  
+
+
+
   useEffect(() => {
     if (orgId && !orgVenues.length) {
       dispatch(fetchVenuesByOrganization(orgId));
     }
-   
+
   }, [orgId, orgVenues.length, dispatch]);
 
   // helpers
@@ -1084,14 +1084,14 @@ export default function VenueDetailsPanel({
       color: "green"
     };
     if (String(deviceType) === "TMD") {
-  return [
-    {
-      ...tempMetric,
-      color: "red",  
-    },
-    humMetric,
-  ];
-}
+      return [
+        {
+          ...tempMetric,
+          color: "red",
+        },
+        humMetric,
+      ];
+    }
 
 
     if (String(deviceType) === "OMD") {
@@ -1126,9 +1126,9 @@ export default function VenueDetailsPanel({
           label: "Power",
           unit: "",
           // value: espPower !== null && espPower !== undefined ? +Number(espPower).toFixed(1) : "--",
-            value: formatPowerValue(espVoltage, espCurrent),
+          value: formatPowerValue(espVoltage, espCurrent),
           img: null,
-          lucideIcon: <Zap size={30}  />,
+          lucideIcon: <Zap size={30} />,
           alertFlag: false,
           color: "green",
         },
@@ -1138,7 +1138,7 @@ export default function VenueDetailsPanel({
           unit: "A",
           value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--",
           img: null,
-          lucideIcon: <SquareActivity  size={30}  />,   // swap for a better icon if you have one
+          lucideIcon: <SquareActivity size={30} />,   // swap for a better icon if you have one
           alertFlag: false,
           color: "green",
         },
@@ -1148,18 +1148,18 @@ export default function VenueDetailsPanel({
           unit: "V",
           value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--",
           img: null,
-          lucideIcon: <Plug size={30}  />,
+          lucideIcon: <Plug size={30} />,
           alertFlag: false,
           color: "green",
         },
       ];
-}
+    }
 
     // fallback: show temp & humidity
-    return [ tempMetric, humMetric ];
+    return [tempMetric, humMetric];
   })();
 
-   console.log("deviceType", deviceType);
+  console.log("deviceType", deviceType);
 
 
   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
@@ -1173,16 +1173,16 @@ export default function VenueDetailsPanel({
   };
 
   // At the top of VenueDetailsPanel.jsx, add this helper:
-function formatPowerValue(espVoltage, espCurrent) {
-  const v = Number(espVoltage);
-  const c = Number(espCurrent);
-  if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
-  
-  const watts = v * c;
-  if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
-  if (watts >= 1000)      return `${(watts / 1000).toFixed(3)} kW`;
-  return `${watts.toFixed(2)} W`;
-}
+  function formatPowerValue(espVoltage, espCurrent) {
+    const v = Number(espVoltage);
+    const c = Number(espCurrent);
+    if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
+
+    const watts = v * c;
+    if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
+    if (watts >= 1000) return `${(watts / 1000).toFixed(3)} kW`;
+    return `${watts.toFixed(2)} W`;
+  }
 
   return (
     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
@@ -1235,23 +1235,23 @@ function formatPowerValue(espVoltage, espCurrent) {
               </div> */}
 
               <div className="text-xl font-semibold">
-  {m.key === "power" && typeof m.value === "string" && m.value !== "--" ? (
-    (() => {
-      const [num, unit] = m.value.split(" ");
-      return (
-        <>
-          {num}
-          <span className="text-sm font-thin ml-1">{unit}</span>
-        </>
-      );
-    })()
-  ) : (
-    <>
-      {m.value ?? "--"}
-      {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-    </>
-  )}
-</div>
+                {m.key === "power" && typeof m.value === "string" && m.value !== "--" ? (
+                  (() => {
+                    const [num, unit] = m.value.split(" ");
+                    return (
+                      <>
+                        {num}
+                        <span className="text-sm font-thin ml-1">{unit}</span>
+                      </>
+                    );
+                  })()
+                ) : (
+                  <>
+                    {m.value ?? "--"}
+                    {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
+                  </>
+                )}
+              </div>
 
 
             </div>
@@ -1315,12 +1315,12 @@ function formatPowerValue(espVoltage, espCurrent) {
 
       {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
       {/* deviceType: 'GLMD' 'TMD' 'OMD' 'AQIMD' */}
-            <DownloadModal
-            open={downloadOpen}
-            onClose={() => setDownloadOpen(false)}
-            measurement={deviceId}
-            bucket="Odour"
-            deviceType={deviceType}
+      <DownloadModal
+        open={downloadOpen}
+        onClose={() => setDownloadOpen(false)}
+        measurement={deviceId}
+        bucket="Odour"
+        deviceType={deviceType}
       />
     </div>
   );

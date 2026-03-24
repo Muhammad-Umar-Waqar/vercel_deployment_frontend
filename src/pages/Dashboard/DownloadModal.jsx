@@ -1360,7 +1360,496 @@
 
 
 
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
+// import {
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogActions,
+//   Button,
+//   Checkbox,
+//   FormControlLabel,
+//   CircularProgress,
+//   TextField,
+//   Box,
+//   Typography,
+//   Table,
+//   TableHead,
+//   TableRow,
+//   TableCell,
+//   TableBody,
+// } from "@mui/material";
+
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+// import dayjs from "dayjs";
+
+// import { InfluxDB } from "@influxdata/influxdb-client";
+
+// export default function DownloadModal({
+//   open,
+//   onClose,
+//   measurement = null,
+//   bucket = import.meta.env.VITE_INFLUX_BUCKET,
+//   deviceType = ""
+// }) {
+//   const DEVICE_FIELDS_CONFIG = {
+//     OMD: {
+//       temperature: { label: "Temperature (°C)", unit: "°C" },
+//       humidity: { label: "Humidity (%)", unit: "%" },
+//       NH3: { label: "NH₃ (ppm)", unit: "ppm" },
+//       H2S: { label: "H₂S (ppm)", unit: "ppm" },
+//       odor: { label: "Odor (%)", unit: "%" },
+//     },
+//     GLMD: {
+//       leakage: { label: "Gas Leakage", unit: "boolean" },
+//       temperature: { label: "Temperature (°C)", unit: "°C" },
+//       humidity: { label: "Humidity (%)", unit: "%" },
+//     },
+//     TMD: {
+//       temperature: { label: "Temperature (°C)", unit: "°C" },
+//       humidity: { label: "Humidity (%)", unit: "%" },
+//     },
+//     AQIMD: {
+//       AQI: { label: "Air Quality Index", unit: "AQI" },
+//       temperature: { label: "Temperature (°C)", unit: "°C" },
+//       humidity: { label: "Humidity (%)", unit: "%" },
+//       PM1: { label: "PM1.0 (ug/m³)", unit: "ug/m³" },
+//       PM25: { label: "PM2.5 (ug/m³)", unit: "ug/m³" },
+//       PM10: { label: "PM10 (ug/m³)", unit: "ug/m³" },
+//       Status: { label: "Status", unit: "" },
+//     },
+//       EMD: {
+//     voltage:  { label: "Voltage (V)",   unit: "V"   },
+//     current:  { label: "Current (A)",   unit: "A"   },
+//     power:    { label: "Power (W)",     unit: "W",  computed: true },
+//     units:    { label: "Units (kWh)",   unit: "kWh", computed: true },
+//     humidity: { label: "Humidity (%)",  unit: "%"   },
+//   },
+//   };
+
+//   const fields = Object.keys(DEVICE_FIELDS_CONFIG[deviceType] || {});
+
+//   const [startDate, setStartDate] = useState(null);
+//   const [endDate, setEndDate] = useState(null);
+//   const [singleDay, setSingleDay] = useState(false);
+//   const [loading, setLoading] = useState(false);
+//   const [rows, setRows] = useState([]);
+//   const [error, setError] = useState("");
+
+//   // Influx envs
+//   const influxUrl = import.meta.env.VITE_INFLUX_URL;
+//   const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
+//   const influxOrg = import.meta.env.VITE_INFLUX_ORG;
+
+//   // // When the modal opens, default to Single Day + today's date in Start date
+//   // useEffect(() => {
+//   //   if (open) {
+//   //     setSingleDay(true);
+//   //     setStartDate(dayjs()); // Dayjs object for the DatePicker (AdapterDayjs)
+//   //     setEndDate(null);
+//   //     setRows([]);
+//   //     setError("");
+//   //   }
+//   // }, [open]);
+
+//   useEffect(() => {
+//   if (open) {
+//     setSingleDay(true);
+//     // startOf('day') ensures the day begins at 00:00:00.000 local time
+//     const todayStart = dayjs().startOf("day");
+//     setStartDate(todayStart);
+//     // keep endDate null in the UI — we'll compute end-of-day when querying
+//     setEndDate(null);
+//     setRows([]);
+//     setError("");
+//   }
+// }, [open]);
+
+//   // Helper to accept Dayjs or Date or ISO and return a real Date
+//   const getDateFrom = (d) => {
+//     if (!d) return null;
+//     // dayjs objects have toDate()
+//     if (typeof d === "object" && typeof d.toDate === "function") {
+//       return d.toDate();
+//     }
+//     // otherwise try native Date
+//     return new Date(d);
+//   };
+
+//   const queryInflux = async (startISO, endISO) => {
+//     if (!influxUrl || !influxToken || !influxOrg) {
+//       throw new Error("Influx env vars are not set (VITE_INFLUX_URL/TOKEN/ORG).");
+//     }
+
+//     const client = new InfluxDB({ url: influxUrl, token: influxToken });
+//     const queryApi = client.getQueryApi(influxOrg);
+
+//     const fieldFilter = fields.map((f) => `r._field == "${f}"`).join(" or ");
+
+//     const flux = `
+// from(bucket: "${bucket}")
+//   |> range(start: time(v: "${startISO}"), stop: time(v: "${endISO}"))
+//   |> filter(fn: (r) => r._measurement == "${measurement}" and (${fieldFilter}))
+//   |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+//   |> keep(columns: ["_time", ${fields.map((f) => `"${f}"`).join(", ")}])
+//   |> sort(columns: ["_time"])
+// `;
+
+//     const result = await queryApi.collectRows(flux);
+//     return result;
+//   };
+
+// //   const handleFetch = async () => {
+// //     setError("");
+// //     setRows([]);
+// //     if (!startDate) {
+// //       setError("Please select a start date.");
+// //       return;
+// //     }
+
+// //     // const start = getDateFrom(startDate);
+// //     // let end;
+
+// //     // if (!singleDay) {
+// //     //   if (!endDate) {
+// //     //     setError("Please select an end date or toggle Single Day.");
+// //     //     return;
+// //     //   }
+// //     //   end = getDateFrom(endDate);
+// //     // } else {
+// //     //   end = new Date(start); // single day => same as start
+// //     // }
+
+// //     // // Always set end to end of day
+// //     // end.setHours(23, 59, 59, 999);
+
+
+// //     // convert Dayjs or Date to Date
+// // const startRaw = getDateFrom(startDate);
+// // if (!startRaw) {
+// //   setError("Please select a start date.");
+// //   return;
+// // }
+
+// // // ensure start is at 00:00:00.000 local time
+// // const start = new Date(startRaw);
+// // start.setHours(0, 0, 0, 0);
+
+// // let end;
+// // if (!singleDay) {
+// //   const endRaw = getDateFrom(endDate);
+// //   if (!endRaw) {
+// //     setError("Please select an end date or toggle Single Day.");
+// //     return;
+// //   }
+// //   end = new Date(endRaw);
+// //   // ensure end is end of that day
+// //   end.setHours(23, 59, 59, 999);
+// // } else {
+// //   // single day: end is end of start's day
+// //   end = new Date(start);
+// //   end.setHours(23, 59, 59, 999);
+// // }
+
+
+// //     const startISO = start.toISOString();
+// //     const endISO = end.toISOString();
+// //     setLoading(true);
+// //     try {
+// //       const data = await queryInflux(startISO, endISO);
+// //       const normalized = data.map((r) => ({
+// //         time: r._time || r.time || r._time,
+// //         ...fields.reduce((acc, f) => {
+// //           acc[f] = r[f] !== undefined ? r[f] : "";
+// //           return acc;
+// //         }, {}),
+// //       }));
+// //       setRows(normalized);
+// //       if (!normalized.length) setError("No data found for the selected range.");
+// //     } catch (err) {
+// //       setError("Failed to fetch data: " + (err.message || err));
+// //       console.error(err);
+// //     } finally {
+// //       setLoading(false);
+// //     }
+// //   };
+
+
+// const handleFetch = async () => {
+//   setError("");
+//   setRows([]);
+
+//   if (!startDate) {
+//     setError("Please select a start date.");
+//     return;
+//   }
+
+//   let startDayjs = dayjs(startDate).startOf("day");
+//   let endDayjs;
+
+//   if (!singleDay) {
+//     if (!endDate) {
+//       setError("Please select an end date or toggle Single Day.");
+//       return;
+//     }
+//     endDayjs = dayjs(endDate).endOf("day");
+//   } else {
+//     endDayjs = dayjs(startDate).endOf("day");
+//   }
+
+//   const startISO = startDayjs.toISOString();
+//   const endISO = endDayjs.toISOString();
+
+//   setLoading(true);
+
+//   try {
+//     const data = await queryInflux(startISO, endISO);
+
+//     const normalized = data.map((r) => ({
+//       time: r._time,
+//       ...fields.reduce((acc, f) => {
+//         acc[f] = r[f] !== undefined ? r[f] : "";
+//         return acc;
+//       }, {}),
+//     }));
+
+//     setRows(normalized);
+//     if (!normalized.length) setError("No data found for the selected range.");
+//   } catch (err) {
+//     setError("Failed to fetch data: " + (err.message || err));
+//     console.error(err);
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+//   const downloadCsv = () => {
+//     if (!rows.length) {
+//       setError("No data to download. Fetch data first.");
+//       return;
+//     }
+
+//     // Helper function to format time in local timezone (same as table display)
+//     const formatTimeForCSV = (timeValue) => {
+//       if (!timeValue) return "";
+//       // Convert UTC ISO string to local timezone using the same format as table display
+//       const date = new Date(timeValue);
+//       // Use toLocaleString() to match exactly what's shown in the table
+//       return date.toLocaleString();
+//     };
+
+//     const headerFields = ["time", ...fields.map((f) => DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f)];
+//     const escape = (v) => `"${String(v).replace(/"/g, '""')}"`;
+//     const headerRow = headerFields.map(escape).join(",");
+//     const csvRows = [headerRow];
+//     for (const r of rows) {
+//       // Use local timezone formatted time instead of raw UTC ISO string
+//       const localTime = formatTimeForCSV(r.time);
+//       const line = [localTime, ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f]))];
+//       csvRows.push(line.map((v) => escape(v)).join(","));
+//     }
+//     const csvBody = csvRows.join("\n");
+//     const BOM = "\uFEFF";
+//     const blob = new Blob([BOM + csvBody], { type: "text/csv;charset=utf-8;" });
+//     const url = URL.createObjectURL(blob);
+//     const a = document.createElement("a");
+//     a.href = url;
+//     const startPart = startDate ? getDateFrom(startDate).toISOString().slice(0, 10) : "start";
+//     const endPart = (singleDay ? startPart : endDate ? getDateFrom(endDate).toISOString().slice(0, 10) : "end");
+//     a.download = `influx_${measurement}_${startPart}_to_${endPart}.csv`;
+//     a.click();
+//     URL.revokeObjectURL(url);
+//   };
+
+//   const handleClose = () => {
+//     // reset
+//     setRows([]);
+//     setError("");
+//     setLoading(false);
+//     setStartDate(null);
+//     setEndDate(null);
+//     setSingleDay(false);
+//     onClose?.();
+//   };
+
+//   return (
+//     <Dialog open={!!open} onClose={handleClose} maxWidth="lg" fullWidth>
+//       <div className="flex items-center justify-between py-2">
+//         <DialogTitle sx={{ fontWeight: "bold", color: "grey.900" }}>Export data</DialogTitle>
+//         <img src="/logo-half.png" alt="IOTFIY Logo" className="h-[3rem] md:h-[4rem] w-[5rem] md:w-[6rem] pr-5" />
+//       </div>
+//       <DialogContent>
+//         <LocalizationProvider dateAdapter={AdapterDayjs}>
+//           <Box display="flex" gap={2} alignItems="center" flexWrap="wrap" mb={2} mt={2}>
+//             {/* <DatePicker
+//               label="Start date"
+//               value={startDate}
+//               onChange={(d) => setStartDate(d)}
+//               renderInput={(params) => <TextField {...params} size="small" />}
+//             /> */}
+
+//             <DatePicker
+//   label="Start date"
+//   value={startDate}
+//   onChange={(d) => {
+//     // d is a Dayjs object — force it to start of day
+//     const sd = d ? d.startOf("day") : null;
+//     setStartDate(sd);
+//     // if single-day, mirror endDate so UI remains consistent
+//     if (singleDay) {
+//       setEndDate(sd);
+//     }
+//   }}
+//   renderInput={(params) => <TextField {...params} size="small" />}
+// />
+
+//             <DatePicker
+//               label="End date"
+//               value={endDate}
+//               onChange={(d) => setEndDate(d)}
+//               disabled={singleDay}
+//               renderInput={(params) => <TextField {...params} size="small" />}
+//             />
+//             {/* <FormControlLabel
+//               control={<Checkbox checked={singleDay} onChange={(e) => setSingleDay(e.target.checked)} />}
+//               label="Single day"
+//             /> */}
+//             <FormControlLabel
+//   control={
+//     <Checkbox
+//       checked={singleDay}
+//       onChange={(e) => {
+//         const checked = e.target.checked;
+//         setSingleDay(checked);
+//         if (checked) {
+//           // if we already have a startDate use its start-of-day
+//           if (startDate) {
+//             setEndDate(startDate.startOf ? startDate.startOf("day") : dayjs(startDate).startOf("day"));
+//           } else {
+//             // fallback to today start
+//             setEndDate(dayjs().startOf("day"));
+//             setStartDate(dayjs().startOf("day"));
+//           }
+//         }
+//       }}
+//     />
+//   }
+//   label="Single day"
+// />
+//             <Box flexGrow={1} py={4} />
+//             <Button variant="contained" onClick={handleFetch} disabled={loading}>
+//               Show data
+//             </Button>
+//           </Box>
+//         </LocalizationProvider>
+
+//         {error && (
+//           <Typography color="error" variant="body2" mb={1}>
+//             {error}
+//           </Typography>
+//         )}
+
+//         <Box mt={2}>
+//           <Typography variant="subtitle2" mb={1}>
+//             Results ({rows.length})
+//           </Typography>
+//           <Box
+//             mt={1}
+//             sx={{
+//               maxHeight: 400,
+//               minHeight: 120,
+//               overflowY: "auto",
+//               border: 1,
+//               borderColor: "divider",
+//               borderRadius: 1,
+//             }}
+//           >
+//             <Table stickyHeader size="small">
+//               <TableHead>
+//                 <TableRow>
+//                   <TableCell
+//                     sx={{
+//                       position: "sticky",
+//                       top: 0,
+//                       fontWeight: 700,
+//                       backgroundColor: "grey.100",
+//                       color: "common.dark",
+//                       zIndex: 2,
+//                     }}
+//                   >
+//                     Time
+//                   </TableCell>
+//                   {fields.map((f) => (
+//                     <TableCell
+//                       key={f}
+//                       align="right"
+//                       sx={{
+//                         position: "sticky",
+//                         top: 0,
+//                         fontWeight: 700,
+//                         backgroundColor: "grey.100",
+//                         color: "common.dark",
+//                         zIndex: 2,
+//                       }}
+//                     >
+//                       {DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f}
+//                     </TableCell>
+//                   ))}
+//                 </TableRow>
+//               </TableHead>
+//               <TableBody>
+//                 {rows.map((r, idx) => (
+//                   <TableRow
+//                     key={idx}
+//                     sx={{
+//                       "&:nth-of-type(odd)": { backgroundColor: "grey.100" },
+//                       "&:hover": { backgroundColor: "grey.200" },
+//                     }}
+//                   >
+//                     <TableCell>{new Date(r.time).toLocaleString()}</TableCell>
+//                     {fields.map((f) => (
+//                       <TableCell key={f} align="right">
+//                         {r[f] !== undefined ? r[f] : ""}
+//                       </TableCell>
+//                     ))}
+//                   </TableRow>
+//                 ))}
+//               </TableBody>
+//             </Table>
+//             {loading && (
+//               <Box display="flex" justifyContent="center" mt={2} py={1}>
+//                 <CircularProgress />
+//               </Box>
+//             )}
+//           </Box>
+//         </Box>
+//       </DialogContent>
+//       <DialogActions>
+//         <Button onClick={downloadCsv} disabled={!rows.length || loading}>
+//           Save CSV
+//         </Button>
+//         <Button onClick={handleClose}>Close</Button>
+//       </DialogActions>
+//     </Dialog>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -1397,77 +1886,76 @@ export default function DownloadModal({
   const DEVICE_FIELDS_CONFIG = {
     OMD: {
       temperature: { label: "Temperature (°C)", unit: "°C" },
-      humidity: { label: "Humidity (%)", unit: "%" },
-      NH3: { label: "NH₃ (ppm)", unit: "ppm" },
-      H2S: { label: "H₂S (ppm)", unit: "ppm" },
-      odor: { label: "Odor (%)", unit: "%" },
+      humidity:    { label: "Humidity (%)",      unit: "%" },
+      NH3:         { label: "NH₃ (ppm)",         unit: "ppm" },
+      H2S:         { label: "H₂S (ppm)",         unit: "ppm" },
+      odor:        { label: "Odor (%)",           unit: "%" },
     },
     GLMD: {
-      leakage: { label: "Gas Leakage", unit: "boolean" },
-      temperature: { label: "Temperature (°C)", unit: "°C" },
-      humidity: { label: "Humidity (%)", unit: "%" },
+      leakage:     { label: "Gas Leakage",        unit: "boolean" },
+      temperature: { label: "Temperature (°C)",   unit: "°C" },
+      humidity:    { label: "Humidity (%)",        unit: "%" },
     },
     TMD: {
-      temperature: { label: "Temperature (°C)", unit: "°C" },
-      humidity: { label: "Humidity (%)", unit: "%" },
+      temperature: { label: "Temperature (°C)",   unit: "°C" },
+      humidity:    { label: "Humidity (%)",        unit: "%" },
     },
     AQIMD: {
-      AQI: { label: "Air Quality Index", unit: "AQI" },
-      temperature: { label: "Temperature (°C)", unit: "°C" },
-      humidity: { label: "Humidity (%)", unit: "%" },
-      PM1: { label: "PM1.0 (ug/m³)", unit: "ug/m³" },
-      PM25: { label: "PM2.5 (ug/m³)", unit: "ug/m³" },
-      PM10: { label: "PM10 (ug/m³)", unit: "ug/m³" },
-      Status: { label: "Status", unit: "" },
+      AQI:         { label: "Air Quality Index",  unit: "AQI" },
+      temperature: { label: "Temperature (°C)",   unit: "°C" },
+      humidity:    { label: "Humidity (%)",        unit: "%" },
+      PM1:         { label: "PM1.0 (ug/m³)",      unit: "ug/m³" },
+      PM25:        { label: "PM2.5 (ug/m³)",      unit: "ug/m³" },
+      PM10:        { label: "PM10 (ug/m³)",       unit: "ug/m³" },
+      Status:      { label: "Status",             unit: "" },
+    },
+    EMD: {
+      voltage:  { label: "Voltage (V)",  unit: "V"   },
+      current:  { label: "Current (A)",  unit: "A"   },
+      power:    { label: "Power (W)",    unit: "W",   computed: true },
+      units:    { label: "Units (kWh)",  unit: "kWh", computed: true },
+      humidity: { label: "Humidity (%)", unit: "%"   },
     },
   };
 
+  const isEMD = String(deviceType) === "EMD";
+
+  // all field keys for this device type
   const fields = Object.keys(DEVICE_FIELDS_CONFIG[deviceType] || {});
 
+  // only fields that are actually stored in InfluxDB (skip computed ones)
+  const influxFields = fields.filter(
+    (f) => !DEVICE_FIELDS_CONFIG[deviceType]?.[f]?.computed
+  );
+
+  // summary config for EMD footer row
+  const SUM_FIELDS = ["power", "units"];
+  const AVG_FIELDS = ["voltage", "current", "humidity"];
+
   const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [endDate, setEndDate]     = useState(null);
   const [singleDay, setSingleDay] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [rows, setRows] = useState([]);
-  const [error, setError] = useState("");
+  const [loading, setLoading]     = useState(false);
+  const [rows, setRows]           = useState([]);
+  const [error, setError]         = useState("");
 
-  // Influx envs
-  const influxUrl = import.meta.env.VITE_INFLUX_URL;
+  const influxUrl   = import.meta.env.VITE_INFLUX_URL;
   const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
-  const influxOrg = import.meta.env.VITE_INFLUX_ORG;
-
-  // // When the modal opens, default to Single Day + today's date in Start date
-  // useEffect(() => {
-  //   if (open) {
-  //     setSingleDay(true);
-  //     setStartDate(dayjs()); // Dayjs object for the DatePicker (AdapterDayjs)
-  //     setEndDate(null);
-  //     setRows([]);
-  //     setError("");
-  //   }
-  // }, [open]);
+  const influxOrg   = import.meta.env.VITE_INFLUX_ORG;
 
   useEffect(() => {
-  if (open) {
-    setSingleDay(true);
-    // startOf('day') ensures the day begins at 00:00:00.000 local time
-    const todayStart = dayjs().startOf("day");
-    setStartDate(todayStart);
-    // keep endDate null in the UI — we'll compute end-of-day when querying
-    setEndDate(null);
-    setRows([]);
-    setError("");
-  }
-}, [open]);
+    if (open) {
+      setSingleDay(true);
+      setStartDate(dayjs().startOf("day"));
+      setEndDate(null);
+      setRows([]);
+      setError("");
+    }
+  }, [open]);
 
-  // Helper to accept Dayjs or Date or ISO and return a real Date
   const getDateFrom = (d) => {
     if (!d) return null;
-    // dayjs objects have toDate()
-    if (typeof d === "object" && typeof d.toDate === "function") {
-      return d.toDate();
-    }
-    // otherwise try native Date
+    if (typeof d === "object" && typeof d.toDate === "function") return d.toDate();
     return new Date(d);
   };
 
@@ -1476,147 +1964,102 @@ export default function DownloadModal({
       throw new Error("Influx env vars are not set (VITE_INFLUX_URL/TOKEN/ORG).");
     }
 
-    const client = new InfluxDB({ url: influxUrl, token: influxToken });
+    const client   = new InfluxDB({ url: influxUrl, token: influxToken });
     const queryApi = client.getQueryApi(influxOrg);
 
-    const fieldFilter = fields.map((f) => `r._field == "${f}"`).join(" or ");
+    // use influxFields only — skip computed fields like power & units
+    const fieldFilter = influxFields.map((f) => `r._field == "${f}"`).join(" or ");
 
     const flux = `
 from(bucket: "${bucket}")
   |> range(start: time(v: "${startISO}"), stop: time(v: "${endISO}"))
   |> filter(fn: (r) => r._measurement == "${measurement}" and (${fieldFilter}))
   |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-  |> keep(columns: ["_time", ${fields.map((f) => `"${f}"`).join(", ")}])
+  |> keep(columns: ["_time", ${influxFields.map((f) => `"${f}"`).join(", ")}])
   |> sort(columns: ["_time"])
 `;
 
-    const result = await queryApi.collectRows(flux);
-    return result;
+    return await queryApi.collectRows(flux);
   };
 
-//   const handleFetch = async () => {
-//     setError("");
-//     setRows([]);
-//     if (!startDate) {
-//       setError("Please select a start date.");
-//       return;
-//     }
+  const handleFetch = async () => {
+    setError("");
+    setRows([]);
 
-//     // const start = getDateFrom(startDate);
-//     // let end;
-
-//     // if (!singleDay) {
-//     //   if (!endDate) {
-//     //     setError("Please select an end date or toggle Single Day.");
-//     //     return;
-//     //   }
-//     //   end = getDateFrom(endDate);
-//     // } else {
-//     //   end = new Date(start); // single day => same as start
-//     // }
-
-//     // // Always set end to end of day
-//     // end.setHours(23, 59, 59, 999);
-
-
-//     // convert Dayjs or Date to Date
-// const startRaw = getDateFrom(startDate);
-// if (!startRaw) {
-//   setError("Please select a start date.");
-//   return;
-// }
-
-// // ensure start is at 00:00:00.000 local time
-// const start = new Date(startRaw);
-// start.setHours(0, 0, 0, 0);
-
-// let end;
-// if (!singleDay) {
-//   const endRaw = getDateFrom(endDate);
-//   if (!endRaw) {
-//     setError("Please select an end date or toggle Single Day.");
-//     return;
-//   }
-//   end = new Date(endRaw);
-//   // ensure end is end of that day
-//   end.setHours(23, 59, 59, 999);
-// } else {
-//   // single day: end is end of start's day
-//   end = new Date(start);
-//   end.setHours(23, 59, 59, 999);
-// }
-
-
-//     const startISO = start.toISOString();
-//     const endISO = end.toISOString();
-//     setLoading(true);
-//     try {
-//       const data = await queryInflux(startISO, endISO);
-//       const normalized = data.map((r) => ({
-//         time: r._time || r.time || r._time,
-//         ...fields.reduce((acc, f) => {
-//           acc[f] = r[f] !== undefined ? r[f] : "";
-//           return acc;
-//         }, {}),
-//       }));
-//       setRows(normalized);
-//       if (!normalized.length) setError("No data found for the selected range.");
-//     } catch (err) {
-//       setError("Failed to fetch data: " + (err.message || err));
-//       console.error(err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-
-const handleFetch = async () => {
-  setError("");
-  setRows([]);
-
-  if (!startDate) {
-    setError("Please select a start date.");
-    return;
-  }
-
-  let startDayjs = dayjs(startDate).startOf("day");
-  let endDayjs;
-
-  if (!singleDay) {
-    if (!endDate) {
-      setError("Please select an end date or toggle Single Day.");
+    if (!startDate) {
+      setError("Please select a start date.");
       return;
     }
-    endDayjs = dayjs(endDate).endOf("day");
-  } else {
-    endDayjs = dayjs(startDate).endOf("day");
-  }
 
-  const startISO = startDayjs.toISOString();
-  const endISO = endDayjs.toISOString();
+    const startDayjs = dayjs(startDate).startOf("day");
+    let endDayjs;
 
-  setLoading(true);
+    if (!singleDay) {
+      if (!endDate) {
+        setError("Please select an end date or toggle Single Day.");
+        return;
+      }
+      endDayjs = dayjs(endDate).endOf("day");
+    } else {
+      endDayjs = dayjs(startDate).endOf("day");
+    }
 
-  try {
-    const data = await queryInflux(startISO, endISO);
+    setLoading(true);
 
-    const normalized = data.map((r) => ({
-      time: r._time,
-      ...fields.reduce((acc, f) => {
-        acc[f] = r[f] !== undefined ? r[f] : "";
-        return acc;
-      }, {}),
-    }));
+    try {
+      const data = await queryInflux(startDayjs.toISOString(), endDayjs.toISOString());
 
-    setRows(normalized);
-    if (!normalized.length) setError("No data found for the selected range.");
-  } catch (err) {
-    setError("Failed to fetch data: " + (err.message || err));
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
+      const normalized = data.map((r) => {
+        const base = {
+          time: r._time,
+          ...influxFields.reduce((acc, f) => {
+            acc[f] = r[f] !== undefined ? r[f] : "";
+            return acc;
+          }, {}),
+        };
+
+        // compute power & units for EMD
+        if (isEMD) {
+          const v = Number(r["voltage"]);
+          const c = Number(r["current"]);
+          const pw = Number.isFinite(v) && Number.isFinite(c) ? v * c : null;
+          base.power = pw !== null ? +pw.toFixed(2) : "";
+          base.units = pw !== null ? +(pw / 1000).toFixed(4) : "";
+        }
+
+        return base;
+      });
+
+      setRows(normalized);
+      if (!normalized.length) setError("No data found for the selected range.");
+    } catch (err) {
+      setError("Failed to fetch data: " + (err.message || err));
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // compute sticky summary footer for EMD
+  const summary = useMemo(() => {
+    if (!rows.length || !isEMD) return null;
+
+    const result = {};
+
+    SUM_FIELDS.forEach((f) => {
+      const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
+      result[f] = vals.length ? +vals.reduce((a, b) => a + b, 0).toFixed(4) : "--";
+    });
+
+    AVG_FIELDS.forEach((f) => {
+      const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
+      result[f] = vals.length
+        ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)
+        : "--";
+    });
+
+    return result;
+  }, [rows, isEMD]);
 
   const downloadCsv = () => {
     if (!rows.length) {
@@ -1624,40 +2067,59 @@ const handleFetch = async () => {
       return;
     }
 
-    // Helper function to format time in local timezone (same as table display)
     const formatTimeForCSV = (timeValue) => {
       if (!timeValue) return "";
-      // Convert UTC ISO string to local timezone using the same format as table display
-      const date = new Date(timeValue);
-      // Use toLocaleString() to match exactly what's shown in the table
-      return date.toLocaleString();
+      return new Date(timeValue).toLocaleString();
     };
 
-    const headerFields = ["time", ...fields.map((f) => DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f)];
-    const escape = (v) => `"${String(v).replace(/"/g, '""')}"`;
-    const headerRow = headerFields.map(escape).join(",");
+    const escape    = (v) => `"${String(v).replace(/"/g, '""')}"`;
+    const headerRow = ["time", ...fields.map((f) => DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f)]
+      .map(escape)
+      .join(",");
+
     const csvRows = [headerRow];
+
     for (const r of rows) {
-      // Use local timezone formatted time instead of raw UTC ISO string
-      const localTime = formatTimeForCSV(r.time);
-      const line = [localTime, ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f]))];
-      csvRows.push(line.map((v) => escape(v)).join(","));
+      const line = [
+        formatTimeForCSV(r.time),
+        ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f])),
+      ];
+      csvRows.push(line.map(escape).join(","));
     }
+
+    // append summary row to CSV for EMD
+    if (summary) {
+      const summaryLine = [
+        "SUMMARY",
+        ...fields.map((f) => {
+          if (SUM_FIELDS.includes(f)) return `Total: ${summary[f]}`;
+          if (AVG_FIELDS.includes(f)) return `Avg: ${summary[f]}`;
+          return "";
+        }),
+      ];
+      csvRows.push(summaryLine.map(escape).join(","));
+    }
+
     const csvBody = csvRows.join("\n");
-    const BOM = "\uFEFF";
-    const blob = new Blob([BOM + csvBody], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
+    const BOM     = "\uFEFF";
+    const blob    = new Blob([BOM + csvBody], { type: "text/csv;charset=utf-8;" });
+    const url     = URL.createObjectURL(blob);
+    const a       = document.createElement("a");
+    a.href        = url;
+
     const startPart = startDate ? getDateFrom(startDate).toISOString().slice(0, 10) : "start";
-    const endPart = (singleDay ? startPart : endDate ? getDateFrom(endDate).toISOString().slice(0, 10) : "end");
+    const endPart   = singleDay
+      ? startPart
+      : endDate
+      ? getDateFrom(endDate).toISOString().slice(0, 10)
+      : "end";
+
     a.download = `influx_${measurement}_${startPart}_to_${endPart}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const handleClose = () => {
-    // reset
     setRows([]);
     setError("");
     setLoading(false);
@@ -1673,30 +2135,20 @@ const handleFetch = async () => {
         <DialogTitle sx={{ fontWeight: "bold", color: "grey.900" }}>Export data</DialogTitle>
         <img src="/logo-half.png" alt="IOTFIY Logo" className="h-[3rem] md:h-[4rem] w-[5rem] md:w-[6rem] pr-5" />
       </div>
+
       <DialogContent>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Box display="flex" gap={2} alignItems="center" flexWrap="wrap" mb={2} mt={2}>
-            {/* <DatePicker
+            <DatePicker
               label="Start date"
               value={startDate}
-              onChange={(d) => setStartDate(d)}
+              onChange={(d) => {
+                const sd = d ? d.startOf("day") : null;
+                setStartDate(sd);
+                if (singleDay) setEndDate(sd);
+              }}
               renderInput={(params) => <TextField {...params} size="small" />}
-            /> */}
-
-            <DatePicker
-  label="Start date"
-  value={startDate}
-  onChange={(d) => {
-    // d is a Dayjs object — force it to start of day
-    const sd = d ? d.startOf("day") : null;
-    setStartDate(sd);
-    // if single-day, mirror endDate so UI remains consistent
-    if (singleDay) {
-      setEndDate(sd);
-    }
-  }}
-  renderInput={(params) => <TextField {...params} size="small" />}
-/>
+            />
 
             <DatePicker
               label="End date"
@@ -1705,32 +2157,28 @@ const handleFetch = async () => {
               disabled={singleDay}
               renderInput={(params) => <TextField {...params} size="small" />}
             />
-            {/* <FormControlLabel
-              control={<Checkbox checked={singleDay} onChange={(e) => setSingleDay(e.target.checked)} />}
-              label="Single day"
-            /> */}
+
             <FormControlLabel
-  control={
-    <Checkbox
-      checked={singleDay}
-      onChange={(e) => {
-        const checked = e.target.checked;
-        setSingleDay(checked);
-        if (checked) {
-          // if we already have a startDate use its start-of-day
-          if (startDate) {
-            setEndDate(startDate.startOf ? startDate.startOf("day") : dayjs(startDate).startOf("day"));
-          } else {
-            // fallback to today start
-            setEndDate(dayjs().startOf("day"));
-            setStartDate(dayjs().startOf("day"));
-          }
-        }
-      }}
-    />
-  }
-  label="Single day"
-/>
+              control={
+                <Checkbox
+                  checked={singleDay}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setSingleDay(checked);
+                    if (checked) {
+                      if (startDate) {
+                        setEndDate(startDate.startOf ? startDate.startOf("day") : dayjs(startDate).startOf("day"));
+                      } else {
+                        setEndDate(dayjs().startOf("day"));
+                        setStartDate(dayjs().startOf("day"));
+                      }
+                    }
+                  }}
+                />
+              }
+              label="Single day"
+            />
+
             <Box flexGrow={1} py={4} />
             <Button variant="contained" onClick={handleFetch} disabled={loading}>
               Show data
@@ -1748,6 +2196,7 @@ const handleFetch = async () => {
           <Typography variant="subtitle2" mb={1}>
             Results ({rows.length})
           </Typography>
+
           <Box
             mt={1}
             sx={{
@@ -1757,41 +2206,29 @@ const handleFetch = async () => {
               border: 1,
               borderColor: "divider",
               borderRadius: 1,
+              position: "relative",
             }}
           >
             <Table stickyHeader size="small">
+              {/* ── Header ── */}
               <TableHead>
                 <TableRow>
-                  <TableCell
-                    sx={{
-                      position: "sticky",
-                      top: 0,
-                      fontWeight: 700,
-                      backgroundColor: "grey.100",
-                      color: "common.dark",
-                      zIndex: 2,
-                    }}
-                  >
+                  <TableCell sx={{ position: "sticky", top: 0, fontWeight: 700, backgroundColor: "grey.100", zIndex: 2 }}>
                     Time
                   </TableCell>
                   {fields.map((f) => (
                     <TableCell
                       key={f}
                       align="right"
-                      sx={{
-                        position: "sticky",
-                        top: 0,
-                        fontWeight: 700,
-                        backgroundColor: "grey.100",
-                        color: "common.dark",
-                        zIndex: 2,
-                      }}
+                      sx={{ position: "sticky", top: 0, fontWeight: 700, backgroundColor: "grey.100", zIndex: 2 }}
                     >
                       {DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f}
                     </TableCell>
                   ))}
                 </TableRow>
               </TableHead>
+
+              {/* ── Rows ── */}
               <TableBody>
                 {rows.map((r, idx) => (
                   <TableRow
@@ -1810,7 +2247,55 @@ const handleFetch = async () => {
                   </TableRow>
                 ))}
               </TableBody>
+
+              {/* ── Sticky summary footer (EMD only) ── */}
+              {summary && (
+                <TableHead>
+                  <TableRow>
+                    <TableCell
+                      sx={{
+                        position: "sticky",
+                        bottom: 0,
+                        fontWeight: 700,
+                        backgroundColor: "#0D5CA4",
+                        color: "white",
+                        zIndex: 3,
+                      }}
+                    >
+                      Summary
+                    </TableCell>
+                    {fields.map((f) => {
+                      const isSum = SUM_FIELDS.includes(f);
+                      const isAvg = AVG_FIELDS.includes(f);
+                      return (
+                        <TableCell
+                          key={f}
+                          align="right"
+                          sx={{
+                            position: "sticky",
+                            bottom: 0,
+                            fontWeight: 700,
+                            backgroundColor: "#0D5CA4",
+                            color: "white",
+                            zIndex: 3,
+                          }}
+                        >
+                          {(isSum || isAvg) ? (
+                            <>
+                              <div style={{ fontSize: "0.6rem", opacity: 0.75, marginBottom: 1 }}>
+                                {isSum ? "Total" : "Avg"}
+                              </div>
+                              {summary[f] ?? "--"}
+                            </>
+                          ) : "--"}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                </TableHead>
+              )}
             </Table>
+
             {loading && (
               <Box display="flex" justifyContent="center" mt={2} py={1}>
                 <CircularProgress />
@@ -1819,6 +2304,7 @@ const handleFetch = async () => {
           </Box>
         </Box>
       </DialogContent>
+
       <DialogActions>
         <Button onClick={downloadCsv} disabled={!rows.length || loading}>
           Save CSV

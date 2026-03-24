@@ -974,7 +974,7 @@ import { useLocation } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Skeleton } from "@mui/material";
 import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
-import { Download, Cloud, Zap } from "lucide-react";
+import { Download, Cloud, Zap, SquareActivity, Plug } from "lucide-react";
 import Swal from "sweetalert2";
 import DownloadModal from "./DownloadModal";
 
@@ -1127,7 +1127,7 @@ export default function VenueDetailsPanel({
           unit: "W",
           value: espPower !== null && espPower !== undefined ? +Number(espPower).toFixed(1) : "--",
           img: null,
-          lucideIcon: <Zap size={30} />,
+          lucideIcon: <Zap size={30}  />,
           alertFlag: false,
           color: "green",
         },
@@ -1137,7 +1137,7 @@ export default function VenueDetailsPanel({
           unit: "A",
           value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--",
           img: null,
-          lucideIcon: <Zap size={30} />,   // swap for a better icon if you have one
+          lucideIcon: <SquareActivity  size={30}  />,   // swap for a better icon if you have one
           alertFlag: false,
           color: "green",
         },
@@ -1147,7 +1147,7 @@ export default function VenueDetailsPanel({
           unit: "V",
           value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--",
           img: null,
-          lucideIcon: <Zap size={30} />,
+          lucideIcon: <Plug size={30}  />,
           alertFlag: false,
           color: "green",
         },

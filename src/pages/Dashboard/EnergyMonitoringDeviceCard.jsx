@@ -204,6 +204,8 @@ function formatSmartNumber(v, maxDecimals = 3) {
 // 1,000 – 99,999   → kWh, 3 decimals  (e.g. 2.000 kWh,  99.999 kWh)
 // 100,000 – 999,999→ kWh, 2 decimals  (e.g. 123.45 kWh, 999.99 kWh)
 // ≥ 1,000,000      → MWh, 3 decimals  (e.g. 1.234 MWh,  10.500 MWh)
+
+
 function formatPower(v) {
   if (v === undefined || v === null || v === "") return null;
   const n = Number(v);
@@ -243,6 +245,16 @@ const EnergyMonitoringDeviceCard = React.memo(function EnergyMonitoringDeviceCar
     humidityAlert
 }) {
 
+    const calculatedPower = useMemo(() => {
+    const v = Number(espVoltage);
+    const c = Number(espCurrent);
+
+    if (!Number.isFinite(v) || !Number.isFinite(c)) return null;
+
+    return v * c;
+}, [espVoltage, espCurrent]);
+
+
     return (
         <div onClick={onCardSelect} className={`freezer-card-container rounded-4xl  bg-white ${isSelected ? "shadow-lg" : ""} min-h-[160px]`} >
             <div className="px-4 py-3 h-full flex flex-col  justify-between">
@@ -275,7 +287,8 @@ const EnergyMonitoringDeviceCard = React.memo(function EnergyMonitoringDeviceCar
                         <div className=" border-b-2  border-gray-300 w-full  ">
 
                             {(() => {
-                                const power = formatPower(espPower);
+                                // const power = formatPower(espPower);
+                                const power = formatPower(calculatedPower);
                                 if (!power) return <div className="text-3xl font-bold">--</div>;
 
                                 const { intPart, decPart, unit } = power;

@@ -1124,8 +1124,9 @@ export default function VenueDetailsPanel({
         {
           key: "power",
           label: "Power",
-          unit: "W",
-          value: espPower !== null && espPower !== undefined ? +Number(espPower).toFixed(1) : "--",
+          unit: "",
+          // value: espPower !== null && espPower !== undefined ? +Number(espPower).toFixed(1) : "--",
+            value: formatPowerValue(espVoltage, espCurrent),
           img: null,
           lucideIcon: <Zap size={30}  />,
           alertFlag: false,
@@ -1170,6 +1171,18 @@ export default function VenueDetailsPanel({
     }
     return "border-gray-300";
   };
+
+  // At the top of VenueDetailsPanel.jsx, add this helper:
+function formatPowerValue(espVoltage, espCurrent) {
+  const v = Number(espVoltage);
+  const c = Number(espCurrent);
+  if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
+  
+  const watts = v * c;
+  if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
+  if (watts >= 1000)      return `${(watts / 1000).toFixed(3)} kW`;
+  return `${watts.toFixed(2)} W`;
+}
 
   return (
     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
@@ -1217,9 +1230,30 @@ export default function VenueDetailsPanel({
                 )}
               </div>
               <div className="text-sm text-gray-600">{m.label}</div>
-              <div className="text-xl font-semibold">
+              {/* <div className="text-xl font-semibold">
                 {m.value ?? "--"}{m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-              </div>
+              </div> */}
+
+              <div className="text-xl font-semibold">
+  {m.key === "power" && typeof m.value === "string" && m.value !== "--" ? (
+    (() => {
+      const [num, unit] = m.value.split(" ");
+      return (
+        <>
+          {num}
+          <span className="text-sm font-thin ml-1">{unit}</span>
+        </>
+      );
+    })()
+  ) : (
+    <>
+      {m.value ?? "--"}
+      {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
+    </>
+  )}
+</div>
+
+
             </div>
           ))}
         </div>

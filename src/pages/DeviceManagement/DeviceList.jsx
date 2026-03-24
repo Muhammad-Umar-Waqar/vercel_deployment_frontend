@@ -3402,6 +3402,7 @@ const DEVICE_TYPE_META = {
   TMD: { label: "Temperature", color: "primary" },
   AQIMD: { label: "Air Quality", color: "success" },
   GLMD: { label: "Leakage", color: "error" },
+  EMD: { label: "Energy", color: "secondary" },
 };
 
 export default function DeviceList({ onDeviceSelect, selectedDevice }) {
@@ -3437,6 +3438,9 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
     gassOp: ">",
     gassVal: "",
     apiKey: "",
+    voltageOp: ">",
+    voltageVal: "",
+
   });
   const [formErrors, setFormErrors] = useState({});
 
@@ -3498,7 +3502,7 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
     const currentVenueObj = device.venue && typeof device.venue === "object" ? device.venue : null;
     const currentVenueId = currentVenueObj?._id ?? device.venue ?? "";
     const currentOrgId = currentVenueObj?.organization?._id ?? currentVenueObj?.organization ?? "";
-
+    
     // deviceType from backend
     const currentType = device.deviceType ?? "TMD";
 
@@ -3510,6 +3514,7 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
     const odourCond = findCondition(device.conditions, "odour") || {};
     const aqiCond = findCondition(device.conditions, "AQI") || {};
     const gassCond = findCondition(device.conditions, "gass") || {};
+    const voltageCond = findCondition(device.conditions, "voltage") || {};
 
     setEditingDeviceId(device._id ?? device.id ?? null);
     setEditForm((s) => ({
@@ -3528,6 +3533,8 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
       aqiVal: aqiCond.value === undefined || aqiCond.value === null ? "" : String(aqiCond.value),
       gassOp: gassCond.operator ?? ">",
       gassVal: gassCond.value === undefined || gassCond.value === null ? "" : String(gassCond.value),
+      voltageOp: voltageCond.operator ?? "=",
+      voltageVal: voltageCond.value === undefined || voltageCond.value === null ? "" : String(voltageCond.value),
       apiKey: device.apiKey ?? device?.apiKey ?? "",
     }));
     setFormErrors({});
@@ -3570,6 +3577,8 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
       aqiVal,
       gassOp,
       gassVal,
+      voltageOp,
+      voltageVal,
     } = editForm;
 
     const errors = {};
@@ -3592,7 +3601,7 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
       return;
     }
 
-    const validOps = [">", "<"];
+    const validOps = [">", "<", "="];
     const conditionsToSend = [];
 
     // temperature (always available for all devices)
@@ -3629,6 +3638,35 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
         conditionsToSend.push({ type: "gass", operator: gassOp, value: Number(gassVal) });
       }
     }
+//     else if (deviceType === "EMD") {
+//   if (voltageVal !== "") {
+//     if (!validOps.includes(voltageOp)) {
+//       setFormErrors({ voltageOp: "Invalid operator" });
+//       return;
+//     }
+
+//     conditionsToSend.push({
+//       type: "voltage",
+//       operator: voltageOp,
+//       value: Number(voltageVal),
+//     });
+//   }
+// }
+else if (deviceType === "EMD") {
+  if (voltageVal !== "") {
+
+    if (voltageOp !== "=") {
+      setFormErrors({ voltageOp: "Voltage only supports '=' operator" });
+      return;
+    }
+
+    conditionsToSend.push({
+      type: "voltage",
+      operator: "=",
+      value: Number(voltageVal),
+    });
+  }
+}
 
     try {
       setWorking(true);
@@ -3814,7 +3852,7 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
             </FormControl>
 
             {/* Device Type select (shows current type and allows change) */}
-            <FormControl sx={{ width: "83%" }}>
+            {/* <FormControl sx={{ width: "83%" }}>
               <InputLabel id="device-type-label">Device Type</InputLabel>
               <Select
                 labelId="device-type-label"
@@ -3827,8 +3865,9 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
                 <MenuItem value="OMD">Odour (OMD)</MenuItem>
                 <MenuItem value="AQIMD">Air Quality (AQIMD)</MenuItem>
                 <MenuItem value="GLMD">Leakage (GLMD)</MenuItem>
+                <MenuItem value="EMD">Energy (EMD)</MenuItem>
               </Select>
-            </FormControl>
+            </FormControl> */}
 
             {/* Organization & Venue */}
             <FormControl sx={{ width: "83%" }}>
@@ -3943,6 +3982,73 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
               </Grid>
             )}
 
+            {/* {editForm.deviceType === "EMD" && (
+              <Grid container spacing={1} alignItems="center" sx={{ mt: 1, width: "83%" }}>
+                <Grid item xs="auto" sm={3}>
+                  <FormControl sx={{ width: { xs: 60, sm: "100%" }, minWidth: 60 }}>
+                    <InputLabel>Op</InputLabel>
+                    <Select
+                      value={editForm.voltageOp}
+                      label="Op"
+                      onChange={handleEditChange("voltageOp")}
+                      size="small"
+                    >
+                      <MenuItem value=">">&gt;</MenuItem>
+                      <MenuItem value="<">&lt;</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs>
+                  <TextField
+                    label="Voltage (V)"
+                    type="number"
+                    value={editForm.voltageVal}
+                    onChange={handleEditChange("voltageVal")}
+                    fullWidth
+                    size="small"
+                  />
+                </Grid>
+              </Grid>
+            )} */}
+
+          {editForm.deviceType === "EMD" && (
+              <Grid container spacing={1} alignItems="center" sx={{ mt: 1, width: "83%" }}>
+                
+                <Grid item xs="auto" sm={3}>
+                  <FormControl sx={{ width: { xs: 60, sm: "100%" }, minWidth: 60 }}>
+                    <InputLabel>Op</InputLabel>
+                    <Select
+                      value="="
+                      label="Op"
+                      disabled
+                      size="small"
+                    >
+                      <MenuItem value="=">=</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs>
+                  <TextField
+                    label="Voltage (V)"
+                    type="number"
+                    value={editForm.voltageVal}
+                    onChange={handleEditChange("voltageVal")}
+                    fullWidth
+                    size="small"
+                    error={!!formErrors.voltageVal}
+                    helperText={formErrors.voltageVal}
+                    sx={{
+                      maxWidth: { xs: 120, sm: "100%" },
+                      "& .MuiInputBase-root": { height: 36 },
+                    }}
+                  />
+                </Grid>
+
+              </Grid>
+            )}
+
+            
             {/* API Key compact display */}
             {editForm.apiKey ? (
               <div className="mt-3 p-3 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-5 w-full">

@@ -1286,6 +1286,7 @@ const DEVICE_CONDITIONS_MAP = {
   TMD: ["temperature", "humidity"],
   AQIMD: ["AQI", "temperature", "humidity"],
   GLMD: ["gass", "temperature", "humidity"],
+  EMD: ["temperature", "humidity", "voltage"],
 };
 
 const CONDITION_LABEL = {
@@ -1294,6 +1295,7 @@ const CONDITION_LABEL = {
   odour: "Odour",
   AQI: "AQI",
   gass: "Leakage",
+  voltage: "Voltage",
 };
 
 const CONDITION_UNIT = {
@@ -1302,6 +1304,7 @@ const CONDITION_UNIT = {
   odour: "%",
   AQI: "AQI",
   gass: "%",
+  voltage: "V",
 };
 
 const DEVICE_TYPE_LABEL = {
@@ -1309,6 +1312,7 @@ const DEVICE_TYPE_LABEL = {
   TMD: "Temperature Monitoring Device",
   AQIMD: "Air Quality Index Monitoring Device",
   GLMD: "Leakage Monitoring Device",
+  EMD: "Energy Monitoring Device",
 };
 
 const SELECT_HEIGHT = 48;
@@ -1333,7 +1337,7 @@ const makeConditionsFor = (deviceType) => {
     id: t,
     type: t,
     label: CONDITION_LABEL[t] || t,
-    operator: ">",
+    operator: t === "voltage" ? "=" : ">",
     value: "",
   }));
 };
@@ -1456,10 +1460,19 @@ const AddDevice = () => {
     }
 
     // validate each cond
-    const validTypes = ["temperature", "humidity", "odour", "AQI", "gass"];
-    const validOps = [">", "<"];
+    const validTypes = ["temperature", "humidity", "odour", "AQI", "gass", "voltage"];
+    const validOps = [">", "<", "="];
 
     for (const c of filtered) {
+  
+  if (c.type === "voltage" && c.operator !== "=") {
+    return Swal.fire({
+      icon: "warning",
+      title: "Invalid operator",
+      text: "Voltage condition only supports '=' operator.",
+    });
+  }
+
       if (!validTypes.includes(c.type)) {
         return Swal.fire({
           icon: "warning",
@@ -1643,6 +1656,7 @@ const AddDevice = () => {
                 <MenuItem value="TMD">{DEVICE_TYPE_LABEL.TMD}</MenuItem>
                 <MenuItem value="AQIMD">{DEVICE_TYPE_LABEL.AQIMD}</MenuItem>
                 <MenuItem value="GLMD">{DEVICE_TYPE_LABEL.GLMD}</MenuItem>
+                  <MenuItem value="EMD">{DEVICE_TYPE_LABEL.EMD}</MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -1725,7 +1739,7 @@ const AddDevice = () => {
                 </div>
 
                 <div className="relative flex-[0.5]">
-                  <select
+                  {/* <select
                     value={cond.operator}
                     onChange={(e) => handleConditionChange(idx, "operator", e.target.value)}
                     className="w-full pl-3 pr-3 py-2 rounded-md bg-white border border-gray-300 text-gray-700 text-sm"
@@ -1733,7 +1747,23 @@ const AddDevice = () => {
                   >
                     <option value=">">&gt;</option>
                     <option value="<">&lt;</option>
-                  </select>
+                  </select> */}
+
+                  <select
+                  value={cond.operator}
+                  onChange={(e) => handleConditionChange(idx, "operator", e.target.value)}
+                >
+                  {cond.type === "voltage" ? (
+                    <option value="=">=</option>
+                  ) : (
+                    <>
+                      <option value=">">&gt;</option>
+                      <option value="<">&lt;</option>
+                    </>
+                  )}
+                </select>
+
+
                 </div>
 
                 <div className="relative flex-[0.6] sm:flex-[1]">

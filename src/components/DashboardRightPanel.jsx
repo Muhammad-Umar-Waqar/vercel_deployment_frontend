@@ -153,7 +153,9 @@ export default function DashboardRightPanel({
           closeIcon={closeIcon}
           onClose={onClose}
           deviceId={selected?.deviceId}
-          lastUpdateTime={selected?.lastUpdateTime}
+          lastUpdateTime={selected?.lastUpdateTime}espVoltage={selected?.espVoltage}
+          espCurrent={selected?.espCurrent}
+          espPower={selected?.espPower}
         />
       ) : (
         <VenueDetailsPanel

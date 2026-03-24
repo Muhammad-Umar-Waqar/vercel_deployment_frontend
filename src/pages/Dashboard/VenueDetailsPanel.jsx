@@ -999,7 +999,10 @@ export default function VenueDetailsPanel({
   espOdour = 0,
   espAQI = null,
   espGL = null,
-  lastUpdateTime = null
+  lastUpdateTime = null,
+  espVoltage = null,
+  espCurrent = null,
+  espPower = null,
 }) {
   const dispatch = useDispatch();
   const { user } = useStore();
@@ -1090,6 +1093,7 @@ export default function VenueDetailsPanel({
   ];
 }
 
+
     if (String(deviceType) === "OMD") {
       return [
         { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
@@ -1097,9 +1101,9 @@ export default function VenueDetailsPanel({
         humMetric,
       ];
     }
-    if (String(deviceType) === "TMD") {
-      return [ tempMetric, humMetric ];
-    }
+    // if (String(deviceType) === "TMD") {
+    //   return [ tempMetric, humMetric ];
+    // }
     if (String(deviceType) === "AQIMD") {
       return [
         { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
@@ -1114,6 +1118,42 @@ export default function VenueDetailsPanel({
         humMetric,
       ];
     }
+
+    if (String(deviceType) === "EMD") {
+      return [
+        {
+          key: "power",
+          label: "Power",
+          unit: "W",
+          value: espPower !== null && espPower !== undefined ? +Number(espPower).toFixed(1) : "--",
+          img: null,
+          lucideIcon: <Zap size={30} />,
+          alertFlag: false,
+          color: "green",
+        },
+        {
+          key: "current",
+          label: "Current",
+          unit: "A",
+          value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--",
+          img: null,
+          lucideIcon: <Zap size={30} />,   // swap for a better icon if you have one
+          alertFlag: false,
+          color: "green",
+        },
+        {
+          key: "voltage",
+          label: "Voltage",
+          unit: "V",
+          value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--",
+          img: null,
+          lucideIcon: <Zap size={30} />,
+          alertFlag: false,
+          color: "green",
+        },
+      ];
+}
+
     // fallback: show temp & humidity
     return [ tempMetric, humMetric ];
   })();

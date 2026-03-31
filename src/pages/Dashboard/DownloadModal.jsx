@@ -1849,6 +1849,483 @@
 
 
 
+// import { useState, useEffect, useMemo } from "react";
+// import {
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogActions,
+//   Button,
+//   Checkbox,
+//   FormControlLabel,
+//   CircularProgress,
+//   TextField,
+//   Box,
+//   Typography,
+//   Table,
+//   TableHead,
+//   TableRow,
+//   TableCell,
+//   TableBody,
+// } from "@mui/material";
+
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+// import dayjs from "dayjs";
+
+// import { InfluxDB } from "@influxdata/influxdb-client";
+
+// export default function DownloadModal({
+//   open,
+//   onClose,
+//   measurement = null,
+//   bucket = import.meta.env.VITE_INFLUX_BUCKET,
+//   deviceType = ""
+// }) {
+//   const DEVICE_FIELDS_CONFIG = {
+//     OMD: {
+//       temperature: { label: "Temperature (°C)", unit: "°C" },
+//       humidity:    { label: "Humidity (%)",      unit: "%" },
+//       NH3:         { label: "NH₃ (ppm)",         unit: "ppm" },
+//       H2S:         { label: "H₂S (ppm)",         unit: "ppm" },
+//       odor:        { label: "Odor (%)",           unit: "%" },
+//     },
+//     GLMD: {
+//       leakage:     { label: "Gas Leakage",        unit: "boolean" },
+//       temperature: { label: "Temperature (°C)",   unit: "°C" },
+//       humidity:    { label: "Humidity (%)",        unit: "%" },
+//     },
+//     TMD: {
+//       temperature: { label: "Temperature (°C)",   unit: "°C" },
+//       humidity:    { label: "Humidity (%)",        unit: "%" },
+//     },
+//     AQIMD: {
+//       AQI:         { label: "Air Quality Index",  unit: "AQI" },
+//       temperature: { label: "Temperature (°C)",   unit: "°C" },
+//       humidity:    { label: "Humidity (%)",        unit: "%" },
+//       PM1:         { label: "PM1.0 (ug/m³)",      unit: "ug/m³" },
+//       PM25:        { label: "PM2.5 (ug/m³)",      unit: "ug/m³" },
+//       PM10:        { label: "PM10 (ug/m³)",       unit: "ug/m³" },
+//       Status:      { label: "Status",             unit: "" },
+//     },
+//     EMD: {
+//       voltage:  { label: "Voltage (V)",  unit: "V"   },
+//       current:  { label: "Current (A)",  unit: "A"   },
+//       power:    { label: "Power (W)",    unit: "W",   computed: true },
+//       units:    { label: "Units (kWh)",  unit: "kWh", computed: true },
+//       humidity: { label: "Humidity (%)", unit: "%"   },
+//     },
+//   };
+
+//   const isEMD = String(deviceType) === "EMD";
+
+//   // all field keys for this device type
+//   const fields = Object.keys(DEVICE_FIELDS_CONFIG[deviceType] || {});
+
+//   // only fields that are actually stored in InfluxDB (skip computed ones)
+//   const influxFields = fields.filter(
+//     (f) => !DEVICE_FIELDS_CONFIG[deviceType]?.[f]?.computed
+//   );
+
+//   // summary config for EMD footer row
+//   const SUM_FIELDS = ["power", "units"];
+//   const AVG_FIELDS = ["voltage", "current", "humidity"];
+
+//   const [startDate, setStartDate] = useState(null);
+//   const [endDate, setEndDate]     = useState(null);
+//   const [singleDay, setSingleDay] = useState(false);
+//   const [loading, setLoading]     = useState(false);
+//   const [rows, setRows]           = useState([]);
+//   const [error, setError]         = useState("");
+
+//   const influxUrl   = import.meta.env.VITE_INFLUX_URL;
+//   const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
+//   const influxOrg   = import.meta.env.VITE_INFLUX_ORG;
+
+//   useEffect(() => {
+//     if (open) {
+//       setSingleDay(true);
+//       setStartDate(dayjs().startOf("day"));
+//       setEndDate(null);
+//       setRows([]);
+//       setError("");
+//     }
+//   }, [open]);
+
+//   const getDateFrom = (d) => {
+//     if (!d) return null;
+//     if (typeof d === "object" && typeof d.toDate === "function") return d.toDate();
+//     return new Date(d);
+//   };
+
+//   const queryInflux = async (startISO, endISO) => {
+//     if (!influxUrl || !influxToken || !influxOrg) {
+//       throw new Error("Influx env vars are not set (VITE_INFLUX_URL/TOKEN/ORG).");
+//     }
+
+//     const client   = new InfluxDB({ url: influxUrl, token: influxToken });
+//     const queryApi = client.getQueryApi(influxOrg);
+
+//     // use influxFields only — skip computed fields like power & units
+//     const fieldFilter = influxFields.map((f) => `r._field == "${f}"`).join(" or ");
+
+//     const flux = `
+// from(bucket: "${bucket}")
+//   |> range(start: time(v: "${startISO}"), stop: time(v: "${endISO}"))
+//   |> filter(fn: (r) => r._measurement == "${measurement}" and (${fieldFilter}))
+//   |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+//   |> keep(columns: ["_time", ${influxFields.map((f) => `"${f}"`).join(", ")}])
+//   |> sort(columns: ["_time"])
+// `;
+
+//     return await queryApi.collectRows(flux);
+//   };
+
+//   const handleFetch = async () => {
+//     setError("");
+//     setRows([]);
+
+//     if (!startDate) {
+//       setError("Please select a start date.");
+//       return;
+//     }
+
+//     const startDayjs = dayjs(startDate).startOf("day");
+//     let endDayjs;
+
+//     if (!singleDay) {
+//       if (!endDate) {
+//         setError("Please select an end date or toggle Single Day.");
+//         return;
+//       }
+//       endDayjs = dayjs(endDate).endOf("day");
+//     } else {
+//       endDayjs = dayjs(startDate).endOf("day");
+//     }
+
+//     setLoading(true);
+
+//     try {
+//       const data = await queryInflux(startDayjs.toISOString(), endDayjs.toISOString());
+
+//       const normalized = data.map((r) => {
+//         const base = {
+//           time: r._time,
+//           ...influxFields.reduce((acc, f) => {
+//             acc[f] = r[f] !== undefined ? r[f] : "";
+//             return acc;
+//           }, {}),
+//         };
+
+//         // compute power & units for EMD
+//         if (isEMD) {
+//           const v = Number(r["voltage"]);
+//           const c = Number(r["current"]);
+//           const pw = Number.isFinite(v) && Number.isFinite(c) ? v * c : null;
+//           base.power = pw !== null ? +pw.toFixed(2) : "";
+//           base.units = pw !== null ? +(pw / 1000).toFixed(4) : "";
+//         }
+
+//         return base;
+//       });
+
+//       setRows(normalized);
+//       if (!normalized.length) setError("No data found for the selected range.");
+//     } catch (err) {
+//       setError("Failed to fetch data: " + (err.message || err));
+//       console.error(err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // compute sticky summary footer for EMD
+//   const summary = useMemo(() => {
+//     if (!rows.length || !isEMD) return null;
+
+//     const result = {};
+
+//     SUM_FIELDS.forEach((f) => {
+//       const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
+//       result[f] = vals.length ? +vals.reduce((a, b) => a + b, 0).toFixed(4) : "--";
+//     });
+
+//     AVG_FIELDS.forEach((f) => {
+//       const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
+//       result[f] = vals.length
+//         ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)
+//         : "--";
+//     });
+
+//     return result;
+//   }, [rows, isEMD]);
+
+//   const downloadCsv = () => {
+//     if (!rows.length) {
+//       setError("No data to download. Fetch data first.");
+//       return;
+//     }
+
+//     const formatTimeForCSV = (timeValue) => {
+//       if (!timeValue) return "";
+//       return new Date(timeValue).toLocaleString();
+//     };
+
+//     const escape    = (v) => `"${String(v).replace(/"/g, '""')}"`;
+//     const headerRow = ["time", ...fields.map((f) => DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f)]
+//       .map(escape)
+//       .join(",");
+
+//     const csvRows = [headerRow];
+
+//     for (const r of rows) {
+//       const line = [
+//         formatTimeForCSV(r.time),
+//         ...fields.map((f) => (r[f] === null || r[f] === undefined ? "" : r[f])),
+//       ];
+//       csvRows.push(line.map(escape).join(","));
+//     }
+
+//     // append summary row to CSV for EMD
+//     if (summary) {
+//       const summaryLine = [
+//         "SUMMARY",
+//         ...fields.map((f) => {
+//           if (SUM_FIELDS.includes(f)) return `Total: ${summary[f]}`;
+//           if (AVG_FIELDS.includes(f)) return `Avg: ${summary[f]}`;
+//           return "";
+//         }),
+//       ];
+//       csvRows.push(summaryLine.map(escape).join(","));
+//     }
+
+//     const csvBody = csvRows.join("\n");
+//     const BOM     = "\uFEFF";
+//     const blob    = new Blob([BOM + csvBody], { type: "text/csv;charset=utf-8;" });
+//     const url     = URL.createObjectURL(blob);
+//     const a       = document.createElement("a");
+//     a.href        = url;
+
+//     const startPart = startDate ? getDateFrom(startDate).toISOString().slice(0, 10) : "start";
+//     const endPart   = singleDay
+//       ? startPart
+//       : endDate
+//       ? getDateFrom(endDate).toISOString().slice(0, 10)
+//       : "end";
+
+//     a.download = `influx_${measurement}_${startPart}_to_${endPart}.csv`;
+//     a.click();
+//     URL.revokeObjectURL(url);
+//   };
+
+//   const handleClose = () => {
+//     setRows([]);
+//     setError("");
+//     setLoading(false);
+//     setStartDate(null);
+//     setEndDate(null);
+//     setSingleDay(false);
+//     onClose?.();
+//   };
+
+//   return (
+//     <Dialog open={!!open} onClose={handleClose} maxWidth="lg" fullWidth>
+//       <div className="flex items-center justify-between py-2">
+//         <DialogTitle sx={{ fontWeight: "bold", color: "grey.900" }}>Export data</DialogTitle>
+//         <img src="/logo-half.png" alt="IOTFIY Logo" className="h-[3rem] md:h-[4rem] w-[5rem] md:w-[6rem] pr-5" />
+//       </div>
+
+//       <DialogContent>
+//         <LocalizationProvider dateAdapter={AdapterDayjs}>
+//           <Box display="flex" gap={2} alignItems="center" flexWrap="wrap" mb={2} mt={2}>
+//             <DatePicker
+//               label="Start date"
+//               value={startDate}
+//               onChange={(d) => {
+//                 const sd = d ? d.startOf("day") : null;
+//                 setStartDate(sd);
+//                 if (singleDay) setEndDate(sd);
+//               }}
+//               renderInput={(params) => <TextField {...params} size="small" />}
+//             />
+
+//             <DatePicker
+//               label="End date"
+//               value={endDate}
+//               onChange={(d) => setEndDate(d)}
+//               disabled={singleDay}
+//               renderInput={(params) => <TextField {...params} size="small" />}
+//             />
+
+//             <FormControlLabel
+//               control={
+//                 <Checkbox
+//                   checked={singleDay}
+//                   onChange={(e) => {
+//                     const checked = e.target.checked;
+//                     setSingleDay(checked);
+//                     if (checked) {
+//                       if (startDate) {
+//                         setEndDate(startDate.startOf ? startDate.startOf("day") : dayjs(startDate).startOf("day"));
+//                       } else {
+//                         setEndDate(dayjs().startOf("day"));
+//                         setStartDate(dayjs().startOf("day"));
+//                       }
+//                     }
+//                   }}
+//                 />
+//               }
+//               label="Single day"
+//             />
+
+//             <Box flexGrow={1} py={4} />
+//             <Button variant="contained" onClick={handleFetch} disabled={loading}>
+//               Show data
+//             </Button>
+//           </Box>
+//         </LocalizationProvider>
+
+//         {error && (
+//           <Typography color="error" variant="body2" mb={1}>
+//             {error}
+//           </Typography>
+//         )}
+
+//         <Box mt={2}>
+//           <Typography variant="subtitle2" mb={1}>
+//             Results ({rows.length})
+//           </Typography>
+
+//           <Box
+//             mt={1}
+//             sx={{
+//               maxHeight: 400,
+//               minHeight: 120,
+//               overflowY: "auto",
+//               border: 1,
+//               borderColor: "divider",
+//               borderRadius: 1,
+//               position: "relative",
+//             }}
+//           >
+//             <Table stickyHeader size="small">
+//               {/* ── Header ── */}
+//               <TableHead>
+//                 <TableRow>
+//                   <TableCell sx={{ position: "sticky", top: 0, fontWeight: 700, backgroundColor: "grey.100", zIndex: 2 }}>
+//                     Time
+//                   </TableCell>
+//                   {fields.map((f) => (
+//                     <TableCell
+//                       key={f}
+//                       align="right"
+//                       sx={{ position: "sticky", top: 0, fontWeight: 700, backgroundColor: "grey.100", zIndex: 2 }}
+//                     >
+//                       {DEVICE_FIELDS_CONFIG[deviceType][f]?.label || f}
+//                     </TableCell>
+//                   ))}
+//                 </TableRow>
+//               </TableHead>
+
+//               {/* ── Rows ── */}
+//               <TableBody>
+//                 {rows.map((r, idx) => (
+//                   <TableRow
+//                     key={idx}
+//                     sx={{
+//                       "&:nth-of-type(odd)": { backgroundColor: "grey.100" },
+//                       "&:hover": { backgroundColor: "grey.200" },
+//                     }}
+//                   >
+//                     <TableCell>{new Date(r.time).toLocaleString()}</TableCell>
+//                     {fields.map((f) => (
+//                       <TableCell key={f} align="right">
+//                         {r[f] !== undefined ? r[f] : ""}
+//                       </TableCell>
+//                     ))}
+//                   </TableRow>
+//                 ))}
+//               </TableBody>
+
+//               {/* ── Sticky summary footer (EMD only) ── */}
+//               {summary && (
+//                 <TableHead>
+//                   <TableRow>
+//                     <TableCell
+//                       sx={{
+//                         position: "sticky",
+//                         bottom: 0,
+//                         fontWeight: 700,
+//                         backgroundColor: "#0D5CA4",
+//                         color: "white",
+//                         zIndex: 3,
+//                       }}
+//                     >
+//                       Summary
+//                     </TableCell>
+//                     {fields.map((f) => {
+//                       const isSum = SUM_FIELDS.includes(f);
+//                       const isAvg = AVG_FIELDS.includes(f);
+//                       return (
+//                         <TableCell
+//                           key={f}
+//                           align="right"
+//                           sx={{
+//                             position: "sticky",
+//                             bottom: 0,
+//                             fontWeight: 700,
+//                             backgroundColor: "#0D5CA4",
+//                             color: "white",
+//                             zIndex: 3,
+//                           }}
+//                         >
+//                           {(isSum || isAvg) ? (
+//                             <>
+//                               <div style={{ fontSize: "0.6rem", opacity: 0.75, marginBottom: 1 }}>
+//                                 {isSum ? "Total" : "Avg"}
+//                               </div>
+//                               {summary[f] ?? "--"}
+//                             </>
+//                           ) : "--"}
+//                         </TableCell>
+//                       );
+//                     })}
+//                   </TableRow>
+//                 </TableHead>
+//               )}
+//             </Table>
+
+//             {loading && (
+//               <Box display="flex" justifyContent="center" mt={2} py={1}>
+//                 <CircularProgress />
+//               </Box>
+//             )}
+//           </Box>
+//         </Box>
+//       </DialogContent>
+
+//       <DialogActions>
+//         <Button onClick={downloadCsv} disabled={!rows.length || loading}>
+//           Save CSV
+//         </Button>
+//         <Button onClick={handleClose}>Close</Button>
+//       </DialogActions>
+//     </Dialog>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
 import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
@@ -1913,8 +2390,9 @@ export default function DownloadModal({
       voltage:  { label: "Voltage (V)",  unit: "V"   },
       current:  { label: "Current (A)",  unit: "A"   },
       power:    { label: "Power (W)",    unit: "W",   computed: true },
-      units:    { label: "Units (kWh)",  unit: "kWh", computed: true },
       humidity: { label: "Humidity (%)", unit: "%"   },
+      temperature: { label: "Temperature (°C)", unit: "°C" },
+      // units:    { label: "Units (kWh)",  unit: "kWh", computed: true },
     },
   };
 
@@ -1929,8 +2407,8 @@ export default function DownloadModal({
   );
 
   // summary config for EMD footer row
-  const SUM_FIELDS = ["power", "units"];
-  const AVG_FIELDS = ["voltage", "current", "humidity"];
+  const SUM_FIELDS = ["power"];
+  const AVG_FIELDS = ["voltage", "current", "humidity", "temperature"];
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate]     = useState(null);
@@ -1938,6 +2416,7 @@ export default function DownloadModal({
   const [loading, setLoading]     = useState(false);
   const [rows, setRows]           = useState([]);
   const [error, setError]         = useState("");
+  const [totalUnits, setTotalUnits] = useState(null);
 
   const influxUrl   = import.meta.env.VITE_INFLUX_URL;
   const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
@@ -1982,84 +2461,280 @@ from(bucket: "${bucket}")
     return await queryApi.collectRows(flux);
   };
 
-  const handleFetch = async () => {
-    setError("");
-    setRows([]);
 
-    if (!startDate) {
-      setError("Please select a start date.");
-      return;
-    }
+//   const queryEnergy = async (startISO, endISO) => {
+//   if (!influxUrl || !influxToken || !influxOrg) {
+//     throw new Error("Influx env vars are not set (VITE_INFLUX_URL/TOKEN/ORG).");
+//   }
 
-    const startDayjs = dayjs(startDate).startOf("day");
-    let endDayjs;
+//   const client = new InfluxDB({ url: influxUrl, token: influxToken });
+//   const queryApi = client.getQueryApi(influxOrg);
 
-    if (!singleDay) {
-      if (!endDate) {
-        setError("Please select an end date or toggle Single Day.");
-        return;
-      }
-      endDayjs = dayjs(endDate).endOf("day");
-    } else {
-      endDayjs = dayjs(startDate).endOf("day");
-    }
+// //   const flux = `
+// // power =
+// //   from(bucket: "${bucket}")
+// //     |> range(start: time(v: "${startISO}"), stop: time(v: "${endISO}"))
+// //     |> filter(fn: (r) =>
+// //       r._measurement == "${measurement}" and
+// //       (r._field == "voltage" or r._field == "current")
+// //     )
+// //     |> pivot(rowKey:["_time"], columnKey:["_field"], valueColumn:"_value")
+// //     |> map(fn: (r) => ({
+// //       _time: r._time,
+// //       _value: float(v: r.voltage) * float(v: r.current)
+// //     }))
+// //     |> keep(columns: ["_time", "_value", "_start", "_stop"])
 
-    setLoading(true);
+// // power
+// //   |> integral(unit: 1h)
+// // `;
 
-    try {
-      const data = await queryInflux(startDayjs.toISOString(), endDayjs.toISOString());
+// // const flux = `
+// // from(bucket: "${bucket}")
+// //   |> range(start: time(v: "${startISO}"), stop: time(v: "${endISO}"))
+// //   |> filter(fn: (r) =>
+// //     r._measurement == "${measurement}" and
+// //     (r._field == "voltage" or r._field == "current")
+// //   )
+// //   |> pivot(rowKey:["_time"], columnKey:["_field"], valueColumn:"_value")
+// //   |> map(fn: (r) => ({
+// //     _time: r._time,
+// //     _value: float(v: r.voltage) * float(v: r.current)
+// //   }))
+// //   |> group(columns: ["_start","_stop"])
+// //   |> integral(unit: 1h)
+// // `;
 
-      const normalized = data.map((r) => {
-        const base = {
-          time: r._time,
-          ...influxFields.reduce((acc, f) => {
-            acc[f] = r[f] !== undefined ? r[f] : "";
-            return acc;
-          }, {}),
-        };
 
-        // compute power & units for EMD
-        if (isEMD) {
-          const v = Number(r["voltage"]);
-          const c = Number(r["current"]);
-          const pw = Number.isFinite(v) && Number.isFinite(c) ? v * c : null;
-          base.power = pw !== null ? +pw.toFixed(2) : "";
-          base.units = pw !== null ? +(pw / 1000).toFixed(4) : "";
-        }
 
-        return base;
-      });
 
-      setRows(normalized);
-      if (!normalized.length) setError("No data found for the selected range.");
-    } catch (err) {
-      setError("Failed to fetch data: " + (err.message || err));
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+//   const rows = await queryApi.collectRows(flux);
+//   if (!rows.length) return 0;
+
+//   return +(rows[0]._value / 1000).toFixed(4);
+// };
+
+
+  // const handleFetch = async () => {
+  //   setError("");
+  //   setRows([]);
+
+  //   if (!startDate) {
+  //     setError("Please select a start date.");
+  //     return;
+  //   }
+
+  //   const startDayjs = dayjs(startDate).startOf("day");
+  //   let endDayjs;
+
+  //   if (!singleDay) {
+  //     if (!endDate) {
+  //       setError("Please select an end date or toggle Single Day.");
+  //       return;
+  //     }
+  //     endDayjs = dayjs(endDate).endOf("day");
+  //   } else {
+  //     endDayjs = dayjs(startDate).endOf("day");
+  //   }
+
+  //   setLoading(true);
+
+  //   try {
+  //     const data = await queryInflux(startDayjs.toISOString(), endDayjs.toISOString());
+
+  //     const normalized = data.map((r) => {
+  //       const base = {
+  //         time: r._time,
+  //         ...influxFields.reduce((acc, f) => {
+  //           acc[f] = r[f] !== undefined ? r[f] : "";
+  //           return acc;
+  //         }, {}),
+  //       };
+
+  //       // compute power & units for EMD
+  //       if (isEMD) {
+  //         const v = Number(r["voltage"]);
+  //         const c = Number(r["current"]);
+  //         const pw = Number.isFinite(v) && Number.isFinite(c) ? v * c : null;
+  //         base.power = pw !== null ? +pw.toFixed(2) : "";
+  //         // base.units = pw !== null ? +(pw / 1000).toFixed(4) : "";
+  //       }
+
+  //       return base;
+  //     });
+
+  //     setRows(normalized);
+  //     if (!normalized.length) setError("No data found for the selected range.");
+  //   } catch (err) {
+  //     setError("Failed to fetch data: " + (err.message || err));
+  //     console.error(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // compute sticky summary footer for EMD
-  const summary = useMemo(() => {
-    if (!rows.length || !isEMD) return null;
+  
 
-    const result = {};
+  const queryEnergy = async (startISO, endISO) => {
+  if (!influxUrl || !influxToken || !influxOrg) {
+    throw new Error("Influx env vars are not set (VITE_INFLUX_URL/TOKEN/ORG).");
+  }
 
-    SUM_FIELDS.forEach((f) => {
-      const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
-      result[f] = vals.length ? +vals.reduce((a, b) => a + b, 0).toFixed(4) : "--";
+  const client = new InfluxDB({ url: influxUrl, token: influxToken });
+  const queryApi = client.getQueryApi(influxOrg);
+
+  const flux = `
+from(bucket: "${bucket}")
+  |> range(start: time(v: "${startISO}"), stop: time(v: "${endISO}"))
+  |> filter(fn: (r) =>
+    r._measurement == "${measurement}" and
+    (r._field == "voltage" or r._field == "current")
+  )
+  |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+  |> map(fn: (r) => ({
+    r with
+    _value: float(v: r.voltage) * float(v: r.current)
+  }))
+  |> integral(unit: 1h)
+`;
+
+  const rows = await queryApi.collectRows(flux);
+  if (!rows.length) return 0;
+
+  return +(rows[0]._value / 1000).toFixed(4);
+};
+
+
+  
+  const handleFetch = async () => {
+  setError("");
+  setRows([]);
+  setTotalUnits(null);
+
+  if (!startDate) {
+    setError("Please select a start date.");
+    return;
+  }
+
+  const startDayjs = dayjs(startDate).startOf("day");
+  let endDayjs;
+
+  if (!singleDay) {
+    if (!endDate) {
+      setError("Please select an end date or toggle Single Day.");
+      return;
+    }
+    endDayjs = dayjs(endDate).endOf("day");
+  } else {
+    endDayjs = dayjs(startDate).endOf("day");
+  }
+
+  setLoading(true);
+
+  try {
+    const startISO = startDayjs.toISOString();
+    const endISO = endDayjs.toISOString();
+
+    const [data, energy] = await Promise.all([
+      queryInflux(startISO, endISO),
+      isEMD ? queryEnergy(startISO, endISO) : Promise.resolve(null),
+    ]);
+
+    setTotalUnits(energy);
+
+    const normalized = data.map((r) => {
+      const base = {
+        time: r._time,
+        ...influxFields.reduce((acc, f) => {
+          acc[f] = r[f] !== undefined ? r[f] : "";
+          return acc;
+        }, {}),
+      };
+
+      if (isEMD) {
+        const v = Number(r.voltage);
+        const c = Number(r.current);
+        const pw = Number.isFinite(v) && Number.isFinite(c) ? v * c : null;
+        base.power = pw !== null ? +pw.toFixed(2) : "";
+      }
+
+      return base;
     });
 
-    AVG_FIELDS.forEach((f) => {
-      const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
-      result[f] = vals.length
-        ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)
-        : "--";
-    });
+    setRows(normalized);
+    if (!normalized.length) setError("No data found for the selected range.");
+  } catch (err) {
+    setError("Failed to fetch data: " + (err.message || err));
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
-    return result;
-  }, [rows, isEMD]);
+
+
+  // const summary = useMemo(() => {
+  //   if (!rows.length || !isEMD) return null;
+
+  //   const result = {};
+
+  //   SUM_FIELDS.forEach((f) => {
+  //     const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
+  //     result[f] = vals.length ? +vals.reduce((a, b) => a + b, 0).toFixed(4) : "--";
+  //   });
+
+  //   AVG_FIELDS.forEach((f) => {
+  //     const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
+  //     result[f] = vals.length
+  //       ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)
+  //       : "--";
+  //   });
+
+  //   return result;
+  // }, [rows, isEMD]);
+
+
+//   const summary = useMemo(() => {
+//   if (!rows.length || !isEMD) return null;
+
+//   const result = {};
+
+//   AVG_FIELDS.forEach((f) => {
+//     const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
+//     result[f] = vals.length
+//       ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)
+//       : "--";
+//   });
+
+//   result.totalUnits = totalUnits;
+
+//   return result;
+// }, [rows, totalUnits, isEMD]);
+
+
+const summary = useMemo(() => {
+  if (!rows.length || !isEMD) return null;
+
+  const result = {};
+
+  const powerVals = rows.map((r) => Number(r.power)).filter(Number.isFinite);
+  result.power = powerVals.length
+    ? +powerVals.reduce((a, b) => a + b, 0).toFixed(2)
+    : "--";
+
+  AVG_FIELDS.forEach((f) => {
+    const vals = rows.map((r) => Number(r[f])).filter(Number.isFinite);
+    result[f] = vals.length
+      ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2)
+      : "--";
+  });
+
+  result.totalUnits = totalUnits !== null ? totalUnits : "--";
+
+  return result;
+}, [rows, totalUnits, isEMD]);
 
   const downloadCsv = () => {
     if (!rows.length) {
@@ -2088,17 +2763,46 @@ from(bucket: "${bucket}")
     }
 
     // append summary row to CSV for EMD
+    // if (summary) {
+    //   const summaryLine = [
+    //     "SUMMARY",
+    //     ...fields.map((f) => {
+    //       if (SUM_FIELDS.includes(f)) return `Total: ${summary[f]}`;
+    //       if (AVG_FIELDS.includes(f)) return `Avg: ${summary[f]}`;
+    //       return "";
+    //     }),
+    //   ];
+    //   csvRows.push(summaryLine.map(escape).join(","));
+    // }
+
+    // if (summary) {
+    //     const summaryLine = [
+    //       "SUMMARY",
+    //       ...fields.map((f, index) => {
+    //         const isLast = index === fields.length - 1;
+    //         if (isLast) return `Total Units: ${summary.totalUnits} kWh`;
+    //         if (AVG_FIELDS.includes(f)) return `Avg: ${summary[f]}`;
+    //         return "";
+    //       }),
+    //     ];
+    //     csvRows.push(summaryLine.map(escape).join(","));
+    //   }
+
+
     if (summary) {
       const summaryLine = [
         "SUMMARY",
-        ...fields.map((f) => {
-          if (SUM_FIELDS.includes(f)) return `Total: ${summary[f]}`;
-          if (AVG_FIELDS.includes(f)) return `Avg: ${summary[f]}`;
+        ...fields.map((f, index) => {
+          if (f === "power") return `Total: ${summary.power}`;      // <-- show total power
+          if (AVG_FIELDS.includes(f)) return `Avg: ${summary[f]}`; // <-- show averages
+          const isLast = index === fields.length - 1;
+          if (isLast) return `Total Units: ${summary.totalUnits} kWh`; // last column for kWh
           return "";
         }),
       ];
       csvRows.push(summaryLine.map(escape).join(","));
     }
+
 
     const csvBody = csvRows.join("\n");
     const BOM     = "\uFEFF";
@@ -2200,7 +2904,7 @@ from(bucket: "${bucket}")
           <Box
             mt={1}
             sx={{
-              maxHeight: 400,
+              maxHeight: 360,
               minHeight: 120,
               overflowY: "auto",
               border: 1,
@@ -2249,7 +2953,7 @@ from(bucket: "${bucket}")
               </TableBody>
 
               {/* ── Sticky summary footer (EMD only) ── */}
-              {summary && (
+              {/* {summary && (
                 <TableHead>
                   <TableRow>
                     <TableCell
@@ -2293,7 +2997,125 @@ from(bucket: "${bucket}")
                     })}
                   </TableRow>
                 </TableHead>
-              )}
+              )} */}
+
+              {/* {summary && (
+  <TableHead>
+    <TableRow>
+      <TableCell
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          fontWeight: 700,
+          backgroundColor: "#0D5CA4",
+          color: "white",
+          zIndex: 3,
+        }}
+      >
+        Summary
+      </TableCell>
+
+      {fields.map((f, index) => {
+        const isLast = index === fields.length - 1;
+        const isAvg = AVG_FIELDS.includes(f);
+
+        return (
+          <TableCell
+            key={f}
+            align="right"
+            sx={{
+              position: "sticky",
+              bottom: 0,
+              fontWeight: 700,
+              backgroundColor: "#0D5CA4",
+              color: "white",
+              zIndex: 3,
+            }}
+          >
+            {isLast ? (
+              <>
+                <div style={{ fontSize: "0.6rem", opacity: 0.75, marginBottom: 1 }}>
+                  Total Units
+                </div>
+                {summary.totalUnits ?? "--"} kWh
+              </>
+            ) : isAvg ? (
+              <>
+                <div style={{ fontSize: "0.6rem", opacity: 0.75, marginBottom: 1 }}>
+                  Avg
+                </div>
+                {summary[f]}
+              </>
+            ) : (
+              "--"
+            )}
+          </TableCell>
+        );
+      })}
+    </TableRow>
+  </TableHead>
+)} */}
+
+
+{summary && (
+  <TableHead>
+    <TableRow>
+      <TableCell
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          fontWeight: 700,
+          backgroundColor: "#0D5CA4",
+          color: "white",
+          zIndex: 3,
+        }}
+      >
+        <div style={{ fontSize: "0.6rem", opacity: 0.75, marginBottom: 1 }}>
+          Total Units
+        </div>
+        {summary.totalUnits} kWh
+      </TableCell>
+
+      {fields.map((f) => {
+        const isPower = f === "power";
+        const isAvg = AVG_FIELDS.includes(f);
+
+        return (
+          <TableCell
+            key={f}
+            align="right"
+            sx={{
+              position: "sticky",
+              bottom: 0,
+              fontWeight: 700,
+              backgroundColor: "#0D5CA4",
+              color: "white",
+              zIndex: 3,
+            }}
+          >
+            {isPower ? (
+              <>
+                <div style={{ fontSize: "0.6rem", opacity: 0.75, marginBottom: 1 }}>
+                  Total
+                </div>
+                {summary.power}
+              </>
+            ) : isAvg ? (
+              <>
+                <div style={{ fontSize: "0.6rem", opacity: 0.75, marginBottom: 1 }}>
+                  Avg
+                </div>
+                {summary[f]}
+              </>
+            ) : (
+              "--"
+            )}
+          </TableCell>
+        );
+      })}
+    </TableRow>
+  </TableHead>
+)}
             </Table>
 
             {loading && (

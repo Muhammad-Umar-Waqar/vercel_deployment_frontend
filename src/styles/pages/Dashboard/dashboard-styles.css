@@ -36,9 +36,10 @@
 
 
 
-@media (min-width: 320px) and (max-width: 420px) {
+/* @media (min-width: 320px) and (max-width: 420px) { */
+@media  (max-width: 420px) {
   .dashboard-right-panel {
-    /* width: 320px !important; */
+    width: 320px !important;
     min-width: 320px !important;
     max-width: 768px !important;
     display: flex !important;

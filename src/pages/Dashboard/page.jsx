@@ -496,7 +496,7 @@
 // //       const thresholdMs = Date.now() - 1.5 * 60 * 60 * 1000; // now - 1.5 hours
 
 // //       console.log("LED DEBUG: thresholdMs (ms) =", thresholdMs, " =>", new Date(thresholdMs).toISOString());
-      
+
 // //       const onlineMap = {};
 // //       deviceIds.forEach((id) => {
 // //         const timeISO = lastMap[id];
@@ -617,7 +617,7 @@
 // //                 // Devices present
 // //                 <div className="freezer-cards-grid freezer-cards-container">
 // //                   {/* {freezerDevices.map((device) => (
-          
+
 // //                 <FreezerDeviceCard
 // //                     key={device._id ?? device.id}
 // //                     deviceId={device.deviceId}
@@ -1353,7 +1353,7 @@
 //       const thresholdMs = Date.now() - 1.5 * 60 * 60 * 1000; // now - 1.5 hours
 
 //       console.log("LED DEBUG: thresholdMs (ms) =", thresholdMs, " =>", new Date(thresholdMs).toISOString());
-      
+
 //       const onlineMap = {};
 //       deviceIds.forEach((id) => {
 //         const timeISO = lastMap[id];
@@ -1475,7 +1475,7 @@
 //                 // Devices present
 //                 <div className="freezer-cards-grid freezer-cards-container">
 //                   {/* {freezerDevices.map((device) => (
-          
+
 //                 <FreezerDeviceCard
 //                     key={device._id ?? device.id}
 //                     deviceId={device.deviceId}
@@ -2164,7 +2164,7 @@
 //       const thresholdMs = Date.now() - 1.5 * 60 * 60 * 1000; // now - 1.5 hours
 
 //       console.log("LED DEBUG: thresholdMs (ms) =", thresholdMs, " =>", new Date(thresholdMs).toISOString());
-      
+
 //       const onlineMap = {};
 //       deviceIds.forEach((id) => {
 //         const timeISO = lastMap[id];
@@ -2285,7 +2285,7 @@
 //                 // Devices present
 //                 <div className="freezer-cards-grid freezer-cards-container">
 //                   {/* {freezerDevices.map((device) => (
-          
+
 //                 <FreezerDeviceCard
 //                     key={device._id ?? device.id}
 //                     deviceId={device.deviceId}
@@ -4810,7 +4810,7 @@
 //                 batteryLow: newDevice.batteryLow ?? oldDevice.batteryLow,
 //                 refrigeratorAlert: newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
 //                 lastUpdateTime: newDevice.lastUpdateTime ?? oldDevice.lastUpdateTime,
-               
+
 //                 espVoltage: newDevice.espVoltage ?? oldDevice.espVoltage,
 //                 espCurrent: newDevice.espCurrent ?? oldDevice.espCurrent,
 //                 // espPower: newDevice.espPower ?? oldDevice.espPower,
@@ -5227,6 +5227,8 @@ import { InfluxDB } from "@influxdata/influxdb-client";
 // NEW import
 import { useOrgVenue } from "../../contexts/OrgVenueContext";
 import EnergyMonitoringDeviceCard from "./EnergyMonitoringDeviceCard";
+import SchedulerDeviceCard from "./SchedulerDeviceCard";
+import { useScheduler } from "../../contexts/SchedulerContext";
 
 const mockFreezerDevices = [];
 
@@ -5238,10 +5240,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const token = getToken();
 
-  // Context for org + venue
   const { organization: ctxOrg, venue: ctxVenue, setOrganization, setVenue, clearVenue } = useOrgVenue();
 
-  // your existing state
   const [organizations, setOrganizations] = useState([]);
   const [freezerDevices, setFreezerDevices] = useState(mockFreezerDevices);
   const [selectedFreezerDeviceId, setSelectedFreezerDeviceId] = useState(null);
@@ -5259,20 +5259,29 @@ export default function Dashboard() {
   const [pollHitTime, setPollHitTime] = useState(Date.now());
   const [deviceOnlineMap, setDeviceOnlineMap] = useState({});
   const [deviceLastUpdateMap, setDeviceLastUpdateMap] = useState({});
-//   const mockEMDDevice = {
-//   _id: "mock-emd-001",
-//   deviceId: "EMD-001",
-//   deviceType: "EMD",
-//   espVoltage: 230,
-//   espCurrent: 5,
-//   espPower: 1150,
-//   espHumidity: 45,
-//   espTemprature: 28,
-//   temperatureAlert: false,
-//   humidityAlert: false,
-//   isOnline: true,
-//   lastUpdateISO: new Date().toISOString(),
-// };
+ 
+
+  const { eventsMap, toggleMap, setEvents, setToggle } = useScheduler();
+
+  const mockSchedulerDevice = {
+    _id: "mock-scheduler-001",
+    deviceId: "SCH-001",
+    deviceType: "SCHEDULER",
+    espTemprature: 28,
+    espHumidity: 45,
+    isOnline: true,
+    lastUpdateISO: new Date().toISOString(),
+
+    scheduler: {
+      startingOn: "10:30 PM",
+      duration: "330",
+      repeatDays: ["Mon", "Tue", "Wed"],
+      command: "ON",
+      enabled: true,
+    },
+  };
+
+
 
   const hasVenueInUrl = useMemo(() => {
     const sp = new URLSearchParams(location.search);
@@ -5316,26 +5325,26 @@ export default function Dashboard() {
 
 
   // ---- MOUNT: restore URL from stored context ----
-useEffect(() => {
-  const sp = new URLSearchParams(location.search);
-  if (!sp.get("venue") && ctxVenue?.id) {
-    navigate(`${location.pathname}?venue=${ctxVenue.id}`, { replace: true });
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []); // run only once on mount
-
-// ---- Initialize org for non-admin users from user object ----
-useEffect(() => {
-  if (user?.role !== "admin" && user?.organization && !selectedOrgId) {
-    const orgId = String(user.organization);
-    setSelectedOrgId(orgId);
-    // if context has no org yet, seed it
-    if (!ctxOrg?.id) {
-      setOrganization({ id: orgId, name: orgNameForTop ?? undefined });
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search);
+    if (!sp.get("venue") && ctxVenue?.id) {
+      navigate(`${location.pathname}?venue=${ctxVenue.id}`, { replace: true });
     }
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [user?.organization]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run only once on mount
+
+  // ---- Initialize org for non-admin users from user object ----
+  useEffect(() => {
+    if (user?.role !== "admin" && user?.organization && !selectedOrgId) {
+      const orgId = String(user.organization);
+      setSelectedOrgId(orgId);
+      // if context has no org yet, seed it
+      if (!ctxOrg?.id) {
+        setOrganization({ id: orgId, name: orgNameForTop ?? undefined });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.organization]);
 
   // EFFECT: fetchOrganizations placeholder (unchanged)
   useEffect(() => {
@@ -5514,15 +5523,28 @@ useEffect(() => {
         if (res.ok) {
           const devices = Array.isArray(data.devices) ? data.devices : data.devices ? [data.devices] : [];
           console.log("devices<>", devices);
-          
+
+          const withFrontendSeed = [...devices];
+          const hasScheduler = withFrontendSeed.some((d) => d.deviceType === "SCHEDULER");
+
+          if (!hasScheduler) {
+            withFrontendSeed.push(mockSchedulerDevice);
+          }
+
+
           setFreezerDevices((prevDevices) => {
             const prevMap = new Map(prevDevices.map((d) => [String(d._id ?? d.id ?? d.deviceId), d]));
-            return devices.map((newDevice) => {
+
+
+            return withFrontendSeed.map((newDevice) => {
               const id = String(newDevice._id ?? newDevice.id ?? newDevice.deviceId);
               const oldDevice = prevMap.get(id);
               if (!oldDevice) return newDevice;
+
+
               return {
                 ...oldDevice,
+                ...newDevice,
                 ambientTemperature: newDevice.ambientTemperature ?? oldDevice.ambientTemperature,
                 freezerTemperature: newDevice.freezerTemperature ?? oldDevice.freezerTemperature,
                 espHumidity: newDevice.espHumidity ?? oldDevice.espHumidity,
@@ -5538,7 +5560,7 @@ useEffect(() => {
                 batteryLow: newDevice.batteryLow ?? oldDevice.batteryLow,
                 refrigeratorAlert: newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
                 lastUpdateTime: newDevice.lastUpdateTime ?? oldDevice.lastUpdateTime,
-               
+
                 espVoltage: newDevice.espVoltage ?? oldDevice.espVoltage,
                 espCurrent: newDevice.espCurrent ?? oldDevice.espCurrent,
                 // espPower: newDevice.espPower ?? oldDevice.espPower,
@@ -5559,14 +5581,7 @@ useEffect(() => {
             });
           });
 
-        //           setFreezerDevices((prevDevices) => {
-        //   // append mock EMD device if not already present
-        //   const exists = prevDevices.some(d => d.deviceType === "EMD");
-        //   if (!exists) {
-        //     return [...prevDevices, mockEMDDevice];
-        //   }
-        //   return prevDevices;
-        // });
+   
 
           if (isDesktop && devices && devices.length > 0) {
             if (!autoSelectedForVenueRef.current[selectedVenueId]) {
@@ -5712,7 +5727,7 @@ useEffect(() => {
     if (!freezerDevices || freezerDevices.length === 0) {
       setDeviceOnlineMap({});
       setDeviceLastUpdateMap({});
-      return () => {};
+      return () => { };
     }
 
     const influxUrl = import.meta.env.VITE_INFLUX_URL;
@@ -5722,7 +5737,7 @@ useEffect(() => {
 
     if (!influxUrl || !influxToken || !influxOrg || !influxBucket) {
       console.warn("Influx env vars not set; skipping LED polling.");
-      return () => {};
+      return () => { };
     }
 
     const client = new InfluxDB({ url: influxUrl, token: influxToken });
@@ -5791,7 +5806,6 @@ from(bucket: "${influxBucket}")
     );
   }
 
-  // Render (unchanged except passing externalLabel props to selects)
   return (
     <div className="flex w-full flex-row h-full font-inter rounded-md bg-[#F5F6FA]">
       <div className="flex-1 min-w-0 space-y-6 overflow-y-auto custom-scrollbar dashboard-main-content bg-white shadow-sm border border-[#E5E7EB]/30 p-4 lg:p-6">
@@ -5819,7 +5833,7 @@ from(bucket: "${influxBucket}")
 
             <div className="flex items-center  ml-5 sm:ml-auto  ">
               <VenueSelect
-              organizationId={selectedOrgId || ctxOrg?.id || user?.organization}
+                organizationId={selectedOrgId || ctxOrg?.id || user?.organization}
                 // organizationId={selectedOrgId || user?.organization}
                 value={selectedVenueId}
                 onChange={onVenueChange}
@@ -5880,30 +5894,55 @@ from(bucket: "${influxBucket}")
                     }
 
                     if (device?.deviceType === "OMD") {
-                      return <OdourDeviceCard  key={idKey} {...commonProps} espOdour={device?.espOdour} odourAlert={device?.odourAlert} />;
+                      return <OdourDeviceCard key={idKey} {...commonProps} espOdour={device?.espOdour} odourAlert={device?.odourAlert} />;
                     }
 
                     if (device?.deviceType === "GLMD") {
-                      return <GasLeakageDeviceCard  key={idKey} {...commonProps} espGL={device?.espGL} glAlert={device?.glAlert} />;
+                      return <GasLeakageDeviceCard key={idKey} {...commonProps} espGL={device?.espGL} glAlert={device?.glAlert} />;
                     }
 
                     if (device?.deviceType === "EMD") {
-                    return (
-                      <EnergyMonitoringDeviceCard
-                        key={idKey}   
-                        {...commonProps}
-                        espVoltage={device?.espVoltage}
-                        espCurrent={device?.espCurrent}
-                        espPower={device?.espPower}
-                        espHumidity={device?.espHumidity}
-                        espTemprature={device?.espTemprature}
-                      />
-                    );
-                  }
+                      return (
+                        <EnergyMonitoringDeviceCard
+                          key={idKey}
+                          {...commonProps}
+                          espVoltage={device?.espVoltage}
+                          espCurrent={device?.espCurrent}
+                          espPower={device?.espPower}
+                          espHumidity={device?.espHumidity}
+                          espTemprature={device?.espTemprature}
+                        />
+                      );
+                    }
+
+
+
+
+                    if (device?.deviceType === "SCHEDULER") {
+                       const idStr = String(idKey);                        // keep for card key/selection
+                       const schedulerKey = String(device.deviceId);       // ← use deviceId for context
+                      return (
+                        <SchedulerDeviceCard
+                          key={idKey}
+                          {...commonProps}
+                          startingOn={device?.scheduler?.startingOn}
+                          duration={device?.scheduler?.duration}
+                          repeatDays={device?.scheduler?.repeatDays || []}
+                          command={device?.scheduler?.command}
+                          enabled={device?.scheduler?.enabled}
+                          pollHitTime={pollHitTime}
+                          events={eventsMap[schedulerKey] || []}
+                          toggleState={toggleMap[schedulerKey] ?? null}
+                          onEventsChange={(updated) => setEvents(schedulerKey, updated)}
+                          onToggleChange={(val) => setToggle(schedulerKey, val)}
+                        />
+                      );
+                    }
+
 
                     return (
                       <FreezerDeviceCard
-                        key={idKey}  
+                        key={idKey}
                         {...commonProps}
                         deviceType={device?.deviceType}
                         espAQI={device?.espAQI}
@@ -5925,10 +5964,25 @@ from(bucket: "${influxBucket}")
       </div>
 
       {isDesktop ? (
-        <DashboardRightPanel freezerDevices={freezerDevices} selectedFreezerDeviceId={selectedFreezerDeviceId} selectedOrgId={selectedOrgId} pollInterval={POLL_MS} />
+        <DashboardRightPanel
+          freezerDevices={freezerDevices}
+          selectedFreezerDeviceId={selectedFreezerDeviceId}
+          selectedOrgId={selectedOrgId}
+          pollInterval={POLL_MS}
+       
+
+        />
       ) : (
         <Drawer open={open} onClose={toggleDrawer(false)} anchor="right">
-          <DashboardRightPanel freezerDevices={freezerDevices} selectedFreezerDeviceId={selectedFreezerDeviceId} selectedOrgId={selectedOrgId} closeIcon={true} onClose={toggleDrawer(false)} pollInterval={POLL_MS} />
+          <DashboardRightPanel
+            freezerDevices={freezerDevices}
+            selectedFreezerDeviceId={selectedFreezerDeviceId}
+            selectedOrgId={selectedOrgId}
+            closeIcon={true}
+            onClose={toggleDrawer(false)}
+            pollInterval={POLL_MS}
+         
+          />
         </Drawer>
       )}
     </div>

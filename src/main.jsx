@@ -27,9 +27,11 @@ import PublicRoute from './Routes/PublicRoute';
 import NotFound from './pages/NotFound';
 import UserCreatedByAdminRoute from './Routes/UserCreatedByAdminRoute';
 import { OrgVenueProvider } from "./contexts/OrgVenueContext";
+import { SchedulerProvider } from './contexts/SchedulerContext';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
        <OrgVenueProvider>
+        <SchedulerProvider>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
           <BrowserRouter>
@@ -100,6 +102,7 @@ createRoot(document.getElementById('root')).render(
           </BrowserRouter>
       </PersistGate>
     </Provider>
+    </SchedulerProvider>
     </OrgVenueProvider>
   </StrictMode>
 );

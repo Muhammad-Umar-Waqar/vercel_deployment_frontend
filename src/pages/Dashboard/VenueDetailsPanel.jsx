@@ -1333,24 +1333,587 @@
 
 
 
+// // src/pages/Dashboard/VenueDetailsPanel.jsx
+// import AlertsChart from "./AlertsChart";
+// import { useDispatch, useSelector } from "react-redux";
+// import { useStore } from "../../contexts/storecontexts";
+// import { useEffect, useState } from "react";
+// import QRCode from "./QrCode";
+// import { useLocation } from "react-router-dom";
+// import CloseIcon from '@mui/icons-material/Close';
+// import { IconButton, Skeleton } from "@mui/material";
+// import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
+// import { Download, Cloud, Zap, SquareActivity, Plug } from "lucide-react";
+// import Swal from "sweetalert2";
+// import DownloadModal from "./DownloadModal";
+// import EventsSection from "../../components/components/events/EventsSection";
+
+
+// export default function VenueDetailsPanel({
+//   organizationId = null,
+//   venueName = "Karim Korangi Branch",
+//   deviceType = null,           // OMD / TMD / AQIMD / GLMD
+//   espTemprature = 0,
+//   ambientTemperature = 0,
+//   espHumidity = 0,
+//   batteryLow = true,
+//   needMaintenance = true,
+//   apiKey = "",
+//   closeIcon = false,
+//   onClose = undefined,
+//   odourAlert = false,
+//   temperatureAlert = false,
+//   humidityAlert = false,
+//   aqiAlert = false,
+//   glAlert = false,
+//   deviceId = "",
+//   espOdour = 0,
+//   espAQI = null,
+//   espGL = null,
+//   lastUpdateTime = null,
+//   espVoltage = null,
+//   espCurrent = null,
+//   espPower = null,
+// }) {
+//   const dispatch = useDispatch();
+//   const { user } = useStore();
+//   const orgId = organizationId || user?.organization || null;
+
+//   const location = useLocation();
+//   const params = new URLSearchParams(location.search);
+//   const venueId = params.get("venue"); // gives the ID
+//   const [downloadOpen, setDownloadOpen] = useState(false);
+
+//   // --- select cached venues for this org
+//   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
+//   const globalVenues = useSelector((state) => state.Venue.Venues || []);
+//   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
+//   const isSchedulerDevice = String(deviceType) === "SCHEDULER";
+
+
+//   useEffect(() => {
+//     if (orgId && !orgVenues.length) {
+//       dispatch(fetchVenuesByOrganization(orgId));
+//     }
+
+//   }, [orgId, orgVenues.length, dispatch]);
+
+//   // helpers
+//   const sameId = (a, b) => String(a) === String(b);
+//   const toInt = (v) => {
+//     const n = Number(v);
+//     return Number.isFinite(n) ? Math.trunc(n) : null;
+//   };
+
+//   // computed display values
+//   const displayTemp = toInt(espTemprature ?? ambientTemperature);
+//   const displayHumidity = toInt(espHumidity);
+//   const displayOdour = toInt(espOdour);
+//   const displayAQI = espAQI === null || espAQI === undefined ? null : toInt(espAQI);
+//   const displayGL = espGL === null || espGL === undefined ? null : toInt(espGL);
+//   const isEMD = String(deviceType) === "EMD";
+
+//   // find venue name fallback
+//   const currentVenueSlice =
+//     venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
+
+//   const displayVenueName =
+//     currentVenueSlice?.name ||
+//     currentVenueSlice?.venueName ||
+//     venueName ||
+//     "Venue";
+
+//   const handleDownload = () => setDownloadOpen(true);
+
+//   const formatLastUpdate = (time) => {
+//     if (!time) return null;
+//     const date = new Date(time);
+//     const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
+//     return date.toLocaleString(undefined, options);
+//   };
+
+//   const topMetrics = (() => {
+//   const tempMetric = {
+//     key: "temperature",
+//     label: "Temperature",
+//     unit: "°C",
+//     value: displayTemp !== null ? displayTemp : "--",
+//     img: "/temperature-icon.svg",
+//     lucideIcon: null,
+//     alertFlag: !!temperatureAlert,
+//     color: "green",
+//   };
+
+//   const humMetric = {
+//     key: "humidity",
+//     label: "Humidity",
+//     unit: "%",
+//     value: displayHumidity !== null ? displayHumidity : "--",
+//     img: "/humidity-alert.svg",
+//     lucideIcon: null,
+//     alertFlag: !!humidityAlert,
+//     color: "green",
+//   };
+
+//   if (String(deviceType) === "EMD") {
+//     return [
+//       {
+//         key: "power",
+//         label: "Power",
+//         unit: "",
+//         value: formatPowerValue(espVoltage, espCurrent),
+//         img: null,
+//         lucideIcon: <Zap size={30} />,
+//         alertFlag: false,
+//         color: "green",
+//       },
+//       {
+//         key: "current",
+//         label: "Current",
+//         unit: "A",
+//         value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--",
+//         img: null,
+//         lucideIcon: <SquareActivity size={30} />,
+//         alertFlag: false,
+//         color: "green",
+//       },
+//       {
+//         key: "voltage",
+//         label: "Voltage",
+//         unit: "V",
+//         value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--",
+//         img: null,
+//         lucideIcon: <Plug size={30} />,
+//         alertFlag: false,
+//         color: "green",
+//       },
+//     ];
+//   }
+
+//   if (String(deviceType) === "OMD") {
+//     return [
+//       { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
+//       tempMetric,
+//       humMetric,
+//     ];
+//   }
+
+//   if (String(deviceType) === "AQIMD") {
+//     return [
+//       { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
+//       tempMetric,
+//       humMetric,
+//     ];
+//   }
+
+//   if (String(deviceType) === "GLMD") {
+//     return [
+//       { key: "gas", label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} />, alertFlag: !!glAlert, color: "red" },
+//       tempMetric,
+//       humMetric,
+//     ];
+//   }
+
+//   if (String(deviceType) === "TMD") {
+//     return [tempMetric, humMetric];
+//   }
+
+//   return [tempMetric, humMetric];
+// })();
+
+// const emdExtraMetrics = isEMD
+//   ? [
+//       {
+//         key: "unit",
+//         label: "Unit",
+//         unit: "",
+//         value: formatUnitValue(espPower, espVoltage, espCurrent),
+//         img: null,
+//         lucideIcon: <Zap size={30} />,
+//         alertFlag: false,
+//         color: "green",
+//       },
+//       {
+//         key: "temperature",
+//         label: "Temperature",
+//         unit: "°C",
+//         value: displayTemp !== null ? displayTemp : "--",
+//         img: "/temperature-icon.svg",
+//         lucideIcon: null,
+//         alertFlag: false,
+//         color: "green",
+//       },
+//       {
+//         key: "humidity",
+//         label: "Humidity",
+//         unit: "%",
+//         value: displayHumidity !== null ? displayHumidity : "--",
+//         img: "/humidity-alert.svg",
+//         lucideIcon: null,
+//         alertFlag: false,
+//         color: "green",
+//       },
+ 
+//     ]
+//   : [];
+
+//   console.log("deviceType", deviceType);
+
+
+//    const schedulerDevice = {
+//     deviceId,
+//     venueId,
+//     venueName: displayVenueName,
+//     deviceType,
+//   };
+
+
+
+//   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
+//   const statusClass = (flag, color = "green") => {
+//     if (flag) {
+//       if (color === "red") return "border-red-500";
+//       if (color === "purple") return "border-purple-600";
+//       return "border-green-500";
+//     }
+//     return "border-gray-300";
+//   };
+
+//   const renderMetricValue = (m) => {
+//   const isSplitMetric = ["power", "unit"].includes(m.key);
+
+//   if (isSplitMetric && typeof m.value === "string" && m.value !== "--") {
+//     // const [num, unit] = m.value.split(" ");
+//      const parts = m.value.split(" ");
+
+//     const num = parts[0];
+//     const unit = parts[1] || ""; // ✅ SAFE
+    
+//     return (
+//       <>
+//         {num}
+//         <span className="text-sm font-thin ml-1">{unit}</span>
+//       </>
+//     );
+//   }
+
+//   return (
+//     <>
+//       {m.value ?? "--"}
+//       {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
+//     </>
+//   );
+// };
+
+
+
+//   // At the top of VenueDetailsPanel.jsx, add this helper:
+// function formatPowerValue(espVoltage, espCurrent) {
+//   const v = Number(espVoltage);
+//   const c = Number(espCurrent);
+//   if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
+
+//   const watts = v * c;
+//   if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
+//   if (watts >= 1000) return `${(watts / 1000).toFixed(3)} kW`;
+//   return `${watts.toFixed(2)} W`;
+// }
+
+// function formatUnitValue(espPower, espVoltage, espCurrent) {
+//   const power = Number(espPower);
+
+//   // fallback to voltage * current if espPower is missing
+//   const fallbackWatts =
+//     Number.isFinite(Number(espVoltage)) && Number.isFinite(Number(espCurrent))
+//       ? Number(espVoltage) * Number(espCurrent)
+//       : null;
+
+//   const watts = Number.isFinite(power) ? power : fallbackWatts;
+//   if (!Number.isFinite(watts)) return "--";
+
+//   // estimated units from watts -> kWh
+//   return `${(watts / 1000).toFixed(3)} kWh`;
+// }
+
+
+
+//   return (
+//     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
+//       {closeIcon && (
+//         <div className="flex justify-between items-center">
+//           <img src="/iotfiy_logo_rpanel.svg" alt="IOTFIY LOGO" className="h-[30px] w-auto" />
+//           <IconButton onClick={() => typeof onClose === "function" && onClose()} edge="start" aria-label="close-details" size="small">
+//             <CloseIcon />
+//           </IconButton>
+//         </div>
+//       )}
+
+//       {/* Header */}
+//       <div className="flex justify-between items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
+//         <div>
+//           <p className="text-sm text-[#64748B] font-medium">Device ID</p>
+//           <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70} />}</h2>
+//           <div className="text-xs text-gray-600">{displayVenueName}</div>
+//         </div>
+
+//         <button
+//           onClick={handleDownload}
+//           className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer "
+//           aria-label="Download"
+//         >
+//           <span className="leading-none">Download</span>
+//           <Download className="w-3.5 h-3.5" />
+//         </button>
+//       </div>
+
+    
+
+
+// <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
+//   {isEMD ? (
+//     <div className="space-y-4">
+//       <div className="grid grid-cols-3 gap-4">
+//         {topMetrics.map((m) => (
+//           <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+//             <div className="mb-2">
+//               {m.img ? (
+//                 <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+//               ) : m.lucideIcon ? (
+//                 <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+//               ) : (
+//                 <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
+//               )}
+//             </div>
+
+//             <div className="text-sm text-gray-600">{m.label}</div>
+
+//             <div className="text-xl font-semibold">
+//               {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
+//                 (() => {
+//                   const [num, unit] = m.value.split(" ");
+//                   return (
+//                     <>
+//                       {num}
+//                       <span className="text-sm font-thin ml-1">{unit}</span>
+//                     </>
+//                   );
+//                 })()
+//               ) : (
+//                 <>
+//                   {m.value ?? "--"}
+//                   {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
+//                 </>
+//               )} */}
+//               {renderMetricValue(m)}
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+
+//       <div className="grid grid-cols-3 gap-4">
+//         {emdExtraMetrics.map((m) => (
+//           <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+//             <div className="mb-2">
+//               {m.img ? (
+//                 <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+//               ) : m.lucideIcon ? (
+//                 <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+//               ) : (
+//                 <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
+//               )}
+//             </div>
+
+//             <div className="text-sm text-gray-600">{m.label}</div>
+
+//             {/* <div className="text-xl font-semibold">
+//               {m.value ?? "--"}
+//               {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
+//             </div> */}
+
+//             <div className="text-xl font-semibold">
+//               {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
+//                 (() => {
+//                   const [num, unit] = m.value.split(" ");
+//                   return (
+//                     <>
+//                       {num}
+//                       <span className="text-sm font-thin ml-1">{unit}</span>
+//                     </>
+//                   );
+//                 })()
+//               ) : (
+//                 <>
+//                   {m.value ?? "--"}
+//                   {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
+//                 </>
+//               )} */}
+//               {renderMetricValue(m)}
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   ) : (
+//     <div className={`flex items-center justify-between gap-4 ${topMetrics.length === 2 ? "sm:justify-around" : ""}`}>
+//       {topMetrics.map((m) => (
+//         <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+//           <div className="mb-2">
+//             {m.img ? (
+//               <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+//             ) : m.lucideIcon ? (
+//               <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+//             ) : (
+//               <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
+//             )}
+//           </div>
+
+//           <div className="text-sm text-gray-600">{m.label}</div>
+
+//           <div className="text-xl font-semibold">
+//             {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
+//               (() => {
+//                 const [num, unit] = m.value.split(" ");
+//                 return (
+//                   <>
+//                     {num}
+//                     <span className="text-sm font-thin ml-1">{unit}</span>
+//                   </>
+//                 );
+//               })()
+//             ) : (
+//               <>
+//                 {m.value ?? "--"}
+//                 {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
+//               </>
+//             )} */}
+
+//             {renderMetricValue(m)}
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   )}
+// </div>
+
+
+    
+
+
+// {!isEMD && (
+//   <div className={`grid ${topMetrics.length === 2 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-2 md:grid-cols-2"} gap-2`}>
+//     {topMetrics.map((m) => {
+//       const flag = !!m.alertFlag;
+//       const color = m.color ?? "green";
+
+//       return (
+//         <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
+//           {m.img ? (
+//             <img src={m.img} alt={m.label} className="w-6 h-6" />
+//           ) : m.lucideIcon ? (
+//             <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
+//           ) : (
+//             <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />
+//           )}
+//           <div>
+//             <div className="text-xs text-gray-600">{m.label}</div>
+//             <div className="text-sm font-medium">{statusText(flag)}</div>
+//           </div>
+//         </div>
+//       );
+//     })}
+//   </div>
+// )}
+
+
+//       {/* API key / QR */}
+//       <div>
+//         {apiKey ? (
+//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
+//             <div className="flex items-center justify-between">
+//               <div>
+//                 <strong>API Key:</strong>
+//                 <div className="mt-2 text-sm" title={apiKey}>
+//                   {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
+//                 </div>
+//               </div>
+
+//               <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || "http://localhost:5173"} />
+//             </div>
+//           </div>
+//         ) : (
+//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
+//             <div className="flex items-center justify-between">
+//               <div>
+//                 <Skeleton variant="text" width={50} height={20} className="mb-2" />
+//                 <Skeleton variant="text" width={120} height={20} className="mb-2" />
+//               </div>
+//               <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: "10%" }} />
+//             </div>
+//           </div>
+//         )}
+
+//         {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
+//       </div>
+
+//       {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
+//       {/* deviceType: 'GLMD' 'TMD' 'OMD' 'AQIMD' */}
+//       <DownloadModal
+//         open={downloadOpen}
+//         onClose={() => setDownloadOpen(false)}
+//         measurement={deviceId}
+//         bucket="Odour"
+//         deviceType={deviceType}
+//       />
+
+
+//       {/* ================= EVENTS SCHEDULER ================= */}
+//         {/* {isSchedulerDevice && (
+//           <div className="pt-6">
+//             <EventsSection selectedDevice={schedulerDevice} />
+//           </div>
+//         )} */}
+
+//     {String(deviceType) === "SCHEDULER" && (
+//       <div className="pt-6">
+//         <EventsSection selectedDevice={{ deviceId, venueId, venueName: displayVenueName, deviceType }} />
+//       </div>
+//     )}
+
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
 // src/pages/Dashboard/VenueDetailsPanel.jsx
 import AlertsChart from "./AlertsChart";
 import { useDispatch, useSelector } from "react-redux";
 import { useStore } from "../../contexts/storecontexts";
-import { useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import QRCode from "./QrCode";
 import { useLocation } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Skeleton } from "@mui/material";
 import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
-import { Download, Cloud, Zap, SquareActivity, Plug } from "lucide-react";
+import { Download, Cloud, Zap, SquareActivity, Plug, Power } from "lucide-react";
 import Swal from "sweetalert2";
 import DownloadModal from "./DownloadModal";
+import EventsSection from "../../components/components/events/EventsSection";
+import { useScheduler } from "../../contexts/SchedulerContext";
 
 export default function VenueDetailsPanel({
   organizationId = null,
   venueName = "Karim Korangi Branch",
-  deviceType = null,           // OMD / TMD / AQIMD / GLMD
+  deviceType = null,
   espTemprature = 0,
   ambientTemperature = 0,
   espHumidity = 0,
@@ -1372,38 +1935,46 @@ export default function VenueDetailsPanel({
   espVoltage = null,
   espCurrent = null,
   espPower = null,
+  
 }) {
   const dispatch = useDispatch();
   const { user } = useStore();
   const orgId = organizationId || user?.organization || null;
 
+  // ✅ ADD inside the component body, after venueId is defined
+const { eventsMap, toggleMap, setEvents, setToggle } = useScheduler();
+
+const schedulerEvents = deviceId ? eventsMap[deviceId] ?? [] : [];
+const resolvedToggle = deviceId ? (toggleMap[deviceId] ?? "off") : "off";
+
+
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const venueId = params.get("venue"); // gives the ID
+  const venueId = params.get("venue");
   const [downloadOpen, setDownloadOpen] = useState(false);
+  // ── Scheduler Events State (lifted) ──
+  // const [schedulerEvents, setSchedulerEvents] = useState([]);
+  
+  // ── Power button state (SCHEDULER only) — controls EventsSection modal ──
+  const [powerModalOpen, setPowerModalOpen] = useState(false);
 
-  // --- select cached venues for this org
   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
   const globalVenues = useSelector((state) => state.Venue.Venues || []);
   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-
-
+  const isSchedulerDevice = String(deviceType) === "SCHEDULER";
 
   useEffect(() => {
     if (orgId && !orgVenues.length) {
       dispatch(fetchVenuesByOrganization(orgId));
     }
-
   }, [orgId, orgVenues.length, dispatch]);
 
-  // helpers
   const sameId = (a, b) => String(a) === String(b);
   const toInt = (v) => {
     const n = Number(v);
     return Number.isFinite(n) ? Math.trunc(n) : null;
   };
 
-  // computed display values
   const displayTemp = toInt(espTemprature ?? ambientTemperature);
   const displayHumidity = toInt(espHumidity);
   const displayOdour = toInt(espOdour);
@@ -1411,7 +1982,6 @@ export default function VenueDetailsPanel({
   const displayGL = espGL === null || espGL === undefined ? null : toInt(espGL);
   const isEMD = String(deviceType) === "EMD";
 
-  // find venue name fallback
   const currentVenueSlice =
     venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
 
@@ -1426,137 +1996,206 @@ export default function VenueDetailsPanel({
   const formatLastUpdate = (time) => {
     if (!time) return null;
     const date = new Date(time);
-    const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
-    return date.toLocaleString(undefined, options);
+    return date.toLocaleString(undefined, {
+      year: "numeric", month: "short", day: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    });
   };
+
+  function formatPowerValue(espVoltage, espCurrent) {
+    const v = Number(espVoltage);
+    const c = Number(espCurrent);
+    if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
+    const watts = v * c;
+    if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
+    if (watts >= 1000) return `${(watts / 1000).toFixed(3)} kW`;
+    return `${watts.toFixed(2)} W`;
+  }
+
+  function formatUnitValue(espPower, espVoltage, espCurrent) {
+    const power = Number(espPower);
+    const fallbackWatts =
+      Number.isFinite(Number(espVoltage)) && Number.isFinite(Number(espCurrent))
+        ? Number(espVoltage) * Number(espCurrent)
+        : null;
+    const watts = Number.isFinite(power) ? power : fallbackWatts;
+    if (!Number.isFinite(watts)) return "--";
+    return `${(watts / 1000).toFixed(3)} kWh`;
+  }
 
   const topMetrics = (() => {
-  const tempMetric = {
-    key: "temperature",
-    label: "Temperature",
-    unit: "°C",
-    value: displayTemp !== null ? displayTemp : "--",
-    img: "/temperature-icon.svg",
-    lucideIcon: null,
-    alertFlag: !!temperatureAlert,
-    color: "green",
-  };
+    const tempMetric = {
+      key: "temperature", label: "Temperature", unit: "°C",
+      value: displayTemp !== null ? displayTemp : "--",
+      img: "/temperature-icon.svg", lucideIcon: null,
+      alertFlag: !!temperatureAlert, color: "green",
+    };
+    const humMetric = {
+      key: "humidity", label: "Humidity", unit: "%",
+      value: displayHumidity !== null ? displayHumidity : "--",
+      img: "/humidity-alert.svg", lucideIcon: null,
+      alertFlag: !!humidityAlert, color: "green",
+    };
 
-  const humMetric = {
-    key: "humidity",
-    label: "Humidity",
-    unit: "%",
-    value: displayHumidity !== null ? displayHumidity : "--",
-    img: "/humidity-alert.svg",
-    lucideIcon: null,
-    alertFlag: !!humidityAlert,
-    color: "green",
-  };
-
-  if (String(deviceType) === "EMD") {
-    return [
-      {
-        key: "power",
-        label: "Power",
-        unit: "",
-        value: formatPowerValue(espVoltage, espCurrent),
-        img: null,
-        lucideIcon: <Zap size={30} />,
-        alertFlag: false,
-        color: "green",
-      },
-      {
-        key: "current",
-        label: "Current",
-        unit: "A",
-        value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--",
-        img: null,
-        lucideIcon: <SquareActivity size={30} />,
-        alertFlag: false,
-        color: "green",
-      },
-      {
-        key: "voltage",
-        label: "Voltage",
-        unit: "V",
-        value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--",
-        img: null,
-        lucideIcon: <Plug size={30} />,
-        alertFlag: false,
-        color: "green",
-      },
-    ];
-  }
-
-  if (String(deviceType) === "OMD") {
-    return [
-      { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
-      tempMetric,
-      humMetric,
-    ];
-  }
-
-  if (String(deviceType) === "AQIMD") {
-    return [
-      { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
-      tempMetric,
-      humMetric,
-    ];
-  }
-
-  if (String(deviceType) === "GLMD") {
-    return [
-      { key: "gas", label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} />, alertFlag: !!glAlert, color: "red" },
-      tempMetric,
-      humMetric,
-    ];
-  }
-
-  if (String(deviceType) === "TMD") {
+    if (String(deviceType) === "EMD") {
+      return [
+        { key: "power", label: "Power", unit: "", value: formatPowerValue(espVoltage, espCurrent), img: null, lucideIcon: <Zap size={30} />, alertFlag: false, color: "green" },
+        { key: "current", label: "Current", unit: "A", value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--", img: null, lucideIcon: <SquareActivity size={30} />, alertFlag: false, color: "green" },
+        { key: "voltage", label: "Voltage", unit: "V", value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--", img: null, lucideIcon: <Plug size={30} />, alertFlag: false, color: "green" },
+      ];
+    }
+    if (String(deviceType) === "OMD") {
+      return [
+        { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
+        tempMetric, humMetric,
+      ];
+    }
+    if (String(deviceType) === "AQIMD") {
+      return [
+        { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
+        tempMetric, humMetric,
+      ];
+    }
+    if (String(deviceType) === "GLMD") {
+      return [
+        { key: "gas", label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} />, alertFlag: !!glAlert, color: "red" },
+        tempMetric, humMetric,
+      ];
+    }
     return [tempMetric, humMetric];
-  }
+  })();
 
-  return [tempMetric, humMetric];
-})();
+// ── Helpers ─────────────────────────────────────────────────────────────────
+// const toMinutes = (t = "") => {
+//   const [h, m] = t.split(":").map(Number);
+//   return h * 60 + (m || 0);
+// };
 
-const emdExtraMetrics = isEMD
-  ? [
-      {
-        key: "unit",
-        label: "Unit",
-        unit: "",
-        value: formatUnitValue(espPower, espVoltage, espCurrent),
-        img: null,
-        lucideIcon: <Zap size={30} />,
-        alertFlag: false,
-        color: "green",
-      },
-      {
-        key: "temperature",
-        label: "Temperature",
-        unit: "°C",
-        value: displayTemp !== null ? displayTemp : "--",
-        img: "/temperature-icon.svg",
-        lucideIcon: null,
-        alertFlag: false,
-        color: "green",
-      },
-      {
-        key: "humidity",
-        label: "Humidity",
-        unit: "%",
-        value: displayHumidity !== null ? displayHumidity : "--",
-        img: "/humidity-alert.svg",
-        lucideIcon: null,
-        alertFlag: false,
-        color: "green",
-      },
- 
-    ]
-  : [];
 
-  console.log("deviceType", deviceType);
 
+// const getCurrentRunningEvent = (events = []) => {
+//   const now = new Date();
+//   const nowM = now.getHours() * 60 + now.getMinutes();
+//   return (
+//     events.find((e) => {
+//       if (!e.enabled || !e.start || !e.end) return false;
+//       const s = toMinutes(e.start);
+//       const en = toMinutes(e.end);
+//       return en > s ? nowM >= s && nowM < en : nowM >= s || nowM < en; // handles overnight
+//     }) ?? null
+//   );
+// };
+
+// src/pages/Dashboard/VenueDetailsPanel.jsx
+// ── ADD / REPLACE these helpers (right after the imports and before the component) ──
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const toMinutes = (t = "") => {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + (m || 0);
+};
+
+const dayMatches = (event, day) => {
+  const days = event.days || event.repeatDays || [];
+  return days.length === 0 || days.includes(day); // empty = every day
+};
+
+const getCurrentRunningEvent = (events = []) => {
+  const now = new Date();
+  const nowM = now.getHours() * 60 + now.getMinutes();
+  const today = DAY_NAMES[now.getDay()];
+
+  return (
+    events.find((e) => {
+      if (!e.enabled || !e.start || !e.end) return false;
+      if (!dayMatches(e, today)) return false;
+
+      const s = toMinutes(e.start);
+      const en = toMinutes(e.end);
+
+      // handles overnight spans (23:00 → 01:00)
+      return en > s
+        ? nowM >= s && nowM < en
+        : nowM >= s || nowM < en;
+    }) ?? null
+  );
+};
+
+
+    const runningSchedulerEvent = useMemo(
+    () => getCurrentRunningEvent(schedulerEvents),
+    [schedulerEvents]
+  );
+
+  // const resolvedToggle = schedulerToggleState ?? "off";
+  const displayToggleState = runningSchedulerEvent ? "gray" : resolvedToggle;
+
+  const handleSchedulerToggleClick = async () => {
+    if (runningSchedulerEvent) {
+      const result = await Swal.fire({
+        title: "Event Currently Running",
+        html: `The <b>${runningSchedulerEvent.command}</b> event (${runningSchedulerEvent.start} – ${runningSchedulerEvent.end}) is currently active.<br><br>Do you want to <b>disable</b> this event?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, disable it",
+        cancelButtonText: "Keep running",
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#64748B",
+        background: "#ffffff",
+        color: "#1e293b",
+        customClass: {
+          popup: "rounded-2xl shadow-xl",
+          title: "text-base font-semibold",
+          htmlContainer: "text-sm text-slate-500",
+          confirmButton: "rounded-lg text-sm font-semibold px-5 py-2",
+          cancelButton: "rounded-lg text-sm font-semibold px-5 py-2",
+        },
+        buttonsStyling: true,
+      });
+
+      if (result.isConfirmed) {
+        const updated = schedulerEvents.map((ev) =>
+          ev.id === runningSchedulerEvent.id ? { ...ev, enabled: false } : ev
+        );
+        // onSchedulerEventsChange?.(updated);
+        setEvents(deviceId, updated);
+        // onSchedulerToggleChange?.("off");
+        setToggle(deviceId, "off");
+      }
+      return;
+    }
+
+    const next = resolvedToggle === "on" ? "off" : "on";
+    // onSchedulerToggleChange?.(next);
+    setToggle(deviceId, next);
+  };
+
+  // ...inside the metrics section, replace the Power button:
+  {isSchedulerDevice && (
+    <button
+      onClick={handleSchedulerToggleClick}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition shadow-sm cursor-pointer active:scale-[.98]
+        ${displayToggleState === "on"   ? "bg-emerald-500 hover:bg-emerald-600"
+        : displayToggleState === "off"  ? "bg-rose-500 hover:bg-rose-600"
+        :                                 "bg-gray-400 hover:bg-gray-500"}`}
+      title={
+        displayToggleState === "gray" ? "Event running — click to disable"
+        : displayToggleState === "on" ? "Turn Off"
+        : "Turn On"
+      }
+    >
+      <Power size={15} strokeWidth={2} />
+      <span className="text-xs font-bold">
+        {displayToggleState === "on" ? "ON" : displayToggleState === "off" ? "OFF" : "···"}
+      </span>
+    </button>
+  )}
+  
+  const emdExtraMetrics = isEMD ? [
+    { key: "unit", label: "Unit", unit: "", value: formatUnitValue(espPower, espVoltage, espCurrent), img: null, lucideIcon: <Zap size={30} />, alertFlag: false, color: "green" },
+    { key: "temperature", label: "Temperature", unit: "°C", value: displayTemp !== null ? displayTemp : "--", img: "/temperature-icon.svg", lucideIcon: null, alertFlag: false, color: "green" },
+    { key: "humidity", label: "Humidity", unit: "%", value: displayHumidity !== null ? displayHumidity : "--", img: "/humidity-alert.svg", lucideIcon: null, alertFlag: false, color: "green" },
+  ] : [];
 
   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
   const statusClass = (flag, color = "green") => {
@@ -1569,62 +2208,15 @@ const emdExtraMetrics = isEMD
   };
 
   const renderMetricValue = (m) => {
-  const isSplitMetric = ["power", "unit"].includes(m.key);
-
-  if (isSplitMetric && typeof m.value === "string" && m.value !== "--") {
-    // const [num, unit] = m.value.split(" ");
-     const parts = m.value.split(" ");
-
-    const num = parts[0];
-    const unit = parts[1] || ""; // ✅ SAFE
-    
-    return (
-      <>
-        {num}
-        <span className="text-sm font-thin ml-1">{unit}</span>
-      </>
-    );
-  }
-
-  return (
-    <>
-      {m.value ?? "--"}
-      {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-    </>
-  );
-};
-
-
-
-  // At the top of VenueDetailsPanel.jsx, add this helper:
-function formatPowerValue(espVoltage, espCurrent) {
-  const v = Number(espVoltage);
-  const c = Number(espCurrent);
-  if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
-
-  const watts = v * c;
-  if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
-  if (watts >= 1000) return `${(watts / 1000).toFixed(3)} kW`;
-  return `${watts.toFixed(2)} W`;
-}
-
-function formatUnitValue(espPower, espVoltage, espCurrent) {
-  const power = Number(espPower);
-
-  // fallback to voltage * current if espPower is missing
-  const fallbackWatts =
-    Number.isFinite(Number(espVoltage)) && Number.isFinite(Number(espCurrent))
-      ? Number(espVoltage) * Number(espCurrent)
-      : null;
-
-  const watts = Number.isFinite(power) ? power : fallbackWatts;
-  if (!Number.isFinite(watts)) return "--";
-
-  // estimated units from watts -> kWh
-  return `${(watts / 1000).toFixed(3)} kWh`;
-}
-
-
+    const isSplitMetric = ["power", "unit"].includes(m.key);
+    if (isSplitMetric && typeof m.value === "string" && m.value !== "--") {
+      const parts = m.value.split(" ");
+      const num = parts[0];
+      const unit = parts[1] || "";
+      return (<>{num}<span className="text-sm font-thin ml-1">{unit}</span></>);
+    }
+    return (<>{m.value ?? "--"}{m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}</>);
+  };
 
   return (
     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
@@ -1644,10 +2236,9 @@ function formatUnitValue(espPower, espVoltage, espCurrent) {
           <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70} />}</h2>
           <div className="text-xs text-gray-600">{displayVenueName}</div>
         </div>
-
         <button
           onClick={handleDownload}
-          className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer "
+          className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer"
           aria-label="Download"
         >
           <span className="leading-none">Download</span>
@@ -1655,164 +2246,98 @@ function formatUnitValue(espPower, espVoltage, espCurrent) {
         </button>
       </div>
 
-    
-
-
-<div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
-  {isEMD ? (
-    <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
-        {topMetrics.map((m) => (
-          <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-            <div className="mb-2">
-              {m.img ? (
-                <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-              ) : m.lucideIcon ? (
-                <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-              ) : (
-                <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
-              )}
+      {/* Metrics display */}
+      <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
+        {isEMD ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              {topMetrics.map((m) => (
+                <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+                  <div className="mb-2">
+                    {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+                      : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+                      : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+                  </div>
+                  <div className="text-sm text-gray-600">{m.label}</div>
+                  <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
+                </div>
+              ))}
             </div>
-
-            <div className="text-sm text-gray-600">{m.label}</div>
-
-            <div className="text-xl font-semibold">
-              {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
-                (() => {
-                  const [num, unit] = m.value.split(" ");
-                  return (
-                    <>
-                      {num}
-                      <span className="text-sm font-thin ml-1">{unit}</span>
-                    </>
-                  );
-                })()
-              ) : (
-                <>
-                  {m.value ?? "--"}
-                  {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-                </>
-              )} */}
-              {renderMetricValue(m)}
+            <div className="grid grid-cols-3 gap-4">
+              {emdExtraMetrics.map((m) => (
+                <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+                  <div className="mb-2">
+                    {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+                      : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+                      : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+                  </div>
+                  <div className="text-sm text-gray-600">{m.label}</div>
+                  <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-3 gap-4">
-        {emdExtraMetrics.map((m) => (
-          <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-            <div className="mb-2">
-              {m.img ? (
-                <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-              ) : m.lucideIcon ? (
-                <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-              ) : (
-                <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
-              )}
-            </div>
-
-            <div className="text-sm text-gray-600">{m.label}</div>
-
-            {/* <div className="text-xl font-semibold">
-              {m.value ?? "--"}
-              {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-            </div> */}
-
-            <div className="text-xl font-semibold">
-              {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
-                (() => {
-                  const [num, unit] = m.value.split(" ");
-                  return (
-                    <>
-                      {num}
-                      <span className="text-sm font-thin ml-1">{unit}</span>
-                    </>
-                  );
-                })()
-              ) : (
-                <>
-                  {m.value ?? "--"}
-                  {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-                </>
-              )} */}
-              {renderMetricValue(m)}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  ) : (
-    <div className={`flex items-center justify-between gap-4 ${topMetrics.length === 2 ? "sm:justify-around" : ""}`}>
-      {topMetrics.map((m) => (
-        <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-          <div className="mb-2">
-            {m.img ? (
-              <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-            ) : m.lucideIcon ? (
-              <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-            ) : (
-              <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
-            )}
-          </div>
-
-          <div className="text-sm text-gray-600">{m.label}</div>
-
-          <div className="text-xl font-semibold">
-            {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
-              (() => {
-                const [num, unit] = m.value.split(" ");
-                return (
-                  <>
-                    {num}
-                    <span className="text-sm font-thin ml-1">{unit}</span>
-                  </>
-                );
-              })()
-            ) : (
-              <>
-                {m.value ?? "--"}
-                {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-              </>
-            )} */}
-
-            {renderMetricValue(m)}
-          </div>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+        ) : (
+          <div className={`flex items-center justify-between gap-4 ${topMetrics.length === 2 ? "sm:justify-around" : ""}`}>
+            {topMetrics.map((m) => (
+              <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+                <div className="mb-2">
+                  {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+                    : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+                    : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+                </div>
+                <div className="text-sm text-gray-600">{m.label}</div>
+                <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
+              </div>
+            ))}
 
 
-    
-
-
-{!isEMD && (
-  <div className={`grid ${topMetrics.length === 2 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-2 md:grid-cols-2"} gap-2`}>
-    {topMetrics.map((m) => {
-      const flag = !!m.alertFlag;
-      const color = m.color ?? "green";
-
-      return (
-        <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
-          {m.img ? (
-            <img src={m.img} alt={m.label} className="w-6 h-6" />
-          ) : m.lucideIcon ? (
-            <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
-          ) : (
-            <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />
-          )}
-          <div>
-            <div className="text-xs text-gray-600">{m.label}</div>
-            <div className="text-sm font-medium">{statusText(flag)}</div>
-          </div>
-        </div>
-      );
-    })}
-  </div>
+      {isSchedulerDevice && (
+        console.log("Rendering Power Button with state:", { schedulerEvents, resolvedToggle, displayToggleState }),
+  <button
+    onClick={handleSchedulerToggleClick}
+    className={`flex flex-col justify-center items-center gap-3 px-4 py-5 rounded-xl text-sm font-semibold text-white transition shadow-sm cursor-pointer active:scale-[.98]
+      ${displayToggleState === "on"  ? "bg-emerald-500 hover:bg-emerald-600"
+      : displayToggleState === "off" ? "bg-rose-500 hover:bg-rose-600"
+      :                                "bg-gray-400 hover:bg-gray-500"}`}
+    title={
+      displayToggleState === "gray" ? "Event running — click to disable"
+      : displayToggleState === "on"  ? "Turn Off"
+      : "Turn On"
+    }
+  >
+    <Power size={15} strokeWidth={2} />
+    <span className="text-xs font-bold">
+      {displayToggleState === "on"  ? "ON"
+      : displayToggleState === "off" ? "OFF"
+      : "Event"}
+    </span>
+  </button>
 )}
+          </div>
+        )}
+      </div>
 
+      {/* Status badges */}
+      {!isEMD && (
+        <div className={`grid ${topMetrics.length === 2 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-2 md:grid-cols-2"} gap-2`}>
+          {topMetrics.map((m) => {
+            const flag = !!m.alertFlag;
+            const color = m.color ?? "green";
+            return (
+              <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
+                {m.img ? <img src={m.img} alt={m.label} className="w-6 h-6" />
+                  : m.lucideIcon ? <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
+                  : <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />}
+                <div>
+                  <div className="text-xs text-gray-600">{m.label}</div>
+                  <div className="text-sm font-medium">{statusText(flag)}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* API key / QR */}
       <div>
@@ -1825,7 +2350,6 @@ function formatUnitValue(espPower, espVoltage, espCurrent) {
                   {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
                 </div>
               </div>
-
               <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || "http://localhost:5173"} />
             </div>
           </div>
@@ -1841,11 +2365,13 @@ function formatUnitValue(espPower, espVoltage, espCurrent) {
           </div>
         )}
 
-        {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
+        {lastUpdateTime ? (
+          <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">
+            Last Update: {formatLastUpdate(lastUpdateTime)}
+          </div>
+        ) : null}
       </div>
 
-      {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
-      {/* deviceType: 'GLMD' 'TMD' 'OMD' 'AQIMD' */}
       <DownloadModal
         open={downloadOpen}
         onClose={() => setDownloadOpen(false)}
@@ -1853,6 +2379,25 @@ function formatUnitValue(espPower, espVoltage, espCurrent) {
         bucket="Odour"
         deviceType={deviceType}
       />
+
+ 
+
+        {String(deviceType) === "SCHEDULER" && (
+    <div className="pt-6">
+      <EventsSection
+        selectedDevice={{ deviceId, venueId, venueName: displayVenueName, deviceType }}
+
+
+       events={schedulerEvents}
+      onEventsChange={(updated) => setEvents(deviceId, updated)}
+      externalOpen={powerModalOpen}
+      onExternalClose={() => setPowerModalOpen(false)}
+      onToggleChange={(val) => setToggle(deviceId, val)}
+    />
+    </div>
+  )}
+
+
     </div>
   );
 }

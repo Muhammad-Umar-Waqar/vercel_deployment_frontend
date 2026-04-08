@@ -3403,6 +3403,7 @@ const DEVICE_TYPE_META = {
   AQIMD: { label: "Air Quality", color: "success" },
   GLMD: { label: "Leakage", color: "error" },
   EMD: { label: "Energy", color: "secondary" },
+  SCHEDULER: { label: "Scheduler",   color: "info"}, 
 };
 
 export default function DeviceList({ onDeviceSelect, selectedDevice }) {
@@ -3638,35 +3639,22 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
         conditionsToSend.push({ type: "gass", operator: gassOp, value: Number(gassVal) });
       }
     }
-//     else if (deviceType === "EMD") {
-//   if (voltageVal !== "") {
-//     if (!validOps.includes(voltageOp)) {
-//       setFormErrors({ voltageOp: "Invalid operator" });
-//       return;
-//     }
 
-//     conditionsToSend.push({
-//       type: "voltage",
-//       operator: voltageOp,
-//       value: Number(voltageVal),
-//     });
-//   }
-// }
-else if (deviceType === "EMD") {
-  if (voltageVal !== "") {
+    else if (deviceType === "EMD") {
+      if (voltageVal !== "") {
 
-    if (voltageOp !== "=") {
-      setFormErrors({ voltageOp: "Voltage only supports '=' operator" });
-      return;
+        if (voltageOp !== "=") {
+          setFormErrors({ voltageOp: "Voltage only supports '=' operator" });
+          return;
+        }
+
+        conditionsToSend.push({
+          type: "voltage",
+          operator: "=",
+          value: Number(voltageVal),
+        });
+      }
     }
-
-    conditionsToSend.push({
-      type: "voltage",
-      operator: "=",
-      value: Number(voltageVal),
-    });
-  }
-}
 
     try {
       setWorking(true);

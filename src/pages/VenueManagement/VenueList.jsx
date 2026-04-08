@@ -644,7 +644,10 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
   useEffect(() => {
     if (orgFilter) {
       dispatch(fetchVenuesByOrganization(orgFilter));
-    }
+    }else {
+    // 🔥 CRITICAL: Always fetch all venues when switching to "All Organizations"
+    dispatch(fetchAllVenues());
+  }
   }, [orgFilter, dispatch]);
 
   const handleDelete = async (id, name) => {
@@ -794,6 +797,7 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
     if (isMobile) setDrawerOpen(false);
   };
 
+
   // NEW: compute displayed venues based on orgFilter
   // prefer the server-cached venuesByOrg when available; otherwise filter global Venues array
   const getDisplayedVenues = () => {
@@ -801,7 +805,7 @@ const VenueList = ({ onVenueSelect, selectedVenue }) => {
 
     // try cached list first
     const cached = Array.isArray(venuesByOrg[orgFilter]) ? venuesByOrg[orgFilter] : null;
-    if (cached && cached.length) return cached;
+    if (cached ) return cached;
 
     // fallback: filter global Venues array by organization id (covers both {organization: id} and {organization: { _id, ... }})
     return (Venues || []).filter((v) => String(v.organization?._id ?? v.organization ?? "") === String(orgFilter));

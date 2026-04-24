@@ -3403,7 +3403,9 @@ const DEVICE_TYPE_META = {
   AQIMD: { label: "Air Quality", color: "success" },
   GLMD: { label: "Leakage", color: "error" },
   EMD: { label: "Energy", color: "secondary" },
-  SCHEDULER: { label: "Scheduler",   color: "info"}, 
+  // SCHEDULER: { label: "Scheduler",   color: "info"}, 
+  TSD: { label: "Temp Scheduler", color: "info" },
+  ESD: { label: "Energy Scheduler", color: "secondary" },
 };
 
 export default function DeviceList({ onDeviceSelect, selectedDevice }) {
@@ -3562,6 +3564,62 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
     setEditingDeviceId(null);
   };
 
+  
+  const DEVICE_CONDITIONS_MAP = {
+      OMD: ["temperature", "humidity", "odour"],
+      TMD: ["temperature", "humidity"],
+      AQIMD: ["AQI", "temperature", "humidity"],
+      GLMD: ["gass", "temperature", "humidity"],
+      EMD: ["temperature", "humidity", "voltage"],
+      TSD: ["temperature", "humidity"],
+      ESD: ["temperature", "humidity", "voltage"],
+    };
+
+
+
+  const buildConditions = () => {
+  const validOps = [">", "<", "="];
+  const types = DEVICE_CONDITIONS_MAP[editForm.deviceType] || [];
+
+  const map = {
+    temperature: { op: editForm.temperatureOp, val: editForm.temperatureVal },
+    humidity: { op: editForm.humidityOp, val: editForm.humidityVal },
+    odour: { op: editForm.odourOp, val: editForm.odourVal },
+    AQI: { op: editForm.aqiOp, val: editForm.aqiVal },
+    gass: { op: editForm.gassOp, val: editForm.gassVal },
+    voltage: { op: "=", val: editForm.voltageVal },
+  };
+
+  const result = [];
+
+  for (const type of types) {
+    const entry = map[type];
+    if (!entry) continue;
+
+    const { op, val } = entry;
+
+    if (val === "") continue;
+
+    if (!validOps.includes(op)) {
+      throw new Error(`Invalid operator for ${type}`);
+    }
+
+    if (type === "voltage" && op !== "=") {
+      throw new Error("Voltage only supports '=' operator");
+    }
+
+    result.push({
+      type,
+      operator: type === "voltage" ? "=" : op,
+      value: Number(val),
+    });
+  }
+
+  return result;
+};
+
+
+
   // Save handler now includes per-type conditions and optional deviceType change
   const handleEditSave = async () => {
     const {
@@ -3603,7 +3661,16 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
     }
 
     const validOps = [">", "<", "="];
-    const conditionsToSend = [];
+    // const conditionsToSend = [];
+
+    let conditionsToSend = [];
+
+    try {
+      conditionsToSend = buildConditions();
+    } catch (err) {
+      Swal.fire({ icon: "warning", title: err.message });
+      return;
+    }
 
     // temperature (always available for all devices)
     if (temperatureVal !== "") {
@@ -3618,43 +3685,43 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
     }
 
     // per-type extra conditions
-    if (deviceType === "OMD") {
-      if (odourVal !== "") {
-        if (!validOps.includes(odourOp)) { setFormErrors({ odourOp: "Invalid operator" }); return; }
-        conditionsToSend.push({ type: "odour", operator: odourOp, value: Number(odourVal) });
-      } else {
-        // OMD requires odour condition — you can decide to enforce strictly; here we just warn if missing
-        // If you want to enforce: uncomment next lines
-        // setFormErrors({ odourVal: "Odour value is required for OMD" });
-        // return;
-      }
-    } else if (deviceType === "AQIMD") {
-      if (aqiVal !== "") {
-        if (!validOps.includes(aqiOp)) { setFormErrors({ aqiOp: "Invalid operator" }); return; }
-        conditionsToSend.push({ type: "AQI", operator: aqiOp, value: Number(aqiVal) });
-      }
-    } else if (deviceType === "GLMD") {
-      if (gassVal !== "") {
-        if (!validOps.includes(gassOp)) { setFormErrors({ gassOp: "Invalid operator" }); return; }
-        conditionsToSend.push({ type: "gass", operator: gassOp, value: Number(gassVal) });
-      }
-    }
+    // if (deviceType === "OMD") {
+    //   if (odourVal !== "") {
+    //     if (!validOps.includes(odourOp)) { setFormErrors({ odourOp: "Invalid operator" }); return; }
+    //     conditionsToSend.push({ type: "odour", operator: odourOp, value: Number(odourVal) });
+    //   } else {
+    //     // OMD requires odour condition — you can decide to enforce strictly; here we just warn if missing
+    //     // If you want to enforce: uncomment next lines
+    //     // setFormErrors({ odourVal: "Odour value is required for OMD" });
+    //     // return;
+    //   }
+    // } else if (deviceType === "AQIMD") {
+    //   if (aqiVal !== "") {
+    //     if (!validOps.includes(aqiOp)) { setFormErrors({ aqiOp: "Invalid operator" }); return; }
+    //     conditionsToSend.push({ type: "AQI", operator: aqiOp, value: Number(aqiVal) });
+    //   }
+    // } else if (deviceType === "GLMD") {
+    //   if (gassVal !== "") {
+    //     if (!validOps.includes(gassOp)) { setFormErrors({ gassOp: "Invalid operator" }); return; }
+    //     conditionsToSend.push({ type: "gass", operator: gassOp, value: Number(gassVal) });
+    //   }
+    // }
 
-    else if (deviceType === "EMD") {
-      if (voltageVal !== "") {
+    // else if (deviceType === "EMD") {
+    //   if (voltageVal !== "") {
 
-        if (voltageOp !== "=") {
-          setFormErrors({ voltageOp: "Voltage only supports '=' operator" });
-          return;
-        }
+    //     if (voltageOp !== "=") {
+    //       setFormErrors({ voltageOp: "Voltage only supports '=' operator" });
+    //       return;
+    //     }
 
-        conditionsToSend.push({
-          type: "voltage",
-          operator: "=",
-          value: Number(voltageVal),
-        });
-      }
-    }
+    //     conditionsToSend.push({
+    //       type: "voltage",
+    //       operator: "=",
+    //       value: Number(voltageVal),
+    //     });
+    //   }
+    // }
 
     try {
       setWorking(true);
@@ -3999,7 +4066,8 @@ export default function DeviceList({ onDeviceSelect, selectedDevice }) {
               </Grid>
             )} */}
 
-          {editForm.deviceType === "EMD" && (
+          {/* {editForm.deviceType === "EMD" && ( */}
+          {["EMD", "ESD"].includes(editForm.deviceType) && (
               <Grid container spacing={1} alignItems="center" sx={{ mt: 1, width: "83%" }}>
                 
                 <Grid item xs="auto" sm={3}>

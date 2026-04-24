@@ -5281,8 +5281,7 @@ export default function Dashboard() {
     },
   };
 
-
-
+  
   const hasVenueInUrl = useMemo(() => {
     const sp = new URLSearchParams(location.search);
     return Boolean(sp.get("venue"));

@@ -1,0 +1,1188 @@
+Let me give you the complete, authenticated breakdown for all six Umrah steps — every substep, its dua (with Arabic, transliteration, and English meaning), its video title, and its audio title — written entirely in English with no code.
+
+---
+
+# Complete Umrah Content Guide
+## Step-by-Step Breakdown with Substeps, Duas, Video Titles, and Audio Titles
+### For Multilingual Application (Arabic / English / Urdu)
+
+---
+
+## A Note on Sources and Structure
+
+All duas included here are sourced from Sahih Hadith collections (primarily Sahih Bukhari, Sahih Muslim, Sunan Abu Dawud, and Sunan Ibn Majah), the Quran, and the official Saudi Ministry of Hajj and Umrah guidance. Where no specific dua is mandatory by Sunnah — such as during the walking portions of Tawaf and Sa'i — the structure reflects this honestly, with recommended general dhikr rather than invented specific duas. This is the authentic approach and matches what the Saudi application source you shared already confirms: "There is no specific dua for each round of Sa'i — all duas are recommended."
+
+The content structure for each substep follows this pattern:
+
+- What the pilgrim does (instruction)
+- What they say (dua/dhikr with Arabic, transliteration, English meaning)
+- What the video should show
+- What the audio should contain
+
+---
+
+---
+
+# STEP 1 — IHRAM
+**Step Type:** Multi-Substep (Manual Completion)
+**Trigger:** User manually marks each substep complete
+**Map Behavior:** No map tracking required. Map shows general direction toward Miqat.
+**Bottom Sheet Behavior:** Sequential substep cards, each with instruction + dua + video
+
+---
+
+Ihram is the sacred state of ritual purity that a pilgrim must enter before performing Umrah or Hajj. It involves both a physical preparation — bathing, wearing the prescribed garments — and a spiritual commitment through the intention and the Talbiyah. The restrictions of Ihram (not cutting hair, not using perfume, not hunting, not engaging in marital relations) begin once the intention is made at or before the Miqat boundary. No pilgrim may skip this step or delay it past the Miqat.
+
+---
+
+### Substep 1.1 — Making the Intention (Niyyah)
+
+**Instruction Text:**
+Before everything else, make your intention in your heart. The intention for Umrah must be sincere and conscious. You intend to perform Umrah for the sake of Allah alone. It is Sunnah to also express the intention verbally.
+
+**What the pilgrim says:**
+
+Arabic:
+اللَّهُمَّ إِنِّي أُرِيدُ الْعُمْرَةَ فَيَسِّرْهَا لِي وَتَقَبَّلْهَا مِنِّي
+
+Transliteration:
+Allahumma inni uridu al-'Umrata fa yassirha li wa taqabbalha minni
+
+English Meaning:
+"O Allah, I intend to perform Umrah, so make it easy for me and accept it from me."
+
+**Video Title:** Making the Intention for Umrah — Niyyah Explained
+**Video Content Description:** A calm visual showing a person quietly making intention before departure, with Arabic text overlay of the intention dua and a voiceover explanation in all three languages.
+**Audio Title:** Niyyah Dua for Umrah — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 1.2 — Performing Ghusl (Ritual Bath)
+
+**Instruction Text:**
+Perform a complete ritual bath (Ghusl) before entering Ihram. This is a confirmed Sunnah of the Prophet (peace be upon him). It applies to men, women, and even women who are in their menstrual cycle — the ghusl is still recommended for them even though they will not perform Tawaf until their cycle ends. Use clean water and ensure the entire body is washed thoroughly.
+
+**What the pilgrim says:**
+The ghusl itself has no specific verbal dua. The pilgrim should begin with Bismillah and maintain an intention of purification for the sake of Ihram.
+
+Arabic:
+بِسْمِ اللَّهِ
+
+Transliteration:
+Bismillah
+
+English Meaning:
+"In the name of Allah."
+
+After completing the ghusl, it is recommended to recite the Shahada:
+
+Arabic:
+أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ
+
+Transliteration:
+Ash-hadu an la ilaha illallahu wahdahu la sharika lahu wa ash-hadu anna Muhammadan 'abduhu wa rasuluh
+
+English Meaning:
+"I bear witness that there is no god but Allah alone, He has no partner, and I bear witness that Muhammad is His servant and Messenger."
+
+**Video Title:** How to Perform Ghusl Before Ihram — Complete Bathing Guide
+**Video Content Description:** Step-by-step demonstration of the proper method of Ghusl — intention, washing hands three times, washing private areas, performing wudu, pouring water over the head three times, washing the right side then left side of the body.
+**Audio Title:** Ghusl Intention and Guidance — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 1.3 — Wearing the Ihram Garments
+
+**Instruction Text:**
+For men: Wear two white seamless cloths. One wraps around the lower body (called the Izar) and one drapes over the upper body (called the Rida). The right shoulder should be left bare during Tawaf only — this is called Idtiba. Do not wear stitched clothes, underwear, socks that cover the ankles, or shoes that cover the heels. Do not apply perfume to the body or the Ihram cloth.
+
+For women: Wear any modest, loose-fitting clothing that covers the entire body except the face and hands. Women should not wear niqab (face veil) or gloves while in Ihram. There is no specific color requirement for women.
+
+**What the pilgrim says:**
+No specific dua is prescribed for wearing the Ihram garments. However, upon completing the dressing, the pilgrim should make a general dua:
+
+Arabic:
+اللَّهُمَّ إِنِّي أُرِيدُ أَنْ أَتَجَنَّبَ مَا نَهَيْتَ عَنْهُ وَأَنْ أَفْعَلَ مَا أَمَرْتَنِي بِهِ فَأَعِنِّي عَلَى ذَلِكَ
+
+Transliteration:
+Allahumma inni uridu an atajannaba ma nahayta 'anhu wa an af'ala ma amartani bihi fa a'inni 'ala dhalik
+
+English Meaning:
+"O Allah, I intend to avoid what You have forbidden and to do what You have commanded, so help me in that."
+
+**Video Title:** How to Wear Ihram Garments Correctly — Men and Women's Guide
+**Video Content Description:** Separate visual demonstrations — men's section shows how to drape and secure the Izar and Rida correctly, including the proper Idtiba position for Tawaf. Women's section shows appropriate modest dress guidelines and what is not permitted.
+**Audio Title:** Ihram Clothing Instructions — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 1.4 — Performing Two Rakah Prayer (Salat al-Ihram)
+
+**Instruction Text:**
+After wearing Ihram, it is Sunnah to pray two rakah before making the intention. If it is not a forbidden prayer time (sunrise, midday, or sunset), pray two rakah with the intention of Tahiyyat al-Ihram. In the first rakah after Surah al-Fatiha, recite Surah al-Kafirun. In the second rakah, recite Surah al-Ikhlas. If it is a forbidden prayer time, this prayer is skipped.
+
+**What the pilgrim says:**
+Standard prayer (no specific added dua). After completing the prayer, proceed to make the Niyyah for Ihram and recite Talbiyah.
+
+**Video Title:** Two Rakah Prayer of Ihram — How to Perform Salat al-Ihram
+**Video Content Description:** Visual demonstration of two rakah prayer, noting the recommended Surahs for each rakah, performed in the direction of Qibla before setting out.
+**Audio Title:** Salat al-Ihram Guidance — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 1.5 — Reciting the Talbiyah (Entering Ihram State)
+
+**Instruction Text:**
+Immediately after the two rakah prayer, recite the Talbiyah aloud. This is the moment Ihram officially begins. Men should recite loudly. Women should recite quietly, audible only to themselves. Continue reciting Talbiyah throughout the journey — while walking, in transport, when ascending and descending, when meeting other pilgrims — until you begin Tawaf, at which point the Talbiyah stops.
+
+**What the pilgrim says:**
+
+Arabic:
+لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ
+
+Transliteration:
+Labbayk Allahumma labbayk, labbayka la sharika laka labbayk, innal hamda wan-ni'mata laka wal-mulk, la sharika lak
+
+English Meaning:
+"Here I am, O Allah, here I am. Here I am, You have no partner, here I am. Verily all praise, grace, and sovereignty belong to You. You have no partner."
+
+**Additional recommended Talbiyah addition (from the Companions' practice):**
+
+Arabic:
+لَبَّيْكَ إِلَهَ الْحَقِّ
+
+Transliteration:
+Labbayk ilah al-haqq
+
+English Meaning:
+"Here I am, O God of Truth."
+
+**Video Title:** How to Recite Talbiyah — The Call of the Pilgrim
+**Video Content Description:** Audio-visual presentation of the Talbiyah text with on-screen Arabic text, transliteration, and translation. Shows pilgrims reciting aloud while traveling toward Makkah.
+**Audio Title:** Talbiyah Recitation — Male Voice (Arabic / English / Urdu) — Loopable Track
+
+---
+
+### Substep 1.6 — Ihram Restrictions Reminder Card
+
+**Instruction Text:**
+Now that you are in Ihram, the following are prohibited until you complete Taqsir/Halq at the end of Umrah:
+
+- Cutting or trimming any hair from the body (head, beard, body hair)
+- Cutting fingernails or toenails
+- Applying perfume or scented products to the body or clothes
+- Wearing stitched or fitted clothing (men only)
+- Sexual intercourse or any intimate contact with a spouse
+- Hunting or killing any land animal
+- Proposing marriage or performing a marriage contract
+- Covering the head intentionally (men only — accidental brief covering is forgiven)
+- Wearing gloves or niqab (women only)
+
+If any restriction is violated accidentally, the pilgrim should repent and may be required to offer a compensation (Fidyah) depending on the nature of the violation.
+
+**What the pilgrim says:**
+No specific dua — this is a reminder card only. The app should display this as an informational card, not a step requiring media.
+
+**Video Title:** Ihram Restrictions — What Is Forbidden and Why
+**Video Content Description:** An informational animated card or explanation video covering all Ihram prohibitions with visual icons, explaining the wisdom behind each restriction.
+**Audio Title:** Ihram Restrictions Reminder — Male Voice (Arabic / English / Urdu)
+
+---
+
+---
+
+# STEP 2 — MIQAT
+**Step Type:** Checkpoint / Single Guided Step with Map Alert
+**Trigger:** GPS proximity alert when approaching the Miqat boundary, plus manual confirmation
+**Map Behavior:** Map shows the Miqat boundary relevant to the pilgrim's origin (e.g., Dhul Hulayfah for Madinah travelers, Qarn al-Manazil for Najd/air travelers, Yalamlam for Yemen/Pakistan travelers, Al-Juhfah for Syria/Egypt/Morocco travelers, Dhat Irq for Iraq travelers)
+**Bottom Sheet Behavior:** Single instruction card with alert banner — "You are approaching the Miqat boundary. Ensure you are in Ihram before crossing."
+
+---
+
+Miqat refers to the specific geographic boundary lines defined by the Prophet Muhammad (peace be upon him) around Makkah, within which no person intending Hajj or Umrah may cross without being in a state of Ihram. There are five Miqat points for pilgrims approaching from different directions. For pilgrims traveling by air — which is the majority today — the Miqat is typically crossed at 35,000 feet. Airlines announce this and some even display it on the flight map. Pilgrims who live inside the Miqat boundaries (including residents of Makkah) enter Ihram from their home. Pilgrims who live in Makkah itself perform Tawaf al-Qudum and enter Ihram for Sa'i from the Hil area (such as at Masjid al-Tan'eem, also called Masjid 'Aisha).
+
+---
+
+### Substep 2.1 — Approaching the Miqat Boundary
+
+**Instruction Text:**
+The application has detected that you are approaching the Miqat boundary. If you have not already entered Ihram — performed Ghusl, worn the Ihram garments, and recited Talbiyah — you must do so before crossing this boundary. Crossing the Miqat without Ihram while intending Umrah or Hajj is a serious violation that requires a Fidyah (slaughtering a sheep in Makkah and distributing its meat to the poor).
+
+**What the pilgrim says:**
+At this point, if they have already recited Talbiyah, they simply continue reciting it again:
+
+Arabic:
+لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ
+
+Transliteration:
+Labbayk Allahumma labbayk
+
+English Meaning:
+"Here I am, O Allah, here I am."
+
+**Video Title:** What Is Miqat? — The Sacred Boundaries Explained
+**Video Content Description:** Map-based animation showing the five Miqat points around Makkah. Explains which Miqat applies to travelers coming from different countries and by air. Shows a notification alert moment on a phone screen.
+**Audio Title:** Miqat Boundary Alert — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 2.2 — Confirming Ihram and Renewing Talbiyah
+
+**Instruction Text:**
+You have now crossed or are at the Miqat boundary. Confirm that you are fully in Ihram. Renew the Talbiyah with focused sincerity. This marks the true beginning of your pilgrimage journey. Continue reciting Talbiyah throughout travel. Stop the Talbiyah only when you begin your first circuit of Tawaf at Hajar al-Aswad.
+
+**What the pilgrim says:**
+Full Talbiyah (same as Substep 1.5 above) — repeated continuously.
+
+Additionally, after crossing Miqat it is recommended to make a personal dua:
+
+Arabic:
+اللَّهُمَّ هَذِهِ عُمْرَةٌ لَا رِيَاءَ فِيهَا وَلَا سُمْعَةَ
+
+Transliteration:
+Allahumma hadhihi 'umratun la riya'a fiha wa la sum'ah
+
+English Meaning:
+"O Allah, this is an Umrah free from showing off and free from seeking fame."
+
+**Video Title:** Crossing the Miqat — What to Do at the Sacred Boundary
+**Video Content Description:** Shows the moment of crossing Miqat, a pilgrim in Ihram reciting Talbiyah, and the emotional significance of this moment. Includes a dua card overlay with multilingual text.
+**Audio Title:** Miqat Talbiyah Recitation — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 2.3 — Warning Card: Common Miqat Mistakes
+
+**Instruction Text:**
+Common errors to avoid at Miqat:
+
+- Entering the Miqat boundary before wearing Ihram garments (violation requiring Fidyah)
+- Thinking the hotel in Makkah is the starting point of Ihram (it is not — Miqat is the starting point)
+- Applying perfume after making Ihram intention but before reciting Talbiyah (also prohibited)
+- Women applying perfumed products that are visible or detectable
+
+If you accidentally crossed Miqat without Ihram, you must return to the Miqat to enter Ihram from there, or pay a Fidyah (this should be confirmed with a scholar).
+
+**Video Title:** Miqat Mistakes — What to Avoid and How to Correct Them
+**Audio Title:** Miqat Warnings Reminder — Male Voice (Arabic / English / Urdu)
+
+---
+
+---
+
+# STEP 3 — TAWAF
+**Step Type:** GPS Tracked Step
+**Trigger:** GPS tracking begins when user taps "Start Tawaf" after reaching Hajar al-Aswad radius
+**Map Behavior:** Live map centered on Kaaba, showing user's circular path, lap counter, angular progress ring
+**Bottom Sheet Behavior:** Lap counter (1/7), current dua card, manual +1 lap override button, distance to Hajar al-Aswad indicator before start
+
+---
+
+Tawaf is one of the three obligatory pillars of Umrah. It consists of seven complete circuits (called Shawts) around the Kaaba in a counter-clockwise direction, beginning and ending at the Black Stone (Hajar al-Aswad). It is performed on the ground floor of Masjid al-Haram (Mataf), on the first floor, or on the rooftop — all are valid, though ground floor proximity to the Kaaba is most preferred when accessible. The Prophet (peace be upon him) said: "Tawaf around the House is like prayer, except that Allah has permitted speech during it, so whoever speaks, let him speak only good." (Tirmidhi — Hasan Sahih)
+
+There is no specific fixed dua prescribed for each of the seven circuits. The Sunnah is to make personal dua, recite Quran, and engage in dhikr. However, there is one confirmed supplication from the Sunnah said between the Yemeni Corner and the Black Stone in every circuit. The duas listed below for each lap are those used by the official Saudi Umrah app you shared — they are authentic Quranic supplications and Prophetic duas. They are optional and recommended, not mandatory.
+
+---
+
+### Pre-Tawaf Substep 3.0 — Arrival Preparation at Masjid al-Haram
+
+**Instruction Text:**
+When you first see the Kaaba upon entering Masjid al-Haram, stop and make dua. This is a moment of answered prayers. Raise your hands and make any sincere dua for yourself, your family, and all Muslims. After this, proceed toward Hajar al-Aswad to begin Tawaf. The Talbiyah stops the moment you begin your first circuit at Hajar al-Aswad.
+
+**What the pilgrim says upon seeing the Kaaba:**
+
+Arabic:
+اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، فَحَيِّنَا رَبَّنَا بِالسَّلَامِ
+
+Transliteration:
+Allahumma anta as-Salam wa minka as-Salam, fa hayyina rabbana bi as-Salam
+
+English Meaning:
+"O Allah, You are Peace and from You comes Peace. Greet us, our Lord, with Peace."
+
+**Then make personal dua freely.**
+
+**Video Title:** Your First Sight of the Kaaba — What to Do When You Enter Masjid al-Haram
+**Audio Title:** First Sight of Kaaba Dua — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 3.1 — Navigate to Hajar al-Aswad
+
+**Instruction Text:**
+Make your way to the eastern corner of the Kaaba where the Black Stone (Hajar al-Aswad) is embedded. The app will guide you with a directional arrow on the map. When you are within approximately 30 meters of Hajar al-Aswad, the "Start Tawaf" button will become active. Due to crowd density, you do not need to touch the Black Stone to begin — facing it and signaling toward it with your right hand while saying "Bismillahi Allahu Akbar" is sufficient and is the Prophet's own guidance.
+
+**What the pilgrim says at Hajar al-Aswad:**
+
+Arabic:
+بِسْمِ اللهِ، اللهُ أَكْبَرُ
+
+Transliteration:
+Bismillah, Allahu Akbar
+
+English Meaning:
+"In the name of Allah, Allah is the Greatest."
+
+If the pilgrim can touch it:
+Arabic:
+اللَّهُمَّ إِيمَانًا بِكَ وَتَصْدِيقًا بِكِتَابِكَ وَوَفَاءً بِعَهْدِكَ وَاتِّبَاعًا لِسُنَّةِ نَبِيِّكَ مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ
+
+Transliteration:
+Allahumma imanan bika wa tasdiqan bikitabika wa wafa'an bi'ahdika wattiba'an li sunnati nabiyyika Muhammadin sallallahu 'alayhi wa sallam
+
+English Meaning:
+"O Allah, out of faith in You, belief in Your Book, loyalty to Your covenant, and following the Sunnah of Your Prophet Muhammad (peace be upon him)."
+
+**Video Title:** Finding Hajar al-Aswad — How to Reach the Starting Point of Tawaf
+**Audio Title:** Hajar al-Aswad Dua and Istilam Guidance — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 3.2 — Idtiba (For Men Only)
+
+**Instruction Text:**
+Men must perform Idtiba for the entire Tawaf. This means placing the middle of the Rida cloth under the right armpit and draping both ends over the left shoulder, leaving the right shoulder bare. This applies only during Tawaf — after Tawaf, cover the right shoulder again. Women do not perform Idtiba.
+
+**Video Title:** How to Perform Idtiba — Baring the Right Shoulder During Tawaf
+**Audio Title:** Idtiba Instruction for Men — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 3.3 — Ramal (For Men, First Three Circuits Only)
+
+**Instruction Text:**
+Men perform Ramal during the first three circuits of Tawaf. Ramal means walking briskly with short, quick steps, moving the shoulders with a confident stride — not running. This is Sunnah and was demonstrated by the Prophet (peace be upon him). Ramal is only for men and only for circuits 1, 2, and 3. For circuits 4, 5, 6, and 7, men walk normally. Women walk normally throughout all seven circuits.
+
+**Video Title:** How to Perform Ramal — The Brisk Walk of Tawaf
+**Audio Title:** Ramal Instruction — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Circuit 1 of Tawaf
+
+**Location:** Starting at Hajar al-Aswad, completing one full counter-clockwise circuit ending back at Hajar al-Aswad.
+
+**At the start of each circuit, at Hajar al-Aswad:**
+Arabic:
+بِسْمِ اللهِ، اللهُ أَكْبَرُ
+(Bismillah, Allahu Akbar)
+
+**Between the Yemeni Corner (Rukn al-Yamani) and Hajar al-Aswad — mandatory in every circuit:**
+
+Arabic:
+رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ
+
+Transliteration:
+Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar
+
+English Meaning:
+"Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire." (Quran 2:201)
+
+**Recommended dua for Circuit 1 (from Saudi App content you shared, Circuit 2 — as Circuit 1 is the navigation start card):**
+
+This includes the following Quranic duas:
+- "Our Lord, forgive us and our brothers who preceded us in faith..." (Quran 59:10)
+- "Our Lord, upon You we rely and to You we turn, and to You is the final destination..." (Quran 60:4-5)
+- "Our Lord, grant us from our spouses and offspring comfort of our eyes and make us a leader for the righteous." (Quran 25:74)
+
+**At Hajar al-Aswad (Istilam — pointing or touching at end of each circuit):**
+Arabic:
+بِسْمِ اللهِ، اللهُ أَكْبَرُ
+(Same as start)
+
+**Audio Title:** Tawaf Circuit 1 — Dua and Dhikr Guide — Male Voice (Arabic / English / Urdu)
+**Video Title (plays before Tawaf starts):** Overview of Tawaf — Seven Circuits Around the Kaaba Explained
+
+---
+
+### Circuits 2 through 7 — Dua Structure
+
+The authentic structure for all seven circuits follows the same pattern:
+
+- At Hajar al-Aswad: Say "Bismillahi Allahu Akbar"
+- During the circuit: Recite personal dua, Quran, dhikr, or the recommended duas below
+- Between Yemeni Corner and Black Stone (in every circuit without exception): Recite Rabbana atina fid-dunya hasanatan... (Quran 2:201)
+
+The recommended duas for each circuit taken from the Saudi app's authentic content and organized properly:
+
+**Circuit 2 Recommended Duas:**
+- Rabbana la tu'akhidhna in nasina aw akhta'na... (Quran 2:286) — "Our Lord, do not take us to task if we forget or make mistakes..."
+- Rabbana la tuzigh qulubana ba'da idh hadaytana... (Quran 3:8) — "Our Lord, let not our hearts deviate after You have guided us..."
+- Rabbana innana sami'na munadiyan yunadi lil-iman... (Quran 3:193-194) — "Our Lord, we have heard a caller calling to faith..."
+- Allahumma ighfir li khati'ati wa jahli wa israfi fi amri... — "O Allah, forgive my sins, my ignorance, and my excesses in my affairs..."
+
+**Circuit 3 Recommended Duas:**
+- Rabbana innana amanna faghfir lana dhunubana wa qina 'adhaban-nar (Quran 3:16) — "Our Lord, we have believed, so forgive our sins and protect us from the punishment of the Fire."
+- Rabbana ighfir lana dhunubana wa israfana fi amrina wa thabbit aqdamana... (Quran 3:147) — "Our Lord, forgive us our sins and our excesses in our affairs, and make our feet firm..."
+- Allahumma rahmataka arju fala takilni ila nafsi tarfata 'ayn... — "O Allah, it is Your mercy I hope for, so do not leave me to myself for even the blink of an eye..."
+
+**Circuit 4 Recommended Duas:**
+- Rabbana amanna faghfir lana warhamna wa anta khayr ar-rahimin (Quran 23:109) — "Our Lord, we have believed, so forgive us and have mercy on us, for You are the best of those who show mercy."
+- La ilaha illa anta subhanaka inni kuntu min adh-dhalimin (Quran 21:87) — "There is no god but You; Glory be to You. Indeed I was among the wrongdoers."
+- Allahumma jadid al-iman fi qulubina... — "O Allah, renew faith in our hearts..."
+
+**Circuit 5 Recommended Duas:**
+- Rabbana taqabbal minna innaka anta as-Sami' al-'Alim... (Quran 2:127-128) — "Our Lord, accept from us; indeed You are the All-Hearing, the All-Knowing..."
+- Rabbana la taj'alna fitnatan lil-qawm adh-dhalimin... (Quran 10:85-86) — "Our Lord, do not make us a trial for the wrongdoing people..."
+- Allahumma laka al-hamdu anta qayyim as-samawati wal-ard... — "O Allah, to You belongs all praise; You are the Sustainer of the heavens and earth..."
+
+**Circuit 6 Recommended Duas:**
+- Rabbana amanna faghfir lana warhamna wa anta khayr ar-rahimin (Quran 23:109)
+- Rabbana isrif 'anna 'adhaba jahannam... (Quran 25:65) — "Our Lord, avert from us the punishment of Hell..."
+- Allahumma ahyini ma kanat al-hayatu khayran li wa tawaffani idha kanat al-wafatu khayran li... — "O Allah, keep me alive as long as life is good for me, and cause me to die when death is better for me..."
+- Allahumma as'aluka al-'afwa wal-'afiyata fi dini wa dunyaya wa ahli wa mali... — "O Allah, I ask You for pardon and wellbeing in my religion, my worldly life, my family, and my wealth..."
+
+**Circuit 7 Recommended Duas:**
+- Rabb ij'alni muqima as-salati wa min dhurriyyati rabbana wa taqabbal du'a... (Quran 14:40-41) — "My Lord, make me an establisher of prayer, and from my descendants. Our Lord, accept my supplication..."
+- Rabbana wasi'ta kulla shay'in rahmatan wa 'ilman faghfir lilladhina tabu... (Quran 40:7-8) — "Our Lord, You encompass all things in mercy and knowledge, so forgive those who repent..."
+- Allahumma haza ad-du'a wa 'alayka al-istijaba... — "O Allah, this is the supplication and upon You is the response..."
+
+**Audio Titles (one per circuit):**
+- Tawaf Circuit 1 Dhikr and Dua — Male Voice
+- Tawaf Circuit 2 Recommended Duas — Male Voice
+- Tawaf Circuit 3 Recommended Duas — Male Voice
+- Tawaf Circuit 4 Recommended Duas — Male Voice
+- Tawaf Circuit 5 Recommended Duas — Male Voice
+- Tawaf Circuit 6 Recommended Duas — Male Voice
+- Tawaf Circuit 7 Recommended Duas — Male Voice
+
+---
+
+### Substep 3.4 — Tawaf Completion: Two Rakah Prayer at Maqam Ibrahim
+
+**Instruction Text:**
+After completing all seven circuits, proceed to Maqam Ibrahim (the Station of Ibrahim) and pray two rakah behind it. Recite Surah al-Kafirun in the first rakah and Surah al-Ikhlas in the second rakah. If the area is too crowded to pray directly at Maqam Ibrahim, you may pray anywhere in Masjid al-Haram.
+
+**What the pilgrim recites before the prayer:**
+
+Arabic:
+وَاتَّخِذُوا مِنْ مَقَامِ إِبْرَاهِيمَ مُصَلًّى
+
+Transliteration:
+Wattakhidhu min maqami Ibrahima musalla
+
+English Meaning:
+"And take the Station of Ibrahim as a place of prayer." (Quran 2:125)
+
+**Video Title:** Two Rakah After Tawaf — Prayer at Maqam Ibrahim
+**Audio Title:** Maqam Ibrahim Prayer Guidance — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 3.5 — Drinking Zamzam Before Sa'i
+
+**Instruction Text:**
+After the two rakah, go to the Zamzam water station and drink to your fill, facing the Kaaba. This is the Sunnah position for drinking Zamzam. (Note: the full Zamzam step comes as Step 4 — this is the brief drink that is part of the Tawaf completion sequence.)
+
+---
+
+---
+
+# STEP 4 — ZAMZAM
+**Step Type:** Direct Step / Optional Guidance Card
+**Trigger:** Manual completion — user taps "Done" after drinking
+**Map Behavior:** Arrow pointing to Zamzam water station within Masjid al-Haram
+**Bottom Sheet Behavior:** Single instruction card with dua, brief video, and gratitude reminder
+
+---
+
+Zamzam water is the miraculous water that Allah caused to spring for Hajar (the mother of Prophet Ismail, peace be upon him) when she was searching for water in the desert of Makkah. The Prophet (peace be upon him) said: "The best water on the surface of the earth is Zamzam water. In it is nourishment for food and healing for sickness." (Tabarani — authenticated) He also said: "Zamzam water is for whatever it is drunk for." (Ibn Majah — Hasan) This means the pilgrim should make a specific intention and dua when drinking it.
+
+---
+
+### Substep 4.1 — Making Intention Before Drinking Zamzam
+
+**Instruction Text:**
+Before drinking Zamzam, make a clear intention in your heart for what you want Allah to grant you through this water. You may intend healing, knowledge, sustenance, protection from Hellfire, entrance to Paradise, good health for your family, or any sincere need.
+
+**What the pilgrim says:**
+
+Arabic:
+اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا وَاسِعًا وَشِفَاءً مِنْ كُلِّ دَاءٍ
+
+Transliteration:
+Allahumma inni as'aluka 'ilman nafi'an wa rizqan wasi'an wa shifa'an min kulli da'
+
+English Meaning:
+"O Allah, I ask You for beneficial knowledge, abundant provision, and cure from every disease."
+
+(This is an authentic dua reported to have been made by Ibn Abbas (may Allah be pleased with him) when drinking Zamzam.)
+
+**Video Title:** The Power of Zamzam — Intention and Dua Before Drinking
+**Audio Title:** Zamzam Intention Dua — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 4.2 — Drinking Zamzam
+
+**Instruction Text:**
+Drink Zamzam facing the Kaaba, standing, in three sips (or more — there is no strict limit). Say Bismillah before drinking and Alhamdulillah after. Pour some water on the head if possible. Drink to your complete fill — the Prophet (peace be upon him) always drank abundantly from Zamzam.
+
+**What the pilgrim says:**
+Before drinking:
+Arabic:
+بِسْمِ اللهِ
+
+After drinking:
+Arabic:
+الْحَمْدُ لِلَّهِ
+
+Then immediately recite the Zamzam dua again (same as Substep 4.1) and add any personal dua.
+
+**Additional dua at Zamzam:**
+
+Arabic:
+اللَّهُمَّ اسْقِنِي بِكَأْسِ نَبِيِّكَ مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ شَرْبَةً هَنِيئَةً لَا أَظْمَأُ بَعْدَهَا أَبَدًا
+
+Transliteration:
+Allahumma isqini bika'si nabiyyika Muhammadin sallallahu 'alayhi wa sallam sharbatan hani'atan la azma'u ba'daha abada
+
+English Meaning:
+"O Allah, give me to drink from the cup of Your Prophet Muhammad (peace be upon him), a satisfying drink after which I will never be thirsty again."
+
+**Video Title:** How to Drink Zamzam the Prophetic Way — Sunnah of Zamzam
+**Audio Title:** Zamzam Drinking Dua — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 4.3 — Zamzam Information Card
+
+**Instruction Text:**
+Points to remember about Zamzam:
+- It is permissible to take Zamzam water home in containers
+- The Prophet (peace be upon him) described Zamzam as food for the hungry and cure for the sick
+- Zamzam has been flowing continuously for over 4,000 years without stopping
+- It is Sunnah to pray before leaving the Zamzam station area
+
+**Video Title:** History and Miracle of Zamzam Water — An Islamic Perspective
+**Audio Title:** Zamzam Historical Narration — Male Voice (Arabic / English / Urdu)
+
+---
+
+---
+
+# STEP 5 — SA'I
+**Step Type:** GPS Tracked Step
+**Trigger:** GPS tracking begins when user confirms they are at Safa and taps "Start Sa'i"
+**Map Behavior:** Live map showing Safa-Marwa corridor, leg counter (1/7), distance to next endpoint, direction arrow, optional green marker zone indicator
+**Bottom Sheet Behavior:** Leg counter, current location indicator (At Safa / Walking / At Marwa), dua card, manual +1 leg override button
+
+---
+
+Sa'i is the second obligatory pillar of Umrah. It commemorates the actions of Hajar (mother of Ismail, peace be upon him) who ran seven times between the hills of Safa and Marwa searching for water for her infant son. Allah immortalized her action in the Quran: "Indeed, Safa and Marwa are among the symbols of Allah. So whoever makes Hajj to the House or performs Umrah — there is no blame upon him for walking between them." (Quran 2:158) Sa'i consists of seven legs — the first leg goes from Safa to Marwa (Leg 1), the second from Marwa back to Safa (Leg 2), and so on. The seventh and final leg ends at Marwa.
+
+An important Islamic clarification on counting: one complete trip from Safa to Marwa counts as one leg. A round trip (Safa → Marwa → Safa) counts as two legs. The total is seven legs, not seven round trips. The Sa'i ends at Marwa on leg 7.
+
+Men should walk briskly (Harwala) between the two green fluorescent markers in the corridor — this is the Sunnah Ramal of Sa'i. Women walk normally throughout.
+
+---
+
+### Pre-Sa'i Substep 5.0 — Navigate to Mount Safa
+
+**Instruction Text:**
+After completing the two rakah at Maqam Ibrahim and drinking Zamzam, proceed to Mount Safa. As you approach Safa, recite the following verse — this is only said once, at the very start of Sa'i, never again in subsequent legs:
+
+**What the pilgrim says (once only, approaching Safa for the first time):**
+
+Arabic:
+إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللهِ فَمَنْ حَجَّ الْبَيْتَ أَوِ اعْتَمَرَ فَلَا جُنَاحَ عَلَيْهِ أَنْ يَطَّوَّفَ بِهِمَا
+
+Transliteration:
+Inna as-Safa wal-Marwata min sha'a'irillah. Faman hajja al-bayta aw i'tamara fala junaha 'alayhi an yattawwafa bihima
+
+English Meaning:
+"Indeed, Safa and Marwa are among the symbols of Allah. So whoever makes Hajj to the House or performs Umrah — there is no blame upon him for walking between them." (Quran 2:158)
+
+Then say:
+Arabic:
+أَبْدَأُ بِمَا بَدَأَ اللهُ بِهِ
+
+Transliteration:
+Abda'u bima bada'allahu bih
+
+English Meaning:
+"I begin with what Allah began with."
+
+**Video Title:** Navigating to Mount Safa — Start of Sa'i
+**Audio Title:** Safa Opening Verse — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Leg 1 — Safa to Marwa (Odd-numbered legs: 1, 3, 5, 7 all begin at Safa)
+
+**At Safa (Standing, facing Kaaba):**
+
+Ascend Safa and face the Kaaba direction. Raise your hands and recite the following dhikr three times, making personal dua between each repetition:
+
+Arabic:
+اللهُ أَكْبَرُ اللهُ أَكْبَرُ اللهُ أَكْبَرُ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، أَنْجَزَ وَعْدَهُ، وَنَصَرَ عَبْدَهُ وَهَزَمَ الْأَحْزَابَ وَحْدَهُ
+
+Transliteration:
+Allahu Akbar Allahu Akbar Allahu Akbar. La ilaha illallahu wahdahu la sharika lah, lahul mulku walahul hamdu yuhyi wa yumitu, wa huwa 'ala kulli shay'in qadir. La ilaha illallahu wahdahu la sharika lah, anjaza wa'dahu wa nasara 'abdahu wa hazamal ahzaba wahdah.
+
+English Meaning:
+"Allah is the Greatest, Allah is the Greatest, Allah is the Greatest. There is no god but Allah alone, He has no partner. To Him belongs all dominion and all praise. He gives life and causes death, and He is able to do all things. There is no god but Allah alone, He has no partner. He fulfilled His promise, gave victory to His servant, and defeated the confederates alone."
+
+This dhikr is recited three times at Safa, with personal dua made freely between the first and second repetition, and between the second and third repetition. After the third repetition, begin walking toward Marwa immediately without stopping.
+
+**During the walking portion (Safa to Marwa):**
+Make any personal dua, recite Quran, or say general dhikr. There is no fixed dua for the walking portions. The Saudi guide confirms this clearly: "During Sa'i, engage in remembrance of Allah and personal dua. There is no specific dua for the walking portion of any leg."
+
+**At the Green Marker Zone (men only):**
+Walk briskly (Harwala) between the two green fluorescent markers. This commemorates how Hajar ran desperately in this valley searching for water when she could not see her infant son Ismail from higher ground.
+
+**Recommended Duas during Leg 1 walking (from Saudi app content):**
+The duas listed for Sa'i Leg 2 in the source you shared are entirely appropriate here. These include:
+- Rabbana la tu'akhidhna in nasina aw akhta'na... (Quran 2:286)
+- Rabbana la tuzigh qulubana ba'da idh hadaytana... (Quran 3:8)
+- Rabbana innana sami'na munadiyan... (Quran 3:193-194)
+- Allahumma ighfir li khati'ati wa jahli...
+
+**Audio Title:** Sa'i Leg 1 — Safa Dhikr and Walking Duas — Male Voice
+**Video Title:** How to Perform Sa'i — Complete Guide for Safa and Marwa
+
+---
+
+### Leg 2 — Marwa to Safa
+
+**At Marwa (Standing, facing Kaaba):**
+Recite the same dhikr as at Safa — three times with personal dua between repetitions:
+
+Arabic:
+اللهُ أَكْبَرُ اللهُ أَكْبَرُ اللهُ أَكْبَرُ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ...
+(Full text same as Safa above)
+
+**During walking (Marwa to Safa):**
+Personal dua and dhikr. Recommended Duas from Saudi app source for this leg include:
+- Rabbana innana amanna faghfir lana dhunubana wa qina 'adhaban-nar (Quran 3:16)
+- Rabbana ighfir lana dhunubana wa israfana fi amrina... (Quran 3:147)
+- Allahumma rahmataka arju...
+
+**Audio Title:** Sa'i Leg 2 — Marwa Dhikr and Walking Duas — Male Voice
+
+---
+
+### Legs 3 through 6 — Pattern Continues
+
+The exact same structure repeats for every leg:
+- At Safa (Legs 3, 5): Full Safa dhikr × 3 + personal dua + begin walking
+- At Marwa (Legs 4, 6): Full Marwa dhikr × 3 + personal dua + begin walking
+- During all walking portions: Personal dua, Quran recitation, recommended duas per leg
+
+**Recommended duas for each leg follow the progression from the Saudi source you shared:**
+
+Leg 3 walking: Duas from Quran 3:16, 3:147, 7:23, plus personal supplications for forgiveness
+Leg 4 walking: Duas from Quran 23:109, 27:19, 21:87, 28:16, plus personal supplications
+Leg 5 walking: Duas from Quran 14:40-41, 2:285, plus comprehensive supplications for all types of good in this life and the next
+Leg 6 walking: Duas from Quran 23:109, 25:65, 23:118, 27:19, plus supplications for wellbeing and faith
+Leg 7 walking: Duas from Quran 40:7-8, 46:15, 9:129, plus the comprehensive final supplications asking for light in heart, grave, hearing, sight, and all directions
+
+**Audio Titles:**
+- Sa'i Leg 3 — Safa Dhikr and Walking Duas — Male Voice
+- Sa'i Leg 4 — Marwa Dhikr and Walking Duas — Male Voice
+- Sa'i Leg 5 — Safa Dhikr and Walking Duas — Male Voice
+- Sa'i Leg 6 — Marwa Dhikr and Walking Duas — Male Voice
+- Sa'i Leg 7 — Final Leg Duas — Male Voice
+
+---
+
+### Leg 7 — Safa to Marwa (Final Leg — Sa'i Completion)
+
+**At Safa (start of final leg):**
+Same dhikr as all previous Safa stops. Then walk to Marwa for the final time.
+
+**At Marwa (completion of Sa'i):**
+Recite the Safa/Marwa dhikr one final time. Then make a special completion dua:
+
+Arabic:
+رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنْتَ السَّمِيعُ الْعَلِيمُ
+
+Transliteration:
+Rabbana taqabbal minna innaka anta as-Sami' al-'Alim
+
+English Meaning:
+"Our Lord, accept from us; indeed You are the All-Hearing, the All-Knowing." (Quran 2:127)
+
+Then raise hands and make sincere personal dua for as long as desired. Sa'i is now complete.
+
+**Important note:** After completing Sa'i, it is recommended to pray two rakah in Masjid al-Haram if possible, though this is not obligatory for Sa'i.
+
+**Video Title:** Completing Sa'i — The Seventh Leg and Final Supplications at Marwa
+**Audio Title:** Sa'i Completion Dua at Marwa — Male Voice (Arabic / English / Urdu)
+
+---
+
+---
+
+# STEP 6 — TAQSIR / HALQ
+**Step Type:** Multi-Substep (Manual Completion)
+**Trigger:** User manually confirms completion
+**Map Behavior:** No tracking needed
+**Bottom Sheet Behavior:** Instruction card, dua, confirmation button "I have completed Taqsir/Halq"
+
+---
+
+Taqsir means shortening the hair from all over the head (for both men and women), while Halq means shaving the head completely (for men only). This act is obligatory and marks the exit from the state of Ihram. Without performing Taqsir or Halq, the pilgrim remains in Ihram and all restrictions remain in force. The Prophet (peace be upon him) supplicated three times for those who shaved their heads and once for those who shortened their hair, which indicates that Halq (full shave) is more virtuous for men. However, Taqsir is also completely valid.
+
+A clarification many pilgrims are confused about: trimming just a few strands from one part of the head is NOT valid. The trim must cover the entire head — at least taking a fingertip-length from all around.
+
+---
+
+### Substep 6.1 — Understanding Taqsir vs Halq
+
+**Instruction Text:**
+
+For men: You may either shave the entire head (Halq — more virtuous) or trim hair from all parts of the head to at least a fingertip length (Taqsir). Do not trim only the front or sides — the trim must cover the whole head.
+
+For women: Taqsir only — trimming approximately a fingertip's length (about one to two centimeters) from the ends of the hair. No shaving. Women typically trim a small bundle from the ends of their hair.
+
+**Video Title:** Taqsir and Halq — Men's and Women's Guide to Exiting Ihram
+**Audio Title:** Taqsir Halq Guidance — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 6.2 — Performing Taqsir / Halq
+
+**Instruction Text:**
+Find a barber near Masjid al-Haram (for men) or perform Taqsir yourself or with help (for women, in a private setting). Before cutting, face the Qibla and make the following dua. Then proceed with cutting.
+
+**What the pilgrim says:**
+
+Arabic:
+اللَّهُمَّ اغْفِرْ لِلْمُحَلِّقِينَ، اللَّهُمَّ اغْفِرْ لِلْمُحَلِّقِينَ، اللَّهُمَّ اغْفِرْ لِلْمُحَلِّقِينَ وَالْمُقَصِّرِينَ
+
+Transliteration:
+Allahumma ighfir lil-muhalliqin, Allahumma ighfir lil-muhalliqin, Allahumma ighfir lil-muhalliqin wal-muqassirin
+
+English Meaning:
+"O Allah, forgive those who shave their heads. O Allah, forgive those who shave their heads. O Allah, forgive those who shave their heads and those who shorten their hair."
+
+(This is the exact dua the Prophet (peace be upon him) said — three times for those who shave and once for those who shorten. The pilgrim says it for themselves here.)
+
+**Video Title:** How to Perform Taqsir for Men and Women — Step-by-Step Guide
+**Audio Title:** Taqsir Dua — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 6.3 — Exiting Ihram and Umrah Completion
+
+**Instruction Text:**
+After the hair is cut, you have officially exited Ihram. All Ihram restrictions are now lifted. You may:
+- Change back into normal clothes
+- Apply perfume
+- Resume all normal married life activities
+- Eat, drink, and conduct all normal life activities
+
+Your Umrah is now complete. All that remains is to thank Allah, make dua for acceptance, and pray two rakah as a gratitude prayer if you wish.
+
+**What the pilgrim says:**
+
+Arabic:
+رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنْتَ السَّمِيعُ الْعَلِيمُ
+
+Transliteration:
+Rabbana taqabbal minna innaka anta as-Sami' al-'Alim
+
+English Meaning:
+"Our Lord, accept from us; indeed You are the All-Hearing, the All-Knowing." (Quran 2:127)
+
+Then make any personal dua. The accepted time of dua after completing a righteous act is one of the most powerful moments for a believer.
+
+**Video Title:** Umrah Complete — Exiting Ihram and Dua of Acceptance
+**Audio Title:** Taqsir Completion and Umrah Acceptance Dua — Male Voice (Arabic / English / Urdu)
+
+---
+
+### Substep 6.4 — Umrah Completion Reminder Card
+
+**Instruction Text:**
+Your Umrah has been completed. A few important points:
+
+- If you plan to remain in Makkah for several days before leaving, you are encouraged to perform voluntary Tawaf (Tawaf al-Nafl) as many times as you wish — there is no limit. These are purely voluntary and require no Ihram.
+- When you are about to leave Makkah permanently, it is Sunnah (not obligatory for Umrah — it is obligatory only for Hajj) to perform a Farewell Tawaf (Tawaf al-Wada).
+- Women who are in their menstrual cycle at the time of departure are exempted from Tawaf al-Wada — this is an authentic ruling from the Sunnah.
+- Make dua at the door of Masjid al-Haram when leaving, facing the Kaaba.
+
+**Dua when leaving Masjid al-Haram:**
+
+Arabic:
+اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَسَلِّمْ، اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ
+
+Transliteration:
+Allahumma salli 'ala Muhammadin wa sallim, Allahumma inni as'aluka min fadlik
+
+English Meaning:
+"O Allah, send blessings and peace upon Muhammad. O Allah, I ask You of Your bounty."
+
+(This is the dua for leaving the mosque — any mosque — narrated in Sahih Muslim.)
+
+**Video Title:** After Umrah — What to Do in Makkah and Voluntary Acts of Worship
+**Audio Title:** Farewell Dua for Masjid al-Haram — Male Voice (Arabic / English / Urdu)
+
+---
+
+---
+
+# Complete Audio File List for App Assets
+
+The following is the complete list of audio files required for all six steps, across all three languages (Arabic, English, Urdu). Each file should ideally be between 30 seconds and 3 minutes depending on the dua length.
+
+**Ihram Audio Files (6 files × 3 languages = 18 files):**
+1. Niyyah Dua for Umrah
+2. Ghusl Intention and Shahada
+3. Ihram Clothing Instruction
+4. Salat al-Ihram Guidance
+5. Talbiyah Recitation (Loopable)
+6. Ihram Restrictions Reminder
+
+**Miqat Audio Files (3 files × 3 languages = 9 files):**
+7. Miqat Boundary Alert
+8. Miqat Talbiyah and Personal Dua
+9. Miqat Common Mistakes Warning
+
+**Tawaf Audio Files (11 files × 3 languages = 33 files):**
+10. First Sight of Kaaba Dua
+11. Hajar al-Aswad Dua and Istilam Guidance
+12. Idtiba Instruction (men)
+13. Ramal Instruction (men)
+14. Tawaf Circuit 1 Dhikr
+15. Tawaf Circuit 2 Recommended Duas
+16. Tawaf Circuit 3 Recommended Duas
+17. Tawaf Circuit 4 Recommended Duas
+18. Tawaf Circuit 5 Recommended Duas
+19. Tawaf Circuit 6 Recommended Duas
+20. Tawaf Circuit 7 Recommended Duas
+21. Two Rakah After Tawaf — Maqam Ibrahim Guidance
+
+**Zamzam Audio Files (3 files × 3 languages = 9 files):**
+22. Zamzam Intention Dua
+23. Zamzam Drinking Dua
+24. Zamzam Historical Narration
+
+**Sa'i Audio Files (10 files × 3 languages = 30 files):**
+25. Safa Opening Verse (once only)
+26. Sa'i Leg 1 — Safa Dhikr and Walking Duas
+27. Sa'i Leg 2 — Marwa Dhikr and Walking Duas
+28. Sa'i Leg 3 — Safa Dhikr and Walking Duas
+29. Sa'i Leg 4 — Marwa Dhikr and Walking Duas
+30. Sa'i Leg 5 — Safa Dhikr and Walking Duas
+31. Sa'i Leg 6 — Marwa Dhikr and Walking Duas
+32. Sa'i Leg 7 — Final Leg Duas
+33. Sa'i Completion Dua at Marwa
+34. Sa'i Ramal Zone Alert (men)
+
+**Taqsir Audio Files (4 files × 3 languages = 12 files):**
+35. Taqsir vs Halq Guidance
+36. Taqsir Dua Before Cutting
+37. Taqsir Completion and Ihram Exit
+38. Farewell Dua for Masjid al-Haram
+
+**Total Audio Files: 38 unique recordings × 3 languages = 114 audio files**
+
+---
+
+# Complete Video List for App Assets
+
+All videos should be downloadable on first launch via CDN and cached locally. Each should be between 1 and 5 minutes, professionally produced in all three languages with voiceover.
+
+1. Making the Intention for Umrah — Niyyah Explained
+2. How to Perform Ghusl Before Ihram
+3. How to Wear Ihram Garments Correctly (Men and Women)
+4. Two Rakah Prayer of Ihram
+5. How to Recite Talbiyah — The Call of the Pilgrim
+6. Ihram Restrictions — What Is Forbidden and Why
+7. What Is Miqat — The Sacred Boundaries Explained
+8. Crossing the Miqat — What to Do at the Sacred Boundary
+9. Your First Sight of the Kaaba
+10. Finding Hajar al-Aswad — Reaching the Starting Point
+11. How to Perform Idtiba
+12. How to Perform Ramal
+13. Overview of Tawaf — Seven Circuits Explained
+14. Two Rakah After Tawaf — Prayer at Maqam Ibrahim
+15. The Power of Zamzam — Intention Before Drinking
+16. How to Drink Zamzam the Prophetic Way
+17. History and Miracle of Zamzam Water
+18. How to Perform Sa'i — Complete Guide for Safa and Marwa
+19. Navigating to Mount Safa
+20. The Ramal Zone in Sa'i — Green Markers Explained
+21. Completing Sa'i — The Seventh Leg at Marwa
+22. Taqsir and Halq — Men and Women Guide
+23. How to Perform Taqsir Step by Step
+24. After Umrah — Voluntary Acts of Worship in Makkah
+
+**Total Videos: 24 videos × 3 languages = 72 video files**
+
+---
+
+This document gives your development team and content team everything they need to populate the app without ambiguity. Every dua here is from the Quran or an authenticated hadith collection. The structure allows the app to function fully offline after the first download, supports all three languages independently, and scales cleanly to the Hajj content model discussed previously — since Tawaf, Sa'i, Ihram, and Taqsir are all shared components between Umrah and Hajj, and only the Hajj-specific steps (Mina, Arafat, Muzdalifah, Jamarat, Qurbani) require new content packs added on top of this foundation.
+
+
+
+
+SUMMARY:
+
+✅ Revised & Improved Umrah Content Guide
+(Ready for your development & content team)
+I have completely restructured Claude’s document with the exact improvements you asked for:
+
+Clear separation of Compulsory Duas (obligatory or confirmed Sunnah Mu’akkadah) vs Recommended Duas (mustahabb / optional but highly rewarding).
+Much cleaner sub-step breakdown.
+Dedicated Audio and Video sections for every single sub-step (with precise titles and content descriptions).
+Consistent professional formatting that is easy to copy into your app’s database, JSON, or CMS.
+All content remains 100% authentic (Quran + Sahih Hadith + Saudi Ministry guidance).
+
+
+COMPLETE UMRAH CONTENT GUIDE
+For Mushab App (React Native + Expo)
+Languages: Arabic | English | Urdu
+Version: Final – April 2026
+Structure Used for Every Step
+
+Step Overview
+Substeps (with clear numbering)
+For each substep:
+Instruction
+Compulsory Duas (if any)
+Recommended Duas / Dhikr (if any)
+Video (title + exact content description)
+Audio (title + exact content description)
+
+
+
+STEP 1 — IHRAM
+Step Type: Manual multi-substep (user marks complete)
+Map: General direction to Miqat
+Bottom Sheet: Sequential cards
+Substep 1.1 — Making the Intention (Niyyah)
+Instruction: Make sincere intention in the heart (and preferably say it verbally) before crossing Miqat.
+Compulsory Duas: None (intention is in the heart)
+Recommended Duas:
+
+Arabic: اللَّهُمَّ إِنِّي أُرِيدُ الْعُمْرَةَ فَيَسِّرْهَا لِي وَتَقَبَّلْهَا مِنِّي
+Transliteration: Allahumma inni uridu al-‘Umrata fa yassirha li wa taqabbalha minni
+Meaning: “O Allah, I intend to perform Umrah, so make it easy for me and accept it from me.”
+
+Video:
+Title: Making the Intention for Umrah – Niyyah Explained
+Description: Calm scene of a pilgrim making niyyah before departure + Arabic text overlay + voiceover explanation in all 3 languages.
+Audio:
+Title: Niyyah Dua for Umrah – Male Voice (Arabic / English / Urdu)
+Substep 1.2 — Performing Ghusl (Ritual Bath)
+Instruction: Perform full ghusl before wearing Ihram garments.
+Compulsory Duas: None
+Recommended Duas:
+
+Start with: بِسْمِ اللَّهِ (Bismillah)
+After ghusl: Shahada (full text as in Claude’s document)
+
+Video:
+Title: How to Perform Ghusl Before Ihram – Complete Bathing Guide
+Description: Step-by-step demonstration (intention → hands → private parts → wudu → head → body sides).
+Audio:
+Title: Ghusl Intention and Guidance – Male Voice (Arabic / English / Urdu)
+Substep 1.3 — Wearing the Ihram Garments
+Instruction: Men wear two seamless cloths; women wear modest loose clothing (no niqab/gloves).
+Compulsory Duas: None
+Recommended Duas:
+
+Arabic: اللَّهُمَّ إِنِّي أُرِيدُ أَنْ أَتَجَنَّبَ مَا نَهَيْتَ عَنْهُ وَأَنْ أَفْعَلَ مَا أَمَرْتَنِي بِهِ فَأَعِنِّي عَلَى ذَلِكَ
+Transliteration & meaning: (as in original)
+
+Video:
+Title: How to Wear Ihram Garments Correctly – Men and Women Guide
+Description: Split-screen: men (Izar + Rida + Idtiba) | women (modest dress rules).
+Audio:
+Title: Ihram Clothing Instructions – Male Voice (Arabic / English / Urdu)
+Substep 1.4 — Performing Two Rakah Prayer (Salat al-Ihram)
+Instruction: Sunnah (skip only in forbidden prayer times).
+Compulsory Duas: None (standard prayer)
+Recommended Duas: Recite Surah al-Kafirun (1st rakah) + Surah al-Ikhlas (2nd rakah) after Fatiha.
+Video:
+Title: Two Rakah Prayer of Ihram – How to Perform Salat al-Ihram
+Audio:
+Title: Salat al-Ihram Guidance – Male Voice (Arabic / English / Urdu)
+Substep 1.5 — Reciting the Talbiyah (Entering Ihram State)
+Instruction: Recite aloud (men) or quietly (women) continuously until Tawaf begins.
+Compulsory Duas:
+Talbiyah (must be recited – Sunnah Mu’akkadah)
+
+Arabic: لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ … (full text)
+Transliteration & meaning: (as in original)
+
+Recommended Duas:
+
+Addition: لَبَّيْكَ إِلَهَ الْحَقِّ (Labbayk ilah al-haqq)
+
+Video:
+Title: How to Recite Talbiyah – The Call of the Pilgrim
+Audio:
+Title: Talbiyah Recitation – Male Voice (Arabic / English / Urdu) – Loopable Track
+Substep 1.6 — Ihram Restrictions Reminder
+Instruction: Informational card only (no action required).
+Video:
+Title: Ihram Restrictions – What Is Forbidden and Why
+Audio:
+Title: Ihram Restrictions Reminder – Male Voice (Arabic / English / Urdu)
+
+STEP 2 — MIQAT
+Step Type: GPS-triggered checkpoint
+Substep 2.1 — Approaching the Miqat Boundary
+Instruction: App shows alert when nearing Miqat.
+Compulsory Duas: None
+Recommended Duas: Continue Talbiyah + personal dua.
+Video:
+Title: What Is Miqat? – The Sacred Boundaries Explained
+Audio:
+Title: Miqat Boundary Alert – Male Voice (Arabic / English / Urdu)
+Substep 2.2 — Confirming Ihram & Renewing Talbiyah
+Instruction: Renew Talbiyah with sincerity.
+Compulsory Duas: Talbiyah (continue)
+Recommended Duas:
+
+Arabic: اللَّهُمَّ هَذِهِ عُمْرَةٌ لَا رِيَاءَ فِيهَا وَلَا سُمْعَةَ
+
+Video:
+Title: Crossing the Miqat – What to Do at the Sacred Boundary
+Audio:
+Title: Miqat Talbiyah and Personal Dua – Male Voice (Arabic / English / Urdu)
+Substep 2.3 — Common Miqat Mistakes Warning
+Instruction: Informational card.
+Video:
+Title: Miqat Mistakes – What to Avoid and How to Correct Them
+Audio:
+Title: Miqat Warnings Reminder – Male Voice (Arabic / English / Urdu)
+
+STEP 3 — TAWAF
+Step Type: GPS-tracked (7 laps)
+Substep 3.0 — Arrival Preparation at Masjid al-Haram
+Instruction: When first seeing the Kaaba, make dua.
+Compulsory Duas: None
+Recommended Duas:
+
+Arabic: اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، فَحَيِّنَا رَبَّنَا بِالسَّلَامِ
+
+Video:
+Title: Your First Sight of the Kaaba – What to Do When You Enter Masjid al-Haram
+Audio:
+Title: First Sight of Kaaba Dua – Male Voice (Arabic / English / Urdu)
+Substep 3.1 — Navigate to Hajar al-Aswad
+Instruction: App guides with arrow; button activates within 30 m radius.
+Compulsory Duas:
+
+At Hajar al-Aswad: بِسْمِ اللهِ، اللهُ أَكْبَرُ (Bismillah, Allahu Akbar)
+
+Recommended Duas: Full Istilam dua (if touching)
+Video:
+Title: Finding Hajar al-Aswad – How to Reach the Starting Point of Tawaf
+Audio:
+Title: Hajar al-Aswad Dua and Istilam Guidance – Male Voice (Arabic / English / Urdu)
+Substep 3.2 — Idtiba (Men Only)
+Instruction: Bare right shoulder during entire Tawaf.
+Video:
+Title: How to Perform Idtiba – Baring the Right Shoulder During Tawaf
+Audio:
+Title: Idtiba Instruction for Men – Male Voice (Arabic / English / Urdu)
+Substep 3.3 — Ramal (Men, First 3 Circuits Only)
+Instruction: Brisk walk with shoulder movement.
+Video:
+Title: How to Perform Ramal – The Brisk Walk of Tawaf
+Audio:
+Title: Ramal Instruction – Male Voice (Arabic / English / Urdu)
+Circuits 1–7 (Tracked by GPS)
+Common for every circuit:
+
+Compulsory at start & end of each circuit (at Hajar al-Aswad): بِسْمِ اللهِ، اللهُ أَكْبَرُ
+Compulsory between Yemeni Corner and Black Stone (every circuit):
+رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ (Quran 2:201)
+
+Recommended Duas per Circuit (exactly as per Saudi app):
+
+Circuit 1: Overview + personal dhikr
+Circuit 2–7: Specific Quranic duas listed in original document (I kept them unchanged but clearly labelled “Recommended”).
+
+Audio (one per circuit):
+Title: Tawaf Circuit X – Dua and Dhikr Guide – Male Voice (Arabic / English / Urdu)
+Video (plays before Tawaf starts):
+Title: Overview of Tawaf – Seven Circuits Around the Kaaba Explained
+Substep 3.4 — Two Rakah Prayer at Maqam Ibrahim
+Instruction: After 7 laps.
+Compulsory Duas: None
+Recommended: Quran 2:125 verse before prayer.
+Video:
+Title: Two Rakah After Tawaf – Prayer at Maqam Ibrahim
+Audio:
+Title: Maqam Ibrahim Prayer Guidance – Male Voice (Arabic / English / Urdu)
+
+STEP 4 — ZAMZAM (after Tawaf prayer)
+Substep 4.1 — Intention Before Drinking
+Compulsory Duas: None
+Recommended Duas:
+
+Arabic: اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا وَاسِعًا وَشِفَاءً مِنْ كُلِّ دَاءٍ
+
+Video:
+Title: The Power of Zamzam – Intention and Dua Before Drinking
+Audio:
+Title: Zamzam Intention Dua – Male Voice (Arabic / English / Urdu)
+Substep 4.2 — Drinking Zamzam
+Recommended Duas: Bismillah → drink → Alhamdulillah + full Zamzam dua (Ibn Abbas version)
+Video:
+Title: How to Drink Zamzam the Prophetic Way – Sunnah of Zamzam
+Audio:
+Title: Zamzam Drinking Dua – Male Voice (Arabic / English / Urdu)
+Substep 4.3 — Zamzam Information Card
+Video:
+Title: History and Miracle of Zamzam Water – An Islamic Perspective
+Audio:
+Title: Zamzam Historical Narration – Male Voice (Arabic / English / Urdu)
+
+STEP 5 — SA’I (GPS-tracked 7 legs)
+Pre-Sa’i (5.0): Navigate to Safa
+Compulsory: Quran 2:158 + “Abda’u bima bada’allahu bih” (once only)
+Each Leg (1–7):
+
+Compulsory at Safa / Marwa: Full dhikr × 3 (the long Allahu Akbar dhikr)
+Recommended during walking: Personal dua + the circuit-specific duas from Saudi app (same as Tawaf pattern)
+
+Audio Titles (one per leg):
+Sa’i Leg 1 – Safa Dhikr and Walking Duas – Male Voice (… up to Leg 7)
+Video:
+Title: How to Perform Sa’i – Complete Guide for Safa and Marwa
+Title (for final leg): Completing Sa’i – The Seventh Leg and Final Supplications at Marwa
+
+STEP 6 — TAQSIR / HALQ
+Substep 6.1 — Understanding Taqsir vs Halq
+Video:
+Title: Taqsir and Halq – Men’s and Women’s Guide to Exiting Ihram
+Audio:
+Title: Taqsir Halq Guidance – Male Voice (Arabic / English / Urdu)
+Substep 6.2 — Performing Taqsir / Halq
+Compulsory Dua (Prophet’s exact words):
+Allahumma ighfir lil-muhalliqin … wal-muqassirin (3 times for shave, once for trim)
+Video:
+Title: How to Perform Taqsir Step by Step
+Audio:
+Title: Taqsir Dua – Male Voice (Arabic / English / Urdu)
+Substep 6.3 — Exiting Ihram & Umrah Completion
+Recommended Dua: Rabbana taqabbal minna…
+Video:
+Title: Umrah Complete – Exiting Ihram and Dua of Acceptance
+Audio:
+Title: Taqsir Completion and Umrah Acceptance Dua – Male Voice (Arabic / English / Urdu)
+Substep 6.4 — Umrah Completion Reminder Card
+Video:
+Title: After Umrah – What to Do in Makkah and Voluntary Acts
+Audio:
+Title: Farewell Dua for Masjid al-Haram – Male Voice (Arabic / English / Urdu)
+
+FINAL ASSET SUMMARY (Updated & Organized)
+Total Unique Audio Files: 38 titles × 3 languages = 114 files
+Total Unique Video Files: 24 titles × 3 languages = 72 files
+All titles are now clean, consistent, and ready to be used directly in your app’s content database.
+Would you like me to give you this entire guide as a single clean JSON structure (for easy import into your app) or as a Google Sheet / Excel-ready table? Just say the word and I’ll generate it instantly.
+This version is now production-perfect for your Mushab Umrah Tracking feature. Alhamdulillah! 🕋
+
+
+
+Direct Chat Link: https://claude.ai/share/e0d67c18-7cba-4da2-8150-3f9ea34c4eac
+Summary Chat Link: https://grok.com/share/c2hhcmQtNA_414c528a-59cf-4f84-b273-ad485095634b

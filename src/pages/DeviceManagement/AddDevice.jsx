@@ -1287,7 +1287,9 @@ const DEVICE_CONDITIONS_MAP = {
   AQIMD: ["AQI", "temperature", "humidity"],
   GLMD: ["gass", "temperature", "humidity"],
   EMD: ["temperature", "humidity", "voltage"],
-    SCHEDULER: ["temperature", "humidity"], 
+  // SCHEDULER: ["temperature", "humidity"], 
+  TSD: ["temperature", "humidity"],
+  ESD: ["voltage","temperature", "humidity"],
 };
 
 const CONDITION_LABEL = {
@@ -1314,7 +1316,9 @@ const DEVICE_TYPE_LABEL = {
   AQIMD: "Air Quality Index Monitoring Device",
   GLMD: "Leakage Monitoring Device",
   EMD: "Energy Monitoring Device",
-  SCHEDULER: "Scheduler Device", 
+  // SCHEDULER: "Scheduler Device", 
+  TSD: "Temperature Scheduling Device",
+ESD: "Energy Scheduling Device",
 };
 
 const SELECT_HEIGHT = 48;
@@ -1659,7 +1663,10 @@ const AddDevice = () => {
                 <MenuItem value="AQIMD">{DEVICE_TYPE_LABEL.AQIMD}</MenuItem>
                 <MenuItem value="GLMD">{DEVICE_TYPE_LABEL.GLMD}</MenuItem>
                   <MenuItem value="EMD">{DEVICE_TYPE_LABEL.EMD}</MenuItem>
-              <MenuItem value="SCHEDULER">{DEVICE_TYPE_LABEL.SCHEDULER}</MenuItem>
+              {/* <MenuItem value="SCHEDULER">{DEVICE_TYPE_LABEL.SCHEDULER}</MenuItem> */}
+
+              <MenuItem value="TSD">{DEVICE_TYPE_LABEL.TSD}</MenuItem>
+              <MenuItem value="ESD">{DEVICE_TYPE_LABEL.ESD}</MenuItem>
               </Select>
             </FormControl>
           </div>

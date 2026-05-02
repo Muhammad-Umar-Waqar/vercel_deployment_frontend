@@ -1,31 +1,9 @@
-// import { createContext, useContext, useState } from "react";
-
-// // SchedulerContext.jsx
-// const SchedulerContext = createContext(null);
-
-// export function SchedulerProvider({ children }) {
-//   const [eventsMap, setEventsMap] = useState({});
-//   const [toggleMap, setToggleMap] = useState({});
-
-//   const setEvents = (deviceId, updated) =>
-//     setEventsMap(prev => ({ ...prev, [deviceId]: updated }));
-
-//   const setToggle = (deviceId, val) =>
-//     setToggleMap(prev => ({ ...prev, [deviceId]: val }));
-
-//   return (
-//     <SchedulerContext.Provider value={{ eventsMap, toggleMap, setEvents, setToggle }}>
-//       {children}
-//     </SchedulerContext.Provider>
-//   );
-// }
-
-// export const useScheduler = () => useContext(SchedulerContext);
-
-
 import { createContext, useContext, useState } from "react";
+import Swal from "sweetalert2";
 
 const SchedulerContext = createContext(null);
+const TOKEN = localStorage.getItem("token");
+
 
 export function SchedulerProvider({ children }) {
   const [eventsMap, setEventsMap] = useState({});
@@ -43,9 +21,220 @@ export function SchedulerProvider({ children }) {
       [deviceId]: val ?? "off",   // ← FORCE DEFAULT OFF
     }));
 
+
+  // const fetchToggleStatus = async (deviceId) => {
+  //   try {
+  //     const res = await fetch(
+  //       `${import.meta.env.VITE_BACKEND_API}/event/get-toggle-status/${deviceId}`,
+  //       {
+  //         method: "GET",
+  //         credentials: "include",
+  //       }
+  //     );
+
+  //     const data = await res.json();
+  //     if (!res.ok) throw new Error(data.message || "Failed to fetch status");
+
+  //     setToggleMap(prev => ({
+  //       ...prev,
+  //       [deviceId]: data.status === "ON" ? "on" : "off",
+  //     }));
+
+  //     return data;
+
+  //   } catch (err) {
+  //     console.error("❌ fetchToggleStatus error:", err);
+  //   }
+  // };
+
+  const fetchToggleStatus = async (deviceId, retries = 5) => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API}/event/get-toggle-status/${deviceId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      const newState = data.status === "ON" ? "on" : "off";
+
+      setToggleMap(prev => {
+        // 🔥 IMPORTANT: force re-render only if changed
+        if (prev[deviceId] === newState) return prev;
+
+        return {
+          ...prev,
+          [deviceId]: newState,
+        };
+      });
+
+      return newState;
+
+    } catch (err) {
+      console.error("❌ Fetch toggle error:", err);
+    }
+  };
+
+  // const triggerDevice = async (deviceId, action) => {
+  //   const res = await fetch(
+  //     `${import.meta.env.VITE_BACKEND_API}/event/toggle-switch`,
+  //     {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       credentials: "include",
+  //       body: JSON.stringify({
+  //         deviceId,
+  //         status: action,
+  //       }),
+  //     }
+  //   );
+
+  //   const data = await res.json();
+  //   if (!res.ok) throw new Error(data.message || "Toggle failed");
+
+  //   // setToggleMap(prev => ({
+  //   //   ...prev,
+  //   //   [deviceId]: action === "ON" ? "on" : "off",
+  //   // }));
+  //   await fetchToggleStatus(deviceId);
+
+  //   return data;
+  // };
+
+  // const delay = (ms) => new Promise(res => setTimeout(res, ms));
+  // const triggerDevice = async (deviceId, action) => {
+  //   const expected = action === "ON" ? "on" : "off";
+
+  //   const res = await fetch(
+  //     `${import.meta.env.VITE_BACKEND_API}/event/toggle-switch`,
+  //     {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       credentials: "include",
+  //       body: JSON.stringify({ deviceId, status: action }),
+  //     }
+  //   );
+
+  //   const data = await res.json();
+  //   console.log(data)
+  //   if (!res.ok) throw new Error(data.message || "Toggle failed");
+
+  //   await delay(800);
+
+  //   // Retry sync until we get the expected state or max attempts
+  //   for (let i = 0; i < 6; i++) {
+  //     const current = await fetchToggleStatus(deviceId);
+  //     if (current === expected) break;
+  //     await delay(400);
+  //   }
+
+  //   return data;
+  // };
+
+  const delay = (ms) => new Promise(res => setTimeout(res, ms));
+
+  const triggerDevice = async (deviceId, action) => {
+    const expected = action === "ON" ? "on" : "off";
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API}/event/toggle-switch`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+          body: JSON.stringify({ deviceId, status: action }),
+        }
+      );
+
+      const data = await res.json();
+      console.log("Trigger Response:", data);
+
+      // 🔥 Check for offline device
+      if (data.note === "Device is offline" ||
+        (data.message && data.message.toLowerCase().includes("offline"))) {
+
+        Swal.fire({
+          icon: "error",
+          title: "Device is Offline",
+          text: "Cannot turn ON/OFF because the device is currently offline.\nPlease check the device connection.",
+          confirmButtonColor: "#EF4444",
+          confirmButtonText: "Okay",
+        });
+
+        return; // Stop execution
+      }
+
+      // Handle other API errors
+      if (!res.ok) {
+        throw new Error(data.message || "Toggle failed");
+      }
+
+      // Success → sync state
+      await delay(800);
+
+      for (let i = 0; i < 6; i++) {
+        const current = await fetchToggleStatus(deviceId);
+        if (current === expected) break;
+        await delay(400);
+      }
+
+      return data;
+
+    } catch (err) {
+      console.error("Trigger error:", err);
+
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: err.message || "Failed to send command to device",
+        confirmButtonColor: "#EF4444",
+      });
+    }
+  };
+
+  const skipEvent = async (deviceId) => {
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_API}/event/skip-event`, {
+      method: "POST",
+       headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      credentials: "include",
+      body: JSON.stringify({ deviceId }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Skip failed");
+
+    setEventsMap(prev => ({
+      ...prev,
+      [deviceId]: [],
+    }));
+
+    setToggleMap(prev => ({
+      ...prev,
+      [deviceId]: "off",
+    }));
+
+    return data;
+  };
+
+
   return (
     <SchedulerContext.Provider
-      value={{ eventsMap, toggleMap, setEvents, setToggle }}
+      value={{ eventsMap, toggleMap, setEvents, setToggle, triggerDevice, skipEvent, fetchToggleStatus }}
     >
       {children}
     </SchedulerContext.Provider>

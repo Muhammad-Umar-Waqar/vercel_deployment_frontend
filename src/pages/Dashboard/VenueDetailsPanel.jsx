@@ -1,1358 +1,23 @@
-// import AlertsChart from "./AlertsChart";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useStore } from "../../contexts/storecontexts";
-// import { useEffect, useState } from "react";
-// import QRCode from "./QrCode";
-// import { useLocation } from "react-router-dom";
-// import CloseIcon from '@mui/icons-material/Close';
-// import { IconButton, Skeleton } from "@mui/material";
-// import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
-// import { Download } from "lucide-react";
-// import Swal from "sweetalert2";
-// import DownloadModal from "./DownloadModal";
-
-// export default function VenueDetailsPanel({
-//   organizationId = null,
-//   venueName = "Karim Korangi Branch",
-//   freezerTemperature = false,
-//   ambientTemperature = 25,
-//   batteryLow = true,
-//   needMaintenance = true,
-//   apiKey = "",
-//   closeIcon = false,
-//   onClose = undefined,
-//   humidity=0,
-//   espOdour=0,
-//   odourAlert = false,
-//   temperatureAlert = false,
-//   humidityAlert = false,
-//   deviceId = "",
-//   lastUpdateTime=null
-// }) {
-//   const dispatch = useDispatch();
-//   const { user } = useStore();
-//   const orgId = organizationId || user?.organization || null;
-
-
-// const location = useLocation();
-// const params = new URLSearchParams(location.search);
-// const venueId = params.get("venue"); // gives the ID
-// const [downloadOpen, setDownloadOpen] = useState(false);
-
-// // const venuesFromSlice = useSelector((state) => state.Venue.Venues || []);
-
-// // const currentVenueSlice = venuesFromSlice.find(v => v._id === venueId) || null;
-
-//  // --- select cached venues for this org
-//   const orgVenues = useSelector(
-//     (state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : [])
-//   );
-
-//   // --- fallback to global Venues
-//   const globalVenues = useSelector((state) => state.Venue.Venues || []);
-
-//     // --- merged array: org venues preferred, fallback to global
-//   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-
-//   console.log("ORGID", orgId)
-//   // --- Redux selector: get all alerts for this org
-//   const orgAlerts = useSelector((s) =>
-//     orgId
-//       ? s.alerts?.byOrg?.[orgId] ?? { venues: [], loading: false, error: null }
-//       : { venues: [], loading: false, error: null }
-//   );
-
-//   // // --- Fetch alerts on mount
-//   // useEffect(() => {
-//   //   if (orgId) dispatch(fetchAlertsByOrg(orgId));
-//   // }, [orgId, dispatch]);
-
-//    // --- fetch venues by org if needed
-//   useEffect(() => {
-//     if (orgId && !orgVenues.length) {
-//       dispatch(fetchVenuesByOrganization(orgId));
-//     }
-//   }, [orgId, orgVenues.length, dispatch]);
-
-//   const venues = orgAlerts?.venues || [];
-
-//   // const handleDownload = () => {
-//   //   Swal.fire({
-//   //       icon: "info", // or "warning"
-//   //       title: "Coming Soon!",
-//   //       text: "This feature is not available yet. Stay tuned!",
-//   //       confirmButtonText: "OK"
-//   //     });
-//   // };
-
-
-// const handleDownload = () => {
-//   setDownloadOpen(true);
-// };
-
-// const sameId = (a, b) => String(a) === String(b);
-
-//    const toInt = (v) => {
-//     const n = Number(v);
-//     return Number.isFinite(n) ? Math.trunc(n) : null;
-//   };
-
-// // --- find current venue
-//   const currentVenueSlice =
-//     venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
-
-//   // --- computed display name
-//   const displayVenueName =
-//     currentVenueSlice?.name ||
-//     currentVenueSlice?.venueName ||
-//     venueName ||
-//     "Venue";
-
-
-
-//     // computed display values (only integer part)
-//   const displayTemp = toInt(ambientTemperature);
-//   const displayHumidity = toInt(humidity);
-
-
-//   // helper to format backend timestamp
-// const formatLastUpdate = (time) => {
-//   if (!time) return null; // handle null
-
-//   const date = new Date(time);
-
-//   // Example: 11 Dec 2025, 19:11
-//   const options = {
-//     year: "numeric",
-//     month: "short",
-//     day: "numeric",
-//     hour: "2-digit",
-//     minute: "2-digit",
-//   };
-//   return date.toLocaleString(undefined, options); // uses user's locale
-// };
-
-
-
-
-//   return (
-//     <div
-//       className="w-full rounded-lg p-6 shadow-sm space-y-6"
-//       style={{ backgroundColor: "#07518D12" }}
-//     >
-//      {closeIcon && (
-//         // only render button when `closeIcon` true (mobile drawer)
-//         <div className="flex justify-between items-center">
-//           <img src="/iotfiy_logo_rpanel.svg" alt="IOTFIY LOGO" className="h-[30px] w-auto" />
-
-//           <IconButton
-//             onClick={() => {
-//               if (typeof onClose === "function") onClose(); // guard, then call
-//             }}
-//             edge="start"
-//             aria-label="close-details"
-//             size="small"
-//           >
-//             <CloseIcon />
-//           </IconButton>
-//         </div>
-//       )}
-
-//       {/* A. Venue Info Section */}
-//       <div className="flex justify-between items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
-//         <div>
-//           <p className="text-sm text-[#64748B] font-medium">Device ID </p>
-//           {/* <h2 className="text-sm text-[#1E293B] font-bold">{displayVenueName}</h2> */}
-//           <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70}  />}</h2>
-//         </div>
-//         <button
-//           onClick={handleDownload}
-//           className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a]  active:scale-[.98] transition shadow-sm cursor-pointer "
-//           aria-label="Download"
-//         >
-//           <span className="leading-none">Download</span>
-//           <Download className="w-3.5 h-3.5" />
-//         </button>
-//       </div>
-
-
-//       {/* C. Temperature Section */}
-//       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl">
-//         <div className="flex flex-col-3 justify-around items-center py-1 ">
-//           <div className="flex flex-col-2 items-center justify-center ">
-//             <img src="/odour-alert.svg" className="h-[70px] w-[35px]" />
-
-//             <p className="text-md md:text-md lg:text-lg xl:text-xl font-semibold">
-//               {/* {freezerTemperature ? "Detected" : "Normal"} */}
-//               {espOdour}%
-//           </p>
-
-
-//           </div>
-
-//           <div className="flex flex-col-2 items-center justify-center ">
-//             <img src="/temperature-icon.svg" className="h-[60px] w-[35px]" />
-//             <div className="flex flex-col items-end justify-end">
-
-//               <p className="text-sm md:text-md lg:text-lg 2xl:text-2xl font-semibold">
-//                 {displayTemp}
-//                 <span className="xs:text-sm md:text-md 2xl:text-lg font-thin">C</span>
-//               </p>
-//             </div>
-//           </div>
-
-//            <div className="flex flex-col-2 items-center justify-center">
-//             <img src="/humidity-alert.svg" className="h-[60px] w-[35px]" />
-//             <div className="flex flex-col items-end justify-end">
-
-//               <p className="text-sm md:text-md lg:text-lg 2xl:text-2xl font-semibold">
-//                 {displayHumidity}
-//                 <span className="xs:text-sm md:text-md  2xl:text-lg font-thin">%</span>
-//               </p>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* <div>
-//           <h3><span></span>Alert Detected</h3>
-//         </div> */}
-
-//         {/* <img
-//           src="red-alert-icon"
-//           alt="Freezer and Ambient Combo"
-//           className="w-full h-auto object-cover"
-//         /> */}
-//       </div>
-
-//         <div className="flex items-end  justify-center sm:justify-start   ">
-//             <img src="/yellow-alert.svg" alt="Alert" className="w-auto h-[1.5rem]" />
-//         <span className=" font-bold text-xs text-black block sm:hidden">Status</span>
-//             {/* <span className="text-[#0D5CA4] text-sm font-medium underline  decoration-[#0D5CA4] decoration-[0.5px] ">Alerts Status</span> */}
-//         </div>
-
-
-
-//       {/* <div className="grid grid-cols-3 gap-1 "> */}
-//       <div className="grid md:grid-cols-3 gap-1">
-//         <div className={`flex items-center  justify-center md:justify-start  gap-4 border border-1 rounded-sm py-0.5 ${odourAlert ? "border-red-500": "border-gray-400"}`}>
-//             <img src="/odour-alert.svg" alt="Alert" className="w-6 h-6 " />
-//             <span className="text-[#1E293B] text-sm sm:text-xs ">{odourAlert ? (
-//         <>
-//           <span className="md:hidden">Alert Detected</span>
-//           <span className="hidden md:inline">Alert Det.</span>
-//         </>
-//       ) : (
-//               <>
-//           <span className="md:hidden">Not Detected</span>
-//           <span className="hidden md:inline">Not Det.</span>
-//         </>
-//       )}</span>
-//         </div>
-//         <div className={`flex items-center justify-center md:justify-start   gap-4 border border-1 rounded-sm py-0.5 ${temperatureAlert ? "border-green-500": "border-gray-400"}`}>
-//             <img src="/temperature-icon.svg" alt="Alert" className="w-6 h-6 " />
-//             <span className="text-[#1E293B] text-sm sm:text-xs ">  {temperatureAlert ? (
-//         <>
-//           <span className="md:hidden">Alert Detected</span>
-//           <span className="hidden md:inline">Alert Det.</span>
-//         </>
-//       ) : (
-//                <>
-//           <span className="md:hidden">Not Detected</span>
-//           <span className="hidden md:inline">Not Det.</span>
-//         </>
-
-//       )}</span>
-//         </div>
-//         <div className={`flex items-center  justify-center md:justify-start  gap-4 border border-1 rounded-sm py-0.5  ${humidityAlert ? "border-green-500": "border-gray-400"}`}>
-//             <img src="/humidity-alert.svg" alt="Alert" className="w-6 h-6 " />
-//             <span className="text-[#1E293B] text-sm sm:text-xs ">
-//               {humidityAlert ? (
-//         <>
-//           <span className="md:hidden">Alert Detected</span>
-//           <span className="hidden md:inline">Alert Det.</span>
-//         </>
-//       ) : (
-//                <>
-//           <span className="md:hidden">Not Detected</span>
-//           <span className="hidden md:inline">Not Det.</span>
-//         </>
-//       )}
-//             </span>
-//         </div>
-//       </div>
-
-
-
-//       {/* D. Alerts Chart */}
-//       {/* <div className="mb-6">
-//         {venues.length > 0 ? (
-//           <AlertsChart venues={venues} defaultMode="battery" />
-//         ) : (
-//           <p className="text-sm text-gray-500 text-center">
-//             No alert data available
-//           </p>
-//         )}
-//       </div> */}
-//       <div>
-//     {/* {apiKey && (
-//       <div className="mt-3  p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//         <div className="flex items-center justify-between ">
-//           <div>
-//         <strong>API Key:</strong>
-//             <div className="mt-2 text-sm " title={apiKey}>
-//               {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
-//             </div>
-//           </div>
-
-//           <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || 'http://localhost:5173'} />
-//         </div>
-//       </div>
-//     )} */}
-
-
-
-// {apiKey ? (
-//   <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//     <div className="flex items-center justify-between">
-//       <div>
-//         <strong>API Key:</strong>
-//         <div className="mt-2 text-sm" title={apiKey}>
-//           {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
-//         </div>
-//       </div>
-
-//       <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || 'http://localhost:5173'} />
-//     </div>
-//   </div>
-// ) : (
-//   <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//     <div className="flex items-center justify-between">
-//       <div>
-//         {/* <strong>API Key:</strong> */}
-//         <Skeleton variant="text" width={50} height={20} className="mb-2" />
-//         <Skeleton variant="text" width={120} height={20} className="mb-2" />
-//       </div>
-//     <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: "10%" }}  />
-//   </div>
-//   </div>
-// )}
-
-// {
-//   lastUpdateTime ? <div  className="text-center mt-3 p-2  rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md ">Last Update: {formatLastUpdate(lastUpdateTime)}</div>: ""
-// }
-
-//       </div>
-//       <DownloadModal
-//         open={downloadOpen}
-//         onClose={() => setDownloadOpen(false)}
-//         measurement={deviceId}
-//         bucket="Odour"
-//       />
-
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // // src/pages/Dashboard/VenueDetailsPanel.jsx
 // import AlertsChart from "./AlertsChart";
 // import { useDispatch, useSelector } from "react-redux";
 // import { useStore } from "../../contexts/storecontexts";
-// import { useEffect, useState } from "react";
+// import { useMemo, useEffect, useState } from "react";
 // import QRCode from "./QrCode";
 // import { useLocation } from "react-router-dom";
 // import CloseIcon from '@mui/icons-material/Close';
 // import { IconButton, Skeleton } from "@mui/material";
 // import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
-// import { Download, Cloud, Zap } from "lucide-react";
-// import Swal from "sweetalert2";
-// import DownloadModal from "./DownloadModal";
-
-// export default function VenueDetailsPanel({
-//   organizationId = null,
-//   venueName = "Karim Korangi Branch",
-//   deviceType = null,           // OMD / TMD / AQIMD / GLMD
-//   espTemprature = 0,
-//   ambientTemperature = 25,    // kept for compatibility
-//   espHumidity = 0,
-//   batteryLow = true,
-//   needMaintenance = true,
-//   apiKey = "",
-//   closeIcon = false,
-//   onClose = undefined,
-//   odourAlert = false,
-//   temperatureAlert = false,
-//   humidityAlert = false,
-//   aqiAlert = false,
-//   glAlert = false,
-//   deviceId = "",
-//   espOdour = 0,
-//   espAQI = null,
-//   espGL = null,
-//   lastUpdateTime = null
-// }) {
-//   const dispatch = useDispatch();
-//   const { user } = useStore();
-//   const orgId = organizationId || user?.organization || null;
-
-//   const location = useLocation();
-//   const params = new URLSearchParams(location.search);
-//   const venueId = params.get("venue"); // gives the ID
-//   const [downloadOpen, setDownloadOpen] = useState(false);
-
-//   // --- select cached venues for this org
-//   const orgVenues = useSelector(
-//     (state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : [])
-//   );
-
-//   // --- fallback to global Venues
-//   const globalVenues = useSelector((state) => state.Venue.Venues || []);
-
-//   // --- merged array: org venues preferred, fallback to global
-//   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-
-//   useEffect(() => {
-//     if (orgId && !orgVenues.length) {
-//       dispatch(fetchVenuesByOrganization(orgId));
-//     }
-//   }, [orgId, orgVenues.length, dispatch]);
-
-//   // small helpers
-//   const sameId = (a, b) => String(a) === String(b);
-//   const toInt = (v) => {
-//     const n = Number(v);
-//     return Number.isFinite(n) ? Math.trunc(n) : null;
-//   };
-
-//   // computed display values
-//   const displayTemp = toInt(espTemprature ?? ambientTemperature);
-//   const displayHumidity = toInt(espHumidity);
-//   const displayOdour = toInt(espOdour);
-//   const displayAQI = espAQI === null || espAQI === undefined ? null : toInt(espAQI);
-//   const displayGL = espGL === null || espGL === undefined ? null : toInt(espGL);
-
-//   // find venue name fallback
-//   const currentVenueSlice =
-//     venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
-
-//   const displayVenueName =
-//     currentVenueSlice?.name ||
-//     currentVenueSlice?.venueName ||
-//     venueName ||
-//     "Venue";
-
-//   const handleDownload = () => setDownloadOpen(true);
-
-//   const formatLastUpdate = (time) => {
-//     if (!time) return null;
-//     const date = new Date(time);
-//     const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
-//     return date.toLocaleString(undefined, options);
-//   };
-
-//   // Determine label + icon for the left-most specialized metric
-//   const specialized = (() => {
-//     const t = deviceType ?? "";
-//     if (t === "OMD") {
-//       return { label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg" };
-//     }
-//     if (t === "AQIMD") {
-//       return { label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} /> };
-//     }
-//     if (t === "GLMD") {
-//       // leakage/gass
-//       return { label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} /> };
-//     }
-//     // TMD or unknown: prefer showing odour only if present, otherwise blank
-//     return { label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg" };
-//   })();
-
-//   // status text helpers
-//   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
-//   const statusClass = (flag, color = "green") => {
-//     if (flag) {
-//       if (color === "red") return "border-red-500";
-//       if (color === "purple") return "border-purple-600";
-//       return "border-green-500";
-//     }
-//     return "border-gray-300";
-//   };
-
-//   return (
-//     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
-//       {closeIcon && (
-//         <div className="flex justify-between items-center">
-//           <img src="/iotfiy_logo_rpanel.svg" alt="IOTFIY LOGO" className="h-[30px] w-auto" />
-//           <IconButton onClick={() => typeof onClose === "function" && onClose()} edge="start" aria-label="close-details" size="small">
-//             <CloseIcon />
-//           </IconButton>
-//         </div>
-//       )}
-
-//       {/* Header */}
-//       <div className="flex justify-between items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
-//         <div>
-//           <p className="text-sm text-[#64748B] font-medium">Device ID</p>
-//           <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70} />}</h2>
-//           <div className="text-xs text-gray-600">{displayVenueName}</div>
-//         </div>
-
-//         <button
-//           onClick={handleDownload}
-//           className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer "
-//           aria-label="Download"
-//         >
-//           <span className="leading-none">Download</span>
-//           <Download className="w-3.5 h-3.5" />
-//         </button>
-//       </div>
-
-//       {/* Middle section: specialized metric, temperature, humidity */}
-//       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
-//         <div className="flex items-center justify-between gap-4">
-//           {/* specialized metric */}
-//           <div className="flex-1 flex flex-col items-center justify-center">
-//             <div className="mb-2">
-//               {specialized.img ? (
-//                 <img src={specialized.img} className="h-[66px] w-auto" alt={specialized.label} />
-//               ) : specialized.lucideIcon ? (
-//                 <div className="text-[#0D5CA4]">{specialized.lucideIcon}</div>
-//               ) : (
-//                 <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={specialized.label} />
-//               )}
-//             </div>
-//             <div className="text-sm text-gray-600">{specialized.label}</div>
-//             <div className="text-xl font-semibold">
-//               {specialized.value ?? "--"}{specialized.unit ? <span className="text-sm font-thin ml-1">{specialized.unit}</span> : ""}
-//             </div>
-//           </div>
-
-//           {/* temperature */}
-//           <div className="flex-1 flex flex-col items-center justify-center">
-//             <img src="/temperature-icon.svg" className="h-[60px] w-auto" />
-//             <div className="text-sm text-gray-600">Temperature</div>
-//             <div className="text-xl font-semibold">{displayTemp !== null ? `${displayTemp}°C` : "--"}</div>
-//           </div>
-
-//           {/* humidity */}
-//           <div className="flex-1 flex flex-col items-center justify-center">
-//             <img src="/humidity-alert.svg" className="h-[60px] w-auto" />
-//             <div className="text-sm text-gray-600">Humidity</div>
-//             <div className="text-xl font-semibold">{displayHumidity !== null ? `${displayHumidity}%` : "--"}</div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Status badges for each alert type */}
-//       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-//         <div className={`flex items-center gap-3 p-2 border rounded ${statusClass(odourAlert, "red")}`}>
-//           <img src="/odour-alert.svg" alt="odour" className="w-6 h-6" />
-//           <div>
-//             <div className="text-xs text-gray-600">Odour</div>
-//             <div className="text-sm font-medium">{statusText(odourAlert)}</div>
-//           </div>
-//         </div>
-
-//         <div className={`flex items-center gap-3 p-2 border rounded ${statusClass(temperatureAlert, "green")}`}>
-//           <img src="/temperature-icon.svg" alt="temp" className="w-6 h-6" />
-//           <div>
-//             <div className="text-xs text-gray-600">Temperature</div>
-//             <div className="text-sm font-medium">{statusText(temperatureAlert)}</div>
-//           </div>
-//         </div>
-
-//         <div className={`flex items-center gap-3 p-2 border rounded ${statusClass(humidityAlert, "green")}`}>
-//           <img src="/humidity-alert.svg" alt="humidity" className="w-6 h-6" />
-//           <div>
-//             <div className="text-xs text-gray-600">Humidity</div>
-//             <div className="text-sm font-medium">{statusText(humidityAlert)}</div>
-//           </div>
-//         </div>
-
-//         <div className={`flex items-center gap-3 p-2 border rounded ${statusClass(aqiAlert, "purple")}`}>
-//           <div className="w-6 h-6 flex items-center justify-center">
-//             <Cloud size={20} />
-//           </div>
-//           <div>
-//             <div className="text-xs text-gray-600">AQI</div>
-//             <div className="text-sm font-medium">{statusText(aqiAlert)}</div>
-//           </div>
-//         </div>
-
-//         <div className={`flex items-center gap-3 p-2 border rounded ${statusClass(glAlert, "red")}`}>
-//           <div className="w-6 h-6 flex items-center justify-center">
-//             <Zap size={20} />
-//           </div>
-//           <div>
-//             <div className="text-xs text-gray-600">Leakage</div>
-//             <div className="text-sm font-medium">{statusText(glAlert)}</div>
-//           </div>
-//         </div>
-
-//       </div>
-
-//       {/* API key / QR */}
-//       <div>
-//         {apiKey ? (
-//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <strong>API Key:</strong>
-//                 <div className="mt-2 text-sm" title={apiKey}>
-//                   {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
-//                 </div>
-//               </div>
-
-//               <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || "http://localhost:5173"} />
-//             </div>
-//           </div>
-//         ) : (
-//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <Skeleton variant="text" width={50} height={20} className="mb-2" />
-//                 <Skeleton variant="text" width={120} height={20} className="mb-2" />
-//               </div>
-//               <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: "10%" }} />
-//             </div>
-//           </div>
-//         )}
-
-//         {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
-//       </div>
-
-//       <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} />
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Fully working code but Single Day Functionlity is not here
-// // src/pages/Dashboard/VenueDetailsPanel.jsx
-// import AlertsChart from "./AlertsChart";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useStore } from "../../contexts/storecontexts";
-// import { useEffect, useState } from "react";
-// import QRCode from "./QrCode";
-// import { useLocation } from "react-router-dom";
-// import CloseIcon from '@mui/icons-material/Close';
-// import { IconButton, Skeleton } from "@mui/material";
-// import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
-// import { Download, Cloud, Zap } from "lucide-react";
-// import Swal from "sweetalert2";
-// import DownloadModal from "./DownloadModal";
-
-// export default function VenueDetailsPanel({
-//   organizationId = null,
-//   venueName = "Karim Korangi Branch",
-//   deviceType = null,           // OMD / TMD / AQIMD / GLMD
-//   espTemprature = 0,
-//   ambientTemperature = 0,
-//   espHumidity = 0,
-//   batteryLow = true,
-//   needMaintenance = true,
-//   apiKey = "",
-//   closeIcon = false,
-//   onClose = undefined,
-//   odourAlert = false,
-//   temperatureAlert = false,
-//   humidityAlert = false,
-//   aqiAlert = false,
-//   glAlert = false,
-//   deviceId = "",
-//   espOdour = 0,
-//   espAQI = null,
-//   espGL = null,
-//   lastUpdateTime = null
-// }) {
-//   const dispatch = useDispatch();
-//   const { user } = useStore();
-//   const orgId = organizationId || user?.organization || null;
-
-//   const location = useLocation();
-//   const params = new URLSearchParams(location.search);
-//   const venueId = params.get("venue"); // gives the ID
-//   const [downloadOpen, setDownloadOpen] = useState(false);
-
-//   // --- select cached venues for this org
-//   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
-//   const globalVenues = useSelector((state) => state.Venue.Venues || []);
-//   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-
-
-
-//   useEffect(() => {
-//     if (orgId && !orgVenues.length) {
-//       dispatch(fetchVenuesByOrganization(orgId));
-//     }
-
-//   }, [orgId, orgVenues.length, dispatch]);
-
-//   // helpers
-//   const sameId = (a, b) => String(a) === String(b);
-//   const toInt = (v) => {
-//     const n = Number(v);
-//     return Number.isFinite(n) ? Math.trunc(n) : null;
-//   };
-
-//   // computed display values
-//   const displayTemp = toInt(espTemprature ?? ambientTemperature);
-//   const displayHumidity = toInt(espHumidity);
-//   const displayOdour = toInt(espOdour);
-//   const displayAQI = espAQI === null || espAQI === undefined ? null : toInt(espAQI);
-//   const displayGL = espGL === null || espGL === undefined ? null : toInt(espGL);
-
-//   // find venue name fallback
-//   const currentVenueSlice =
-//     venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
-
-//   const displayVenueName =
-//     currentVenueSlice?.name ||
-//     currentVenueSlice?.venueName ||
-//     venueName ||
-//     "Venue";
-
-//   const handleDownload = () => setDownloadOpen(true);
-
-//   const formatLastUpdate = (time) => {
-//     if (!time) return null;
-//     const date = new Date(time);
-//     const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
-//     return date.toLocaleString(undefined, options);
-//   };
-
-//   // Build the set of metrics to display based on deviceType
-//   // Each metric: { key, label, unit, value, img, lucideIcon, alertFlag }
-//   const metrics = (() => {
-//     const tempMetric = {
-//       key: "temperature",
-//       label: "Temperature",
-//       unit: "°C",
-//       value: displayTemp !== null ? displayTemp : "--",
-//       img: "/temperature-icon.svg",
-//       lucideIcon: null,
-//       alertFlag: !!temperatureAlert,
-//       color: "green"
-//     };
-//     const humMetric = {
-//       key: "humidity",
-//       label: "Humidity",
-//       unit: "%",
-//       value: displayHumidity !== null ? displayHumidity : "--",
-//       img: "/humidity-alert.svg",
-//       lucideIcon: null,
-//       alertFlag: !!humidityAlert,
-//       color: "green"
-//     };
-//     if (String(deviceType) === "TMD") {
-//   return [
-//     {
-//       ...tempMetric,
-//       color: "red",  
-//     },
-//     humMetric,
-//   ];
-// }
-
-//     if (String(deviceType) === "OMD") {
-//       return [
-//         { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
-//         tempMetric,
-//         humMetric,
-//       ];
-//     }
-//     if (String(deviceType) === "TMD") {
-//       return [ tempMetric, humMetric ];
-//     }
-//     if (String(deviceType) === "AQIMD") {
-//       return [
-//         { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
-//         tempMetric,
-//         humMetric,
-//       ];
-//     }
-//     if (String(deviceType) === "GLMD") {
-//       return [
-//         { key: "gas", label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} />, alertFlag: !!glAlert, color: "red" },
-//         tempMetric,
-//         humMetric,
-//       ];
-//     }
-//     // fallback: show temp & humidity
-//     return [ tempMetric, humMetric ];
-//   })();
-
-//    console.log("deviceType", deviceType);
-
-
-//   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
-//   const statusClass = (flag, color = "green") => {
-//     if (flag) {
-//       if (color === "red") return "border-red-500";
-//       if (color === "purple") return "border-purple-600";
-//       return "border-green-500";
-//     }
-//     return "border-gray-300";
-//   };
-
-//   return (
-//     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
-//       {closeIcon && (
-//         <div className="flex justify-between items-center">
-//           <img src="/iotfiy_logo_rpanel.svg" alt="IOTFIY LOGO" className="h-[30px] w-auto" />
-//           <IconButton onClick={() => typeof onClose === "function" && onClose()} edge="start" aria-label="close-details" size="small">
-//             <CloseIcon />
-//           </IconButton>
-//         </div>
-//       )}
-
-//       {/* Header */}
-//       <div className="flex justify-between items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
-//         <div>
-//           <p className="text-sm text-[#64748B] font-medium">Device ID</p>
-//           <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70} />}</h2>
-//           <div className="text-xs text-gray-600">{displayVenueName}</div>
-//         </div>
-
-//         <button
-//           onClick={handleDownload}
-//           className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer "
-//           aria-label="Download"
-//         >
-//           <span className="leading-none">Download</span>
-//           <Download className="w-3.5 h-3.5" />
-//         </button>
-//       </div>
-
-//       {/* Middle section: render exactly 3 columns if metrics length === 3, otherwise render each metric evenly */}
-//       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
-//         <div
-//           className={`flex items-center justify-between gap-4 ${metrics.length === 2 ? "sm:justify-around" : ""}`}
-//         >
-//           {metrics.map((m) => (
-//             <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-//               <div className="mb-2">
-//                 {m.img ? (
-//                   <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-//                 ) : m.lucideIcon ? (
-//                   <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-//                 ) : (
-//                   <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
-//                 )}
-//               </div>
-//               <div className="text-sm text-gray-600">{m.label}</div>
-//               <div className="text-xl font-semibold">
-//                 {m.value ?? "--"}{m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Status badges: render only the same metrics (keeps your desktop grid classes intact) */}
-//       <div className={`grid ${metrics.length === 2 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-2 md:grid-cols-2"} gap-2`}>
-//         {metrics.map((m) => {
-//           // pick color and flag
-//           const flag = !!m.alertFlag;
-//           const color = m.color ?? "green";
-//           return (
-//             <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
-//               {m.img ? (
-//                 <img src={m.img} alt={m.label} className="w-6 h-6" />
-//               ) : m.lucideIcon ? (
-//                 <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
-//               ) : (
-//                 <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />
-//               )}
-//               <div>
-//                 <div className="text-xs text-gray-600">{m.label}</div>
-//                 <div className="text-sm font-medium">{statusText(flag)}</div>
-//               </div>
-//             </div>
-//           );
-//         })}
-//       </div>
-
-//       {/* API key / QR */}
-//       <div>
-//         {apiKey ? (
-//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <strong>API Key:</strong>
-//                 <div className="mt-2 text-sm" title={apiKey}>
-//                   {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
-//                 </div>
-//               </div>
-
-//               <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || "http://localhost:5173"} />
-//             </div>
-//           </div>
-//         ) : (
-//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <Skeleton variant="text" width={50} height={20} className="mb-2" />
-//                 <Skeleton variant="text" width={120} height={20} className="mb-2" />
-//               </div>
-//               <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: "10%" }} />
-//             </div>
-//           </div>
-//         )}
-
-//         {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
-//       </div>
-
-//       {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
-//       {/* deviceType: 'GLMD' 'TMD' 'OMD' 'AQIMD' */}
-//             <DownloadModal
-//             open={downloadOpen}
-//             onClose={() => setDownloadOpen(false)}
-//             measurement={deviceId}
-//             bucket="Odour"
-//             deviceType={deviceType}
-//       />
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-// src/pages/Dashboard/VenueDetailsPanel.jsx
-// import AlertsChart from "./AlertsChart";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useStore } from "../../contexts/storecontexts";
-// import { useEffect, useState } from "react";
-// import QRCode from "./QrCode";
-// import { useLocation } from "react-router-dom";
-// import CloseIcon from '@mui/icons-material/Close';
-// import { IconButton, Skeleton } from "@mui/material";
-// import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
-// import { Download, Cloud, Zap, SquareActivity, Plug } from "lucide-react";
-// import Swal from "sweetalert2";
-// import DownloadModal from "./DownloadModal";
-
-// export default function VenueDetailsPanel({
-//   organizationId = null,
-//   venueName = "Karim Korangi Branch",
-//   deviceType = null,           // OMD / TMD / AQIMD / GLMD
-//   espTemprature = 0,
-//   ambientTemperature = 0,
-//   espHumidity = 0,
-//   batteryLow = true,
-//   needMaintenance = true,
-//   apiKey = "",
-//   closeIcon = false,
-//   onClose = undefined,
-//   odourAlert = false,
-//   temperatureAlert = false,
-//   humidityAlert = false,
-//   aqiAlert = false,
-//   glAlert = false,
-//   deviceId = "",
-//   espOdour = 0,
-//   espAQI = null,
-//   espGL = null,
-//   lastUpdateTime = null,
-//   espVoltage = null,
-//   espCurrent = null,
-//   espPower = null,
-// }) {
-//   const dispatch = useDispatch();
-//   const { user } = useStore();
-//   const orgId = organizationId || user?.organization || null;
-
-//   const location = useLocation();
-//   const params = new URLSearchParams(location.search);
-//   const venueId = params.get("venue"); // gives the ID
-//   const [downloadOpen, setDownloadOpen] = useState(false);
-
-//   // --- select cached venues for this org
-//   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
-//   const globalVenues = useSelector((state) => state.Venue.Venues || []);
-//   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-
-
-
-//   useEffect(() => {
-//     if (orgId && !orgVenues.length) {
-//       dispatch(fetchVenuesByOrganization(orgId));
-//     }
-
-//   }, [orgId, orgVenues.length, dispatch]);
-
-//   // helpers
-//   const sameId = (a, b) => String(a) === String(b);
-//   const toInt = (v) => {
-//     const n = Number(v);
-//     return Number.isFinite(n) ? Math.trunc(n) : null;
-//   };
-
-//   // computed display values
-//   const displayTemp = toInt(espTemprature ?? ambientTemperature);
-//   const displayHumidity = toInt(espHumidity);
-//   const displayOdour = toInt(espOdour);
-//   const displayAQI = espAQI === null || espAQI === undefined ? null : toInt(espAQI);
-//   const displayGL = espGL === null || espGL === undefined ? null : toInt(espGL);
-
-//   // find venue name fallback
-//   const currentVenueSlice =
-//     venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
-
-//   const displayVenueName =
-//     currentVenueSlice?.name ||
-//     currentVenueSlice?.venueName ||
-//     venueName ||
-//     "Venue";
-
-//   const handleDownload = () => setDownloadOpen(true);
-
-//   const formatLastUpdate = (time) => {
-//     if (!time) return null;
-//     const date = new Date(time);
-//     const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
-//     return date.toLocaleString(undefined, options);
-//   };
-
-//   // Build the set of metrics to display based on deviceType
-//   // Each metric: { key, label, unit, value, img, lucideIcon, alertFlag }
-//   const metrics = (() => {
-//     const tempMetric = {
-//       key: "temperature",
-//       label: "Temperature",
-//       unit: "°C",
-//       value: displayTemp !== null ? displayTemp : "--",
-//       img: "/temperature-icon.svg",
-//       lucideIcon: null,
-//       alertFlag: !!temperatureAlert,
-//       color: "green"
-//     };
-//     const humMetric = {
-//       key: "humidity",
-//       label: "Humidity",
-//       unit: "%",
-//       value: displayHumidity !== null ? displayHumidity : "--",
-//       img: "/humidity-alert.svg",
-//       lucideIcon: null,
-//       alertFlag: !!humidityAlert,
-//       color: "green"
-//     };
-//     if (String(deviceType) === "TMD") {
-//       return [
-//         {
-//           ...tempMetric,
-//           color: "red",
-//         },
-//         humMetric,
-//       ];
-//     }
-
-
-//     if (String(deviceType) === "OMD") {
-//       return [
-//         { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
-//         tempMetric,
-//         humMetric,
-//       ];
-//     }
-//     // if (String(deviceType) === "TMD") {
-//     //   return [ tempMetric, humMetric ];
-//     // }
-//     if (String(deviceType) === "AQIMD") {
-//       return [
-//         { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
-//         tempMetric,
-//         humMetric,
-//       ];
-//     }
-//     if (String(deviceType) === "GLMD") {
-//       return [
-//         { key: "gas", label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} />, alertFlag: !!glAlert, color: "red" },
-//         tempMetric,
-//         humMetric,
-//       ];
-//     }
-
-//     if (String(deviceType) === "EMD") {
-//       return [
-//         {
-//           key: "power",
-//           label: "Power",
-//           unit: "",
-//           // value: espPower !== null && espPower !== undefined ? +Number(espPower).toFixed(1) : "--",
-//           value: formatPowerValue(espVoltage, espCurrent),
-//           img: null,
-//           lucideIcon: <Zap size={30} />,
-//           alertFlag: false,
-//           color: "green",
-//         },
-//         {
-//           key: "current",
-//           label: "Current",
-//           unit: "A",
-//           value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--",
-//           img: null,
-//           lucideIcon: <SquareActivity size={30} />,   // swap for a better icon if you have one
-//           alertFlag: false,
-//           color: "green",
-//         },
-//         {
-//           key: "voltage",
-//           label: "Voltage",
-//           unit: "V",
-//           value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--",
-//           img: null,
-//           lucideIcon: <Plug size={30} />,
-//           alertFlag: false,
-//           color: "green",
-//         },
-        
-//       ];
-//     }
-
-//     // fallback: show temp & humidity
-//     return [tempMetric, humMetric];
-//   })();
-
-//   console.log("deviceType", deviceType);
-
-
-//   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
-//   const statusClass = (flag, color = "green") => {
-//     if (flag) {
-//       if (color === "red") return "border-red-500";
-//       if (color === "purple") return "border-purple-600";
-//       return "border-green-500";
-//     }
-//     return "border-gray-300";
-//   };
-
-//   // At the top of VenueDetailsPanel.jsx, add this helper:
-// function formatPowerValue(espVoltage, espCurrent) {
-//   const v = Number(espVoltage);
-//   const c = Number(espCurrent);
-//   if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
-
-//   const watts = v * c;
-//   if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
-//   if (watts >= 1000) return `${(watts / 1000).toFixed(3)} kW`;
-//   return `${watts.toFixed(2)} W`;
-// }
-
-//   return (
-//     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
-//       {closeIcon && (
-//         <div className="flex justify-between items-center">
-//           <img src="/iotfiy_logo_rpanel.svg" alt="IOTFIY LOGO" className="h-[30px] w-auto" />
-//           <IconButton onClick={() => typeof onClose === "function" && onClose()} edge="start" aria-label="close-details" size="small">
-//             <CloseIcon />
-//           </IconButton>
-//         </div>
-//       )}
-
-//       {/* Header */}
-//       <div className="flex justify-between items-center pb-4 border-b border-[#E5E7EB]/40 mb-6">
-//         <div>
-//           <p className="text-sm text-[#64748B] font-medium">Device ID</p>
-//           <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70} />}</h2>
-//           <div className="text-xs text-gray-600">{displayVenueName}</div>
-//         </div>
-
-//         <button
-//           onClick={handleDownload}
-//           className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer "
-//           aria-label="Download"
-//         >
-//           <span className="leading-none">Download</span>
-//           <Download className="w-3.5 h-3.5" />
-//         </button>
-//       </div>
-
-//       {/* Middle section: render exactly 3 columns if metrics length === 3, otherwise render each metric evenly */}
-//       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
-//         <div
-//           className={`flex items-center justify-between gap-4 ${metrics.length === 2 ? "sm:justify-around" : ""}`}
-//         >
-//           {metrics.map((m) => (
-//             <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-//               <div className="mb-2">
-//                 {m.img ? (
-//                   <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-//                 ) : m.lucideIcon ? (
-//                   <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-//                 ) : (
-//                   <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
-//                 )}
-//               </div>
-//               <div className="text-sm text-gray-600">{m.label}</div>
-//               {/* <div className="text-xl font-semibold">
-//                 {m.value ?? "--"}{m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-//               </div> */}
-
-//               <div className="text-xl font-semibold">
-//                 {m.key === "power" && typeof m.value === "string" && m.value !== "--" ? (
-//                   (() => {
-//                     const [num, unit] = m.value.split(" ");
-//                     return (
-//                       <>
-//                         {num}
-//                         <span className="text-sm font-thin ml-1">{unit}</span>
-//                       </>
-//                     );
-//                   })()
-//                 ) : (
-//                   <>
-//                     {m.value ?? "--"}
-//                     {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-//                   </>
-//                 )}
-//               </div>
-
-
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Status badges: render only the same metrics (keeps your desktop grid classes intact) */}
-//       <div className={`grid ${metrics.length === 2 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-2 md:grid-cols-2"} gap-2`}>
-//         {metrics.map((m) => {
-//           // pick color and flag
-//           const flag = !!m.alertFlag;
-//           const color = m.color ?? "green";
-//           return (
-//             <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
-//               {m.img ? (
-//                 <img src={m.img} alt={m.label} className="w-6 h-6" />
-//               ) : m.lucideIcon ? (
-//                 <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
-//               ) : (
-//                 <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />
-//               )}
-//               <div>
-//                 <div className="text-xs text-gray-600">{m.label}</div>
-//                 <div className="text-sm font-medium">{statusText(flag)}</div>
-//               </div>
-//             </div>
-//           );
-//         })}
-//       </div>
-
-//       {/* API key / QR */}
-//       <div>
-//         {apiKey ? (
-//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <strong>API Key:</strong>
-//                 <div className="mt-2 text-sm" title={apiKey}>
-//                   {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
-//                 </div>
-//               </div>
-
-//               <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || "http://localhost:5173"} />
-//             </div>
-//           </div>
-//         ) : (
-//           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <Skeleton variant="text" width={50} height={20} className="mb-2" />
-//                 <Skeleton variant="text" width={120} height={20} className="mb-2" />
-//               </div>
-//               <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: "10%" }} />
-//             </div>
-//           </div>
-//         )}
-
-//         {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
-//       </div>
-
-//       {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
-//       {/* deviceType: 'GLMD' 'TMD' 'OMD' 'AQIMD' */}
-//       <DownloadModal
-//         open={downloadOpen}
-//         onClose={() => setDownloadOpen(false)}
-//         measurement={deviceId}
-//         bucket="Odour"
-//         deviceType={deviceType}
-//       />
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-// // src/pages/Dashboard/VenueDetailsPanel.jsx
-// import AlertsChart from "./AlertsChart";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useStore } from "../../contexts/storecontexts";
-// import { useEffect, useState } from "react";
-// import QRCode from "./QrCode";
-// import { useLocation } from "react-router-dom";
-// import CloseIcon from '@mui/icons-material/Close';
-// import { IconButton, Skeleton } from "@mui/material";
-// import { fetchVenuesByOrganization } from "../../slices/VenueSlice";
-// import { Download, Cloud, Zap, SquareActivity, Plug } from "lucide-react";
+// import { Download, Cloud, Zap, SquareActivity, Plug, Power } from "lucide-react";
 // import Swal from "sweetalert2";
 // import DownloadModal from "./DownloadModal";
 // import EventsSection from "../../components/components/events/EventsSection";
-
+// import { useScheduler } from "../../contexts/SchedulerContext";
 
 // export default function VenueDetailsPanel({
 //   organizationId = null,
 //   venueName = "Karim Korangi Branch",
-//   deviceType = null,           // OMD / TMD / AQIMD / GLMD
+//   deviceType = null,
 //   espTemprature = 0,
 //   ambientTemperature = 0,
 //   espHumidity = 0,
@@ -1374,38 +39,55 @@
 //   espVoltage = null,
 //   espCurrent = null,
 //   espPower = null,
+
 // }) {
 //   const dispatch = useDispatch();
 //   const { user } = useStore();
 //   const orgId = organizationId || user?.organization || null;
 
+//   // ✅ ADD inside the component body, after venueId is defined
+//   const { eventsMap, toggleMap, setEvents, setToggle, triggerDevice, fetchToggleStatus } = useScheduler();
+
+//   useEffect(() => {
+//     if (!deviceId) return;
+
+//     fetchToggleStatus(deviceId);
+//   }, [deviceId]);
+
+//   const schedulerEvents = deviceId ? eventsMap[deviceId] ?? [] : [];
+//   // const resolvedToggle = deviceId ? (toggleMap[deviceId] ?? "off") : "off";
+//   const resolvedToggle = useMemo(() => {
+//     return deviceId ? (toggleMap?.[deviceId] ?? "off") : "off";
+//   }, [deviceId, toggleMap]);
+
+
 //   const location = useLocation();
 //   const params = new URLSearchParams(location.search);
-//   const venueId = params.get("venue"); // gives the ID
+//   const venueId = params.get("venue");
 //   const [downloadOpen, setDownloadOpen] = useState(false);
+//   // ── Scheduler Events State (lifted) ──
+//   // const [schedulerEvents, setSchedulerEvents] = useState([]);
 
-//   // --- select cached venues for this org
+//   // ── Power button state (SCHEDULER only) — controls EventsSection modal ──
+//   const [powerModalOpen, setPowerModalOpen] = useState(false);
+
 //   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
 //   const globalVenues = useSelector((state) => state.Venue.Venues || []);
 //   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-//   const isSchedulerDevice = String(deviceType) === "SCHEDULER";
-
+//   const isSchedulerDevice = String(deviceType) === "TSD";
 
 //   useEffect(() => {
 //     if (orgId && !orgVenues.length) {
 //       dispatch(fetchVenuesByOrganization(orgId));
 //     }
-
 //   }, [orgId, orgVenues.length, dispatch]);
 
-//   // helpers
 //   const sameId = (a, b) => String(a) === String(b);
 //   const toInt = (v) => {
 //     const n = Number(v);
 //     return Number.isFinite(n) ? Math.trunc(n) : null;
 //   };
 
-//   // computed display values
 //   const displayTemp = toInt(espTemprature ?? ambientTemperature);
 //   const displayHumidity = toInt(espHumidity);
 //   const displayOdour = toInt(espOdour);
@@ -1413,7 +95,6 @@
 //   const displayGL = espGL === null || espGL === undefined ? null : toInt(espGL);
 //   const isEMD = String(deviceType) === "EMD";
 
-//   // find venue name fallback
 //   const currentVenueSlice =
 //     venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
 
@@ -1428,146 +109,320 @@
 //   const formatLastUpdate = (time) => {
 //     if (!time) return null;
 //     const date = new Date(time);
-//     const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
-//     return date.toLocaleString(undefined, options);
+//     return date.toLocaleString(undefined, {
+//       year: "numeric", month: "short", day: "numeric",
+//       hour: "2-digit", minute: "2-digit",
+//     });
 //   };
+
+//   function formatPowerValue(espVoltage, espCurrent) {
+//     const v = Number(espVoltage);
+//     const c = Number(espCurrent);
+//     if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
+//     const watts = v * c;
+//     if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
+//     if (watts >= 1000) return `${(watts / 1000).toFixed(3)} kW`;
+//     return `${watts.toFixed(2)} W`;
+//   }
+
+//   function formatUnitValue(espPower, espVoltage, espCurrent) {
+//     const power = Number(espPower);
+//     const fallbackWatts =
+//       Number.isFinite(Number(espVoltage)) && Number.isFinite(Number(espCurrent))
+//         ? Number(espVoltage) * Number(espCurrent)
+//         : null;
+//     const watts = Number.isFinite(power) ? power : fallbackWatts;
+//     if (!Number.isFinite(watts)) return "--";
+//     return `${(watts / 1000).toFixed(3)} kWh`;
+//   }
 
 //   const topMetrics = (() => {
-//   const tempMetric = {
-//     key: "temperature",
-//     label: "Temperature",
-//     unit: "°C",
-//     value: displayTemp !== null ? displayTemp : "--",
-//     img: "/temperature-icon.svg",
-//     lucideIcon: null,
-//     alertFlag: !!temperatureAlert,
-//     color: "green",
-//   };
+//     const tempMetric = {
+//       key: "temperature", label: "Temperature", unit: "°C",
+//       value: displayTemp !== null ? displayTemp : "--",
+//       img: "/temperature-icon.svg", lucideIcon: null,
+//       alertFlag: !!temperatureAlert, color: "green",
+//     };
+//     const humMetric = {
+//       key: "humidity", label: "Humidity", unit: "%",
+//       value: displayHumidity !== null ? displayHumidity : "--",
+//       img: "/humidity-alert.svg", lucideIcon: null,
+//       alertFlag: !!humidityAlert, color: "green",
+//     };
 
-//   const humMetric = {
-//     key: "humidity",
-//     label: "Humidity",
-//     unit: "%",
-//     value: displayHumidity !== null ? displayHumidity : "--",
-//     img: "/humidity-alert.svg",
-//     lucideIcon: null,
-//     alertFlag: !!humidityAlert,
-//     color: "green",
-//   };
-
-//   if (String(deviceType) === "EMD") {
-//     return [
-//       {
-//         key: "power",
-//         label: "Power",
-//         unit: "",
-//         value: formatPowerValue(espVoltage, espCurrent),
-//         img: null,
-//         lucideIcon: <Zap size={30} />,
-//         alertFlag: false,
-//         color: "green",
-//       },
-//       {
-//         key: "current",
-//         label: "Current",
-//         unit: "A",
-//         value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--",
-//         img: null,
-//         lucideIcon: <SquareActivity size={30} />,
-//         alertFlag: false,
-//         color: "green",
-//       },
-//       {
-//         key: "voltage",
-//         label: "Voltage",
-//         unit: "V",
-//         value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--",
-//         img: null,
-//         lucideIcon: <Plug size={30} />,
-//         alertFlag: false,
-//         color: "green",
-//       },
-//     ];
-//   }
-
-//   if (String(deviceType) === "OMD") {
-//     return [
-//       { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
-//       tempMetric,
-//       humMetric,
-//     ];
-//   }
-
-//   if (String(deviceType) === "AQIMD") {
-//     return [
-//       { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
-//       tempMetric,
-//       humMetric,
-//     ];
-//   }
-
-//   if (String(deviceType) === "GLMD") {
-//     return [
-//       { key: "gas", label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} />, alertFlag: !!glAlert, color: "red" },
-//       tempMetric,
-//       humMetric,
-//     ];
-//   }
-
-//   if (String(deviceType) === "TMD") {
+//     if (String(deviceType) === "EMD") {
+//       return [
+//         { key: "power", label: "Power", unit: "", value: formatPowerValue(espVoltage, espCurrent), img: null, lucideIcon: <Zap size={30} />, alertFlag: false, color: "green" },
+//         { key: "current", label: "Current", unit: "A", value: espCurrent !== null && espCurrent !== undefined ? +Number(espCurrent).toFixed(2) : "--", img: null, lucideIcon: <SquareActivity size={30} />, alertFlag: false, color: "green" },
+//         { key: "voltage", label: "Voltage", unit: "V", value: espVoltage !== null && espVoltage !== undefined ? +Number(espVoltage).toFixed(1) : "--", img: null, lucideIcon: <Plug size={30} />, alertFlag: false, color: "green" },
+//       ];
+//     }
+//     if (String(deviceType) === "OMD") {
+//       return [
+//         { key: "odour", label: "Odour", unit: "%", value: displayOdour ?? 0, img: "/odour-alert.svg", lucideIcon: null, alertFlag: !!odourAlert, color: "red" },
+//         tempMetric, humMetric,
+//       ];
+//     }
+//     if (String(deviceType) === "AQIMD") {
+//       return [
+//         { key: "aqi", label: "AQI", unit: "AQI", value: displayAQI ?? "--", img: null, lucideIcon: <Cloud size={36} />, alertFlag: !!aqiAlert, color: "red" },
+//         tempMetric, humMetric,
+//       ];
+//     }
+//     if (String(deviceType) === "GLMD") {
+//       return [
+//         { key: "gas", label: "Gas", unit: "%", value: displayGL ?? "--", img: null, lucideIcon: <Zap size={36} />, alertFlag: !!glAlert, color: "red" },
+//         tempMetric, humMetric,
+//       ];
+//     }
 //     return [tempMetric, humMetric];
-//   }
+//   })();
 
-//   return [tempMetric, humMetric];
-// })();
-
-// const emdExtraMetrics = isEMD
-//   ? [
-//       {
-//         key: "unit",
-//         label: "Unit",
-//         unit: "",
-//         value: formatUnitValue(espPower, espVoltage, espCurrent),
-//         img: null,
-//         lucideIcon: <Zap size={30} />,
-//         alertFlag: false,
-//         color: "green",
-//       },
-//       {
-//         key: "temperature",
-//         label: "Temperature",
-//         unit: "°C",
-//         value: displayTemp !== null ? displayTemp : "--",
-//         img: "/temperature-icon.svg",
-//         lucideIcon: null,
-//         alertFlag: false,
-//         color: "green",
-//       },
-//       {
-//         key: "humidity",
-//         label: "Humidity",
-//         unit: "%",
-//         value: displayHumidity !== null ? displayHumidity : "--",
-//         img: "/humidity-alert.svg",
-//         lucideIcon: null,
-//         alertFlag: false,
-//         color: "green",
-//       },
- 
-//     ]
-//   : [];
-
-//   console.log("deviceType", deviceType);
+//   // ── Helpers ─────────────────────────────────────────────────────────────────
+//   // const toMinutes = (t = "") => {
+//   //   const [h, m] = t.split(":").map(Number);
+//   //   return h * 60 + (m || 0);
+//   // };
 
 
-//    const schedulerDevice = {
-//     deviceId,
-//     venueId,
-//     venueName: displayVenueName,
-//     deviceType,
+
+//   // const getCurrentRunningEvent = (events = []) => {
+//   //   const now = new Date();
+//   //   const nowM = now.getHours() * 60 + now.getMinutes();
+//   //   return (
+//   //     events.find((e) => {
+//   //       if (!e.enabled || !e.start || !e.end) return false;
+//   //       const s = toMinutes(e.start);
+//   //       const en = toMinutes(e.end);
+//   //       return en > s ? nowM >= s && nowM < en : nowM >= s || nowM < en; // handles overnight
+//   //     }) ?? null
+//   //   );
+//   // };
+
+//   // src/pages/Dashboard/VenueDetailsPanel.jsx
+//   // ── ADD / REPLACE these helpers (right after the imports and before the component) ──
+//   const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+//   const toMinutes = (t = "") => {
+//     const [h, m] = t.split(":").map(Number);
+//     return h * 60 + (m || 0);
+//   };
+
+//   const dayMatches = (event, day) => {
+//     const days = event.days || event.repeatDays || [];
+//     return days.length === 0 || days.includes(day); // empty = every day
+//   };
+
+//   const getCurrentRunningEvent = (events = []) => {
+//     const now = new Date();
+//     const nowM = now.getHours() * 60 + now.getMinutes();
+//     const today = DAY_NAMES[now.getDay()];
+
+//     return (
+//       events.find((e) => {
+//         if (!e.enabled || !e.start || !e.end) return false;
+//         if (!dayMatches(e, today)) return false;
+
+//         const s = toMinutes(e.start);
+//         const en = toMinutes(e.end);
+
+//         // handles overnight spans (23:00 → 01:00)
+//         return en > s
+//           ? nowM >= s && nowM < en
+//           : nowM >= s || nowM < en;
+//       }) ?? null
+//     );
 //   };
 
 
+//   const runningSchedulerEvent = useMemo(
+//     () => getCurrentRunningEvent(schedulerEvents),
+//     [schedulerEvents]
+//   );
+
+//   // const resolvedToggle = schedulerToggleState ?? "off";
+//   // const displayToggleState = runningSchedulerEvent ? "/gray" : resolvedToggle;
+
+//   const displayToggleState = useMemo(() => {
+//     if (runningSchedulerEvent) return "gray";
+//     return resolvedToggle;        // from context
+//   }, [runningSchedulerEvent, resolvedToggle]);
+
+
+//   // const handleSchedulerToggleClick = async () => {
+//   //   if (runningSchedulerEvent) {
+//   //     const result = await Swal.fire({
+//   //       title: "Event Currently Running",
+//   //       html: `The <b>${runningSchedulerEvent.command}</b> event (${runningSchedulerEvent.start} – ${runningSchedulerEvent.end}) is currently active.<br><br>Do you want to <b>disable</b> this event?`,
+//   //       icon: "warning",
+//   //       showCancelButton: true,
+//   //       confirmButtonText: "Yes, disable it",
+//   //       cancelButtonText: "Keep running",
+//   //       confirmButtonColor: "#EF4444",
+//   //       cancelButtonColor: "#64748B",
+//   //       background: "#ffffff",
+//   //       color: "#1e293b",
+//   //       customClass: {
+//   //         popup: "rounded-2xl shadow-xl",
+//   //         title: "text-base font-semibold",
+//   //         htmlContainer: "text-sm text-slate-500",
+//   //         confirmButton: "rounded-lg text-sm font-semibold px-5 py-2",
+//   //         cancelButton: "rounded-lg text-sm font-semibold px-5 py-2",
+//   //       },
+//   //       buttonsStyling: true,
+//   //     });
+
+//   //     if (result.isConfirmed) {
+//   //       const updated = schedulerEvents.map((ev) =>
+//   //         ev.id === runningSchedulerEvent.id ? { ...ev, enabled: false } : ev
+//   //       );
+//   //       // onSchedulerEventsChange?.(updated);
+//   //       setEvents(deviceId, updated);
+//   //       // onSchedulerToggleChange?.("off");
+//   //       setToggle(deviceId, "off");
+//   //     }
+//   //     return;
+//   //   }
+
+//   //   // const next = resolvedToggle === "on" ? "off" : "on";
+//   //   // onSchedulerToggleChange?.(next);
+//   //   // setToggle(deviceId, next);
+//   //   try {
+//   //     const next = resolvedToggle === "on" ? "off" : "on";
+//   //     const action = next === "on" ? "ON" : "OFF";
+
+//   //     await triggerDevice(deviceId, action);s
+
+//   //   } catch (err) {
+//   //     console.error(err);
+//   //     Swal.fire({
+//   //       icon: "error",
+//   //       title: "Failed",
+//   //       text: err.message || "Failed to send command",
+//   //     });
+//   //   }
+//   // };
+
+//   // const handleSchedulerToggleClick = async () => {
+//   //   try {
+//   //     const next = resolvedToggle === "on" ? "off" : "on";
+//   //     const action = next === "on" ? "ON" : "OFF";
+
+//   //     await triggerDevice(deviceId, action);
+
+//   //     // sync global toggle state (ALL CARDS UPDATE)
+//   //     // setToggle(deviceId, next);
+
+//   //     // OPTIONAL (recommended): if turning OFF, clear running event UI
+//   //     if (next === "off" && runningSchedulerEvent) {
+//   //       const updated = schedulerEvents.map(ev =>
+//   //         ev.id === runningSchedulerEvent.id
+//   //           ? { ...ev, enabled: false }
+//   //           : ev
+//   //       );
+
+//   //       setEvents(deviceId, updated);
+//   //     }
+
+//   //   } catch (err) {
+//   //     console.error(err);
+//   //     Swal.fire({
+//   //       icon: "error",
+//   //       title: "Failed",
+//   //       text: err.message || "Failed to send command",
+//   //     });
+//   //   }
+//   // };
+
+//   // const handleSchedulerToggleClick = async () => {
+//   //   try {
+//   //     const next = resolvedToggle === "on" ? "off" : "on";
+//   //     const action = next === "on" ? "ON" : "OFF";
+
+//   //     await triggerDevice(deviceId, action);
+
+//   //   } catch (err) {
+//   //     console.error(err);
+//   //     Swal.fire({
+//   //       icon: "error",
+//   //       title: "Failed",
+//   //       text: err.message || "Failed to send command",
+//   //     });
+//   //   }
+//   // };
+
+//   const handleSchedulerToggleClick = async () => {
+//     if (runningSchedulerEvent) {
+//       // Same modal as card
+//       const result = await Swal.fire({
+//         title: "Event Currently Running",
+//         html: `
+//         The <b>${runningSchedulerEvent.command}</b> event is currently active.<br/>
+//         <span style="color:#64748b;font-size:13px">
+//           ${runningSchedulerEvent.startTime} → ${runningSchedulerEvent.endTime}
+//         </span>
+//         <br/><br/>
+//         Do you want to disable this event?
+//       `,
+//         icon: "warning",
+//         showCancelButton: true,
+//         confirmButtonText: "Yes, disable it",
+//         cancelButtonText: "Keep running",
+//       });
+
+//       if (result.isConfirmed) {
+//         try {
+//           await skipEvent(deviceId);
+//           await fetchToggleStatus(deviceId);   // get real state after skip
+//         } catch (err) {
+//           Swal.fire({ icon: "error", title: "Failed", text: err.message });
+//         }
+//       }
+//       return;
+//     }
+
+//     // No event → manual toggle
+//     try {
+//       const nextAction = resolvedToggle === "on" ? "OFF" : "ON";
+//       await triggerDevice(deviceId, nextAction);
+//       // triggerDevice already handles final sync via fetchToggleStatus
+//     } catch (err) {
+//       Swal.fire({
+//         icon: "error",
+//         title: "Failed",
+//         text: err.message || "Failed to send command",
+//       });
+//     }
+//   };
+
+//   // ...inside the metrics section, replace the Power button:
+//   // {
+//   //   isSchedulerDevice && (
+//   //     <button
+//   //       onClick={handleSchedulerToggleClick}
+//   //       className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition shadow-sm cursor-pointer active:scale-[.98]
+//   //       ${displayToggleState === "on" ? "bg-emerald-500 hover:bg-emerald-600"
+//   //           : displayToggleState === "off" ? "bg-rose-500 hover:bg-rose-600"
+//   //             : "bg-gray-400 hover:bg-gray-500"}`}
+//   //       title={
+//   //         displayToggleState === "gray" ? "Event running — click to disable"
+//   //           : displayToggleState === "on" ? "Turn Off"
+//   //             : "Turn On"
+//   //       }
+//   //     >
+//   //       <Power size={15} strokeWidth={2} />
+//   //       <span className="text-xs font-bold">
+//   //         {displayToggleState === "on" ? "ON" : displayToggleState === "off" ? "OFF" : "···"}
+//   //       </span>
+//   //     </button>
+//   //   )
+//   // }
+
+//   const emdExtraMetrics = isEMD ? [
+//     { key: "unit", label: "Unit", unit: "", value: formatUnitValue(espPower, espVoltage, espCurrent), img: null, lucideIcon: <Zap size={30} />, alertFlag: false, color: "green" },
+//     { key: "temperature", label: "Temperature", unit: "°C", value: displayTemp !== null ? displayTemp : "--", img: "/temperature-icon.svg", lucideIcon: null, alertFlag: false, color: "green" },
+//     { key: "humidity", label: "Humidity", unit: "%", value: displayHumidity !== null ? displayHumidity : "--", img: "/humidity-alert.svg", lucideIcon: null, alertFlag: false, color: "green" },
+//   ] : [];
 
 //   const statusText = (flag) => (flag ? "Alert Det." : "Not Det.");
 //   const statusClass = (flag, color = "green") => {
@@ -1580,62 +435,15 @@
 //   };
 
 //   const renderMetricValue = (m) => {
-//   const isSplitMetric = ["power", "unit"].includes(m.key);
-
-//   if (isSplitMetric && typeof m.value === "string" && m.value !== "--") {
-//     // const [num, unit] = m.value.split(" ");
-//      const parts = m.value.split(" ");
-
-//     const num = parts[0];
-//     const unit = parts[1] || ""; // ✅ SAFE
-    
-//     return (
-//       <>
-//         {num}
-//         <span className="text-sm font-thin ml-1">{unit}</span>
-//       </>
-//     );
-//   }
-
-//   return (
-//     <>
-//       {m.value ?? "--"}
-//       {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-//     </>
-//   );
-// };
-
-
-
-//   // At the top of VenueDetailsPanel.jsx, add this helper:
-// function formatPowerValue(espVoltage, espCurrent) {
-//   const v = Number(espVoltage);
-//   const c = Number(espCurrent);
-//   if (!Number.isFinite(v) || !Number.isFinite(c)) return "--";
-
-//   const watts = v * c;
-//   if (watts >= 1_000_000) return `${(watts / 1_000_000).toFixed(3)} MW`;
-//   if (watts >= 1000) return `${(watts / 1000).toFixed(3)} kW`;
-//   return `${watts.toFixed(2)} W`;
-// }
-
-// function formatUnitValue(espPower, espVoltage, espCurrent) {
-//   const power = Number(espPower);
-
-//   // fallback to voltage * current if espPower is missing
-//   const fallbackWatts =
-//     Number.isFinite(Number(espVoltage)) && Number.isFinite(Number(espCurrent))
-//       ? Number(espVoltage) * Number(espCurrent)
-//       : null;
-
-//   const watts = Number.isFinite(power) ? power : fallbackWatts;
-//   if (!Number.isFinite(watts)) return "--";
-
-//   // estimated units from watts -> kWh
-//   return `${(watts / 1000).toFixed(3)} kWh`;
-// }
-
-
+//     const isSplitMetric = ["power", "unit"].includes(m.key);
+//     if (isSplitMetric && typeof m.value === "string" && m.value !== "--") {
+//       const parts = m.value.split(" ");
+//       const num = parts[0];
+//       const unit = parts[1] || "";
+//       return (<>{num}<span className="text-sm font-thin ml-1">{unit}</span></>);
+//     }
+//     return (<>{m.value ?? "--"}{m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}</>);
+//   };
 
 //   return (
 //     <div className="w-full rounded-lg p-6 shadow-sm space-y-6" style={{ backgroundColor: "#07518D12" }}>
@@ -1655,10 +463,9 @@
 //           <h2 className="text-sm text-[#1E293B] font-bold">{deviceId || <Skeleton variant="text" width={70} />}</h2>
 //           <div className="text-xs text-gray-600">{displayVenueName}</div>
 //         </div>
-
 //         <button
 //           onClick={handleDownload}
-//           className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer "
+//           className="inline-flex items-center gap-2 px-3 py-2 bg-[#0D5CA4] text-white rounded-full text-xs font-semibold hover:bg-[#0b4e8a] active:scale-[.98] transition shadow-sm cursor-pointer"
 //           aria-label="Download"
 //         >
 //           <span className="leading-none">Download</span>
@@ -1666,164 +473,98 @@
 //         </button>
 //       </div>
 
-    
-
-
-// <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
-//   {isEMD ? (
-//     <div className="space-y-4">
-//       <div className="grid grid-cols-3 gap-4">
-//         {topMetrics.map((m) => (
-//           <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-//             <div className="mb-2">
-//               {m.img ? (
-//                 <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-//               ) : m.lucideIcon ? (
-//                 <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-//               ) : (
-//                 <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
-//               )}
+//       {/* Metrics display */}
+//       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
+//         {isEMD ? (
+//           <div className="space-y-4">
+//             <div className="grid grid-cols-3 gap-4">
+//               {topMetrics.map((m) => (
+//                 <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+//                   <div className="mb-2">
+//                     {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+//                       : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+//                         : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+//                   </div>
+//                   <div className="text-sm text-gray-600">{m.label}</div>
+//                   <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
+//                 </div>
+//               ))}
 //             </div>
-
-//             <div className="text-sm text-gray-600">{m.label}</div>
-
-//             <div className="text-xl font-semibold">
-//               {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
-//                 (() => {
-//                   const [num, unit] = m.value.split(" ");
-//                   return (
-//                     <>
-//                       {num}
-//                       <span className="text-sm font-thin ml-1">{unit}</span>
-//                     </>
-//                   );
-//                 })()
-//               ) : (
-//                 <>
-//                   {m.value ?? "--"}
-//                   {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-//                 </>
-//               )} */}
-//               {renderMetricValue(m)}
+//             <div className="grid grid-cols-3 gap-4">
+//               {emdExtraMetrics.map((m) => (
+//                 <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+//                   <div className="mb-2">
+//                     {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+//                       : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+//                         : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+//                   </div>
+//                   <div className="text-sm text-gray-600">{m.label}</div>
+//                   <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
+//                 </div>
+//               ))}
 //             </div>
 //           </div>
-//         ))}
-//       </div>
+//         ) : (
+//           <div className={`flex items-center justify-between gap-4 ${topMetrics.length === 2 ? "sm:justify-around" : ""}`}>
+//             {topMetrics.map((m) => (
+//               <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+//                 <div className="mb-2">
+//                   {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+//                     : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+//                       : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+//                 </div>
+//                 <div className="text-sm text-gray-600">{m.label}</div>
+//                 <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
+//               </div>
+//             ))}
 
-//       <div className="grid grid-cols-3 gap-4">
-//         {emdExtraMetrics.map((m) => (
-//           <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-//             <div className="mb-2">
-//               {m.img ? (
-//                 <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-//               ) : m.lucideIcon ? (
-//                 <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-//               ) : (
-//                 <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
-//               )}
-//             </div>
 
-//             <div className="text-sm text-gray-600">{m.label}</div>
-
-//             {/* <div className="text-xl font-semibold">
-//               {m.value ?? "--"}
-//               {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-//             </div> */}
-
-//             <div className="text-xl font-semibold">
-//               {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
-//                 (() => {
-//                   const [num, unit] = m.value.split(" ");
-//                   return (
-//                     <>
-//                       {num}
-//                       <span className="text-sm font-thin ml-1">{unit}</span>
-//                     </>
-//                   );
-//                 })()
-//               ) : (
-//                 <>
-//                   {m.value ?? "--"}
-//                   {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-//                 </>
-//               )} */}
-//               {renderMetricValue(m)}
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   ) : (
-//     <div className={`flex items-center justify-between gap-4 ${topMetrics.length === 2 ? "sm:justify-around" : ""}`}>
-//       {topMetrics.map((m) => (
-//         <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-//           <div className="mb-2">
-//             {m.img ? (
-//               <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-//             ) : m.lucideIcon ? (
-//               <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-//             ) : (
-//               <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />
+//             {isSchedulerDevice && (
+//               console.log("Rendering Power Button with state:", { schedulerEvents, resolvedToggle, displayToggleState }),
+//               <button
+//                 onClick={handleSchedulerToggleClick}
+//                 className={`flex flex-col justify-center items-center gap-3 px-4 py-5 rounded-xl text-sm font-semibold text-white transition shadow-sm cursor-pointer active:scale-[.98]
+//       ${displayToggleState === "on" ? "bg-emerald-500 hover:bg-emerald-600"
+//                     : displayToggleState === "off" ? "bg-rose-500 hover:bg-rose-600"
+//                       : "bg-gray-400 hover:bg-gray-500"}`}
+//                 title={
+//                   displayToggleState === "gray" ? "Event running — click to disable"
+//                     : displayToggleState === "on" ? "Turn Off"
+//                       : "Turn On"
+//                 }
+//               >
+//                 <Power size={15} strokeWidth={2} />
+//                 <span className="text-xs font-bold">
+//                   {displayToggleState === "on" ? "ON"
+//                     : displayToggleState === "off" ? "OFF"
+//                       : "Event"}
+//                 </span>
+//               </button>
 //             )}
 //           </div>
+//         )}
+//       </div>
 
-//           <div className="text-sm text-gray-600">{m.label}</div>
-
-//           <div className="text-xl font-semibold">
-//             {/* {(m.key === "power" || m.key === "unit") && typeof m.value === "string" && m.value !== "--" ? (
-//               (() => {
-//                 const [num, unit] = m.value.split(" ");
-//                 return (
-//                   <>
-//                     {num}
-//                     <span className="text-sm font-thin ml-1">{unit}</span>
-//                   </>
-//                 );
-//               })()
-//             ) : (
-//               <>
-//                 {m.value ?? "--"}
-//                 {m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}
-//               </>
-//             )} */}
-
-//             {renderMetricValue(m)}
-//           </div>
+//       {/* Status badges */}
+//       {!isEMD && (
+//         <div className={`grid ${topMetrics.length === 2 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-2 md:grid-cols-2"} gap-2`}>
+//           {topMetrics.map((m) => {
+//             const flag = !!m.alertFlag;
+//             const color = m.color ?? "green";
+//             return (
+//               <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
+//                 {m.img ? <img src={m.img} alt={m.label} className="w-6 h-6" />
+//                   : m.lucideIcon ? <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
+//                     : <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />}
+//                 <div>
+//                   <div className="text-xs text-gray-600">{m.label}</div>
+//                   <div className="text-sm font-medium">{statusText(flag)}</div>
+//                 </div>
+//               </div>
+//             );
+//           })}
 //         </div>
-//       ))}
-//     </div>
-//   )}
-// </div>
-
-
-    
-
-
-// {!isEMD && (
-//   <div className={`grid ${topMetrics.length === 2 ? "grid-cols-2 md:grid-cols-2" : "grid-cols-2 md:grid-cols-2"} gap-2`}>
-//     {topMetrics.map((m) => {
-//       const flag = !!m.alertFlag;
-//       const color = m.color ?? "green";
-
-//       return (
-//         <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
-//           {m.img ? (
-//             <img src={m.img} alt={m.label} className="w-6 h-6" />
-//           ) : m.lucideIcon ? (
-//             <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
-//           ) : (
-//             <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />
-//           )}
-//           <div>
-//             <div className="text-xs text-gray-600">{m.label}</div>
-//             <div className="text-sm font-medium">{statusText(flag)}</div>
-//           </div>
-//         </div>
-//       );
-//     })}
-//   </div>
-// )}
-
+//       )}
 
 //       {/* API key / QR */}
 //       <div>
@@ -1836,7 +577,6 @@
 //                   {apiKey ? `${apiKey.slice(0, 15)}...` : ""}
 //                 </div>
 //               </div>
-
 //               <QRCode apiKey={apiKey} baseUrl={import.meta.env.VITE_REACT_URI || "http://localhost:5173"} />
 //             </div>
 //           </div>
@@ -1852,11 +592,13 @@
 //           </div>
 //         )}
 
-//         {lastUpdateTime ? <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">Last Update: {formatLastUpdate(lastUpdateTime)}</div> : null}
+//         {lastUpdateTime ? (
+//           <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">
+//             Last Update: {formatLastUpdate(lastUpdateTime)}
+//           </div>
+//         ) : null}
 //       </div>
 
-//       {/* <DownloadModal open={downloadOpen} onClose={() => setDownloadOpen(false)} measurement={deviceId} bucket={deviceType === "OMD" ? "Odour" : "General"} /> */}
-//       {/* deviceType: 'GLMD' 'TMD' 'OMD' 'AQIMD' */}
 //       <DownloadModal
 //         open={downloadOpen}
 //         onClose={() => setDownloadOpen(false)}
@@ -1866,22 +608,34 @@
 //       />
 
 
-//       {/* ================= EVENTS SCHEDULER ================= */}
-//         {/* {isSchedulerDevice && (
-//           <div className="pt-6">
-//             <EventsSection selectedDevice={schedulerDevice} />
-//           </div>
-//         )} */}
 
-//     {String(deviceType) === "SCHEDULER" && (
-//       <div className="pt-6">
-//         <EventsSection selectedDevice={{ deviceId, venueId, venueName: displayVenueName, deviceType }} />
-//       </div>
-//     )}
+//       {String(deviceType) === "TSD" && (
+//         <div className="pt-6">
+//           <EventsSection
+//             selectedDevice={{ deviceId, venueId, venueName: displayVenueName, deviceType }}
+
+
+//             // events={schedulerEvents}
+//             onEventsChange={(updated) => setEvents(deviceId, updated)}
+//             externalOpen={powerModalOpen}
+//             onExternalClose={() => setPowerModalOpen(false)}
+//             onToggleChange={(val) => setToggle(deviceId, val)}
+//           />
+//         </div>
+//       )}
+
 
 //     </div>
 //   );
 // }
+
+
+
+
+
+
+
+
 
 
 
@@ -1935,33 +689,29 @@ export default function VenueDetailsPanel({
   espVoltage = null,
   espCurrent = null,
   espPower = null,
-  
 }) {
+
   const dispatch = useDispatch();
   const { user } = useStore();
   const orgId = organizationId || user?.organization || null;
 
-  // ✅ ADD inside the component body, after venueId is defined
-const { eventsMap, toggleMap, setEvents, setToggle } = useScheduler();
+  const { eventsMap, toggleMap, triggerDevice, skipEvent, fetchToggleStatus } = useScheduler();
 
-const schedulerEvents = deviceId ? eventsMap[deviceId] ?? [] : [];
-const resolvedToggle = deviceId ? (toggleMap[deviceId] ?? "off") : "off";
-
+  const schedulerEvents = deviceId ? eventsMap[deviceId] ?? [] : [];
+  const resolvedToggle = useMemo(() => {
+    return deviceId ? (toggleMap?.[deviceId] ?? "off") : "off";
+  }, [deviceId, toggleMap]);
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const venueId = params.get("venue");
   const [downloadOpen, setDownloadOpen] = useState(false);
-  // ── Scheduler Events State (lifted) ──
-  // const [schedulerEvents, setSchedulerEvents] = useState([]);
-  
-  // ── Power button state (SCHEDULER only) — controls EventsSection modal ──
   const [powerModalOpen, setPowerModalOpen] = useState(false);
 
   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
   const globalVenues = useSelector((state) => state.Venue.Venues || []);
   const venuesFromSlice = orgVenues.length ? orgVenues : globalVenues;
-  const isSchedulerDevice = String(deviceType) === "SCHEDULER";
+  const isSchedulerDevice = String(deviceType) === "TSD";
 
   useEffect(() => {
     if (orgId && !orgVenues.length) {
@@ -1969,6 +719,81 @@ const resolvedToggle = deviceId ? (toggleMap[deviceId] ?? "off") : "off";
     }
   }, [orgId, orgVenues.length, dispatch]);
 
+  useEffect(() => {
+    if (deviceId) {
+      fetchToggleStatus(deviceId);
+    }
+  }, [deviceId, fetchToggleStatus]);
+
+  // ── Trust Backend Type (Same logic as Card) ──
+  const runningSchedulerEvent = useMemo(() => {
+    if (!schedulerEvents || schedulerEvents.length === 0) return null;
+
+    let item = schedulerEvents[0];
+
+    // Handle wrapped response {type: "CURRENT", event: {...}}
+    if (item?.type === "CURRENT" && item?.event) {
+      item = item.event;
+    }
+
+    // Only consider it running if backend says type === "CURRENT"
+    return item?.type === "CURRENT" ? item : null;
+  }, [schedulerEvents]);
+
+  const displayToggleState = useMemo(() => {
+    if (runningSchedulerEvent) return "gray";
+    return resolvedToggle;
+  }, [runningSchedulerEvent, resolvedToggle]);
+
+  // Handle Toggle Click (Same as Card)
+  const handleSchedulerToggleClick = async () => {
+    if (runningSchedulerEvent) {
+      const result = await Swal.fire({
+        title: "Event Currently Running",
+        html: `
+          The <b>${runningSchedulerEvent.command || "Scheduled"}</b> event is currently active.<br/>
+          <span style="color:#64748b;font-size:13px">
+            ${runningSchedulerEvent.startTime} → ${runningSchedulerEvent.endTime}
+          </span>
+          <br/><br/>
+          Do you want to disable this event?
+        `,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, disable it",
+        cancelButtonText: "Keep running",
+        confirmButtonColor: "#EF4444",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await skipEvent(deviceId);
+          await fetchToggleStatus(deviceId);
+        } catch (err) {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: err.message || "Could not skip event",
+          });
+        }
+      }
+      return;
+    }
+
+    // No running event → normal toggle
+    try {
+      const nextAction = resolvedToggle === "on" ? "OFF" : "ON";
+      await triggerDevice(deviceId, nextAction);
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: err.message || "Failed to send command",
+      });
+    }
+  };
+
+  // Rest of your existing code (Metrics, etc.) remains same
   const sameId = (a, b) => String(a) === String(b);
   const toInt = (v) => {
     const n = Number(v);
@@ -1982,14 +807,9 @@ const resolvedToggle = deviceId ? (toggleMap[deviceId] ?? "off") : "off";
   const displayGL = espGL === null || espGL === undefined ? null : toInt(espGL);
   const isEMD = String(deviceType) === "EMD";
 
-  const currentVenueSlice =
-    venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
+  const currentVenueSlice = venuesFromSlice.find((v) => sameId(v._id, venueId) || sameId(v.id, venueId)) || null;
 
-  const displayVenueName =
-    currentVenueSlice?.name ||
-    currentVenueSlice?.venueName ||
-    venueName ||
-    "Venue";
+  const displayVenueName = currentVenueSlice?.name || currentVenueSlice?.venueName || venueName || "Venue";
 
   const handleDownload = () => setDownloadOpen(true);
 
@@ -2014,10 +834,8 @@ const resolvedToggle = deviceId ? (toggleMap[deviceId] ?? "off") : "off";
 
   function formatUnitValue(espPower, espVoltage, espCurrent) {
     const power = Number(espPower);
-    const fallbackWatts =
-      Number.isFinite(Number(espVoltage)) && Number.isFinite(Number(espCurrent))
-        ? Number(espVoltage) * Number(espCurrent)
-        : null;
+    const fallbackWatts = Number.isFinite(Number(espVoltage)) && Number.isFinite(Number(espCurrent))
+      ? Number(espVoltage) * Number(espCurrent) : null;
     const watts = Number.isFinite(power) ? power : fallbackWatts;
     if (!Number.isFinite(watts)) return "--";
     return `${(watts / 1000).toFixed(3)} kWh`;
@@ -2065,132 +883,6 @@ const resolvedToggle = deviceId ? (toggleMap[deviceId] ?? "off") : "off";
     return [tempMetric, humMetric];
   })();
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
-// const toMinutes = (t = "") => {
-//   const [h, m] = t.split(":").map(Number);
-//   return h * 60 + (m || 0);
-// };
-
-
-
-// const getCurrentRunningEvent = (events = []) => {
-//   const now = new Date();
-//   const nowM = now.getHours() * 60 + now.getMinutes();
-//   return (
-//     events.find((e) => {
-//       if (!e.enabled || !e.start || !e.end) return false;
-//       const s = toMinutes(e.start);
-//       const en = toMinutes(e.end);
-//       return en > s ? nowM >= s && nowM < en : nowM >= s || nowM < en; // handles overnight
-//     }) ?? null
-//   );
-// };
-
-// src/pages/Dashboard/VenueDetailsPanel.jsx
-// ── ADD / REPLACE these helpers (right after the imports and before the component) ──
-const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-const toMinutes = (t = "") => {
-  const [h, m] = t.split(":").map(Number);
-  return h * 60 + (m || 0);
-};
-
-const dayMatches = (event, day) => {
-  const days = event.days || event.repeatDays || [];
-  return days.length === 0 || days.includes(day); // empty = every day
-};
-
-const getCurrentRunningEvent = (events = []) => {
-  const now = new Date();
-  const nowM = now.getHours() * 60 + now.getMinutes();
-  const today = DAY_NAMES[now.getDay()];
-
-  return (
-    events.find((e) => {
-      if (!e.enabled || !e.start || !e.end) return false;
-      if (!dayMatches(e, today)) return false;
-
-      const s = toMinutes(e.start);
-      const en = toMinutes(e.end);
-
-      // handles overnight spans (23:00 → 01:00)
-      return en > s
-        ? nowM >= s && nowM < en
-        : nowM >= s || nowM < en;
-    }) ?? null
-  );
-};
-
-
-    const runningSchedulerEvent = useMemo(
-    () => getCurrentRunningEvent(schedulerEvents),
-    [schedulerEvents]
-  );
-
-  // const resolvedToggle = schedulerToggleState ?? "off";
-  const displayToggleState = runningSchedulerEvent ? "gray" : resolvedToggle;
-
-  const handleSchedulerToggleClick = async () => {
-    if (runningSchedulerEvent) {
-      const result = await Swal.fire({
-        title: "Event Currently Running",
-        html: `The <b>${runningSchedulerEvent.command}</b> event (${runningSchedulerEvent.start} – ${runningSchedulerEvent.end}) is currently active.<br><br>Do you want to <b>disable</b> this event?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, disable it",
-        cancelButtonText: "Keep running",
-        confirmButtonColor: "#EF4444",
-        cancelButtonColor: "#64748B",
-        background: "#ffffff",
-        color: "#1e293b",
-        customClass: {
-          popup: "rounded-2xl shadow-xl",
-          title: "text-base font-semibold",
-          htmlContainer: "text-sm text-slate-500",
-          confirmButton: "rounded-lg text-sm font-semibold px-5 py-2",
-          cancelButton: "rounded-lg text-sm font-semibold px-5 py-2",
-        },
-        buttonsStyling: true,
-      });
-
-      if (result.isConfirmed) {
-        const updated = schedulerEvents.map((ev) =>
-          ev.id === runningSchedulerEvent.id ? { ...ev, enabled: false } : ev
-        );
-        // onSchedulerEventsChange?.(updated);
-        setEvents(deviceId, updated);
-        // onSchedulerToggleChange?.("off");
-        setToggle(deviceId, "off");
-      }
-      return;
-    }
-
-    const next = resolvedToggle === "on" ? "off" : "on";
-    // onSchedulerToggleChange?.(next);
-    setToggle(deviceId, next);
-  };
-
-  // ...inside the metrics section, replace the Power button:
-  {isSchedulerDevice && (
-    <button
-      onClick={handleSchedulerToggleClick}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition shadow-sm cursor-pointer active:scale-[.98]
-        ${displayToggleState === "on"   ? "bg-emerald-500 hover:bg-emerald-600"
-        : displayToggleState === "off"  ? "bg-rose-500 hover:bg-rose-600"
-        :                                 "bg-gray-400 hover:bg-gray-500"}`}
-      title={
-        displayToggleState === "gray" ? "Event running — click to disable"
-        : displayToggleState === "on" ? "Turn Off"
-        : "Turn On"
-      }
-    >
-      <Power size={15} strokeWidth={2} />
-      <span className="text-xs font-bold">
-        {displayToggleState === "on" ? "ON" : displayToggleState === "off" ? "OFF" : "···"}
-      </span>
-    </button>
-  )}
-  
   const emdExtraMetrics = isEMD ? [
     { key: "unit", label: "Unit", unit: "", value: formatUnitValue(espPower, espVoltage, espCurrent), img: null, lucideIcon: <Zap size={30} />, alertFlag: false, color: "green" },
     { key: "temperature", label: "Temperature", unit: "°C", value: displayTemp !== null ? displayTemp : "--", img: "/temperature-icon.svg", lucideIcon: null, alertFlag: false, color: "green" },
@@ -2201,7 +893,6 @@ const getCurrentRunningEvent = (events = []) => {
   const statusClass = (flag, color = "green") => {
     if (flag) {
       if (color === "red") return "border-red-500";
-      if (color === "purple") return "border-purple-600";
       return "border-green-500";
     }
     return "border-gray-300";
@@ -2213,9 +904,9 @@ const getCurrentRunningEvent = (events = []) => {
       const parts = m.value.split(" ");
       const num = parts[0];
       const unit = parts[1] || "";
-      return (<>{num}<span className="text-sm font-thin ml-1">{unit}</span></>);
+      return <>{num}<span className="text-sm font-thin ml-1">{unit}</span></>;
     }
-    return (<>{m.value ?? "--"}{m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}</>);
+    return <>{m.value ?? "--"}{m.unit ? <span className="text-sm font-thin ml-1">{m.unit}</span> : ""}</>;
   };
 
   return (
@@ -2250,32 +941,7 @@ const getCurrentRunningEvent = (events = []) => {
       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
         {isEMD ? (
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              {topMetrics.map((m) => (
-                <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-                  <div className="mb-2">
-                    {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-                      : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-                      : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
-                  </div>
-                  <div className="text-sm text-gray-600">{m.label}</div>
-                  <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              {emdExtraMetrics.map((m) => (
-                <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
-                  <div className="mb-2">
-                    {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
-                      : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-                      : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
-                  </div>
-                  <div className="text-sm text-gray-600">{m.label}</div>
-                  <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
-                </div>
-              ))}
-            </div>
+            {/* EMD metrics */}
           </div>
         ) : (
           <div className={`flex items-center justify-between gap-4 ${topMetrics.length === 2 ? "sm:justify-around" : ""}`}>
@@ -2284,36 +950,29 @@ const getCurrentRunningEvent = (events = []) => {
                 <div className="mb-2">
                   {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
                     : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
-                    : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+                      : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
                 </div>
                 <div className="text-sm text-gray-600">{m.label}</div>
                 <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
               </div>
             ))}
 
-
-      {isSchedulerDevice && (
-        console.log("Rendering Power Button with state:", { schedulerEvents, resolvedToggle, displayToggleState }),
-  <button
-    onClick={handleSchedulerToggleClick}
-    className={`flex flex-col justify-center items-center gap-3 px-4 py-5 rounded-xl text-sm font-semibold text-white transition shadow-sm cursor-pointer active:scale-[.98]
-      ${displayToggleState === "on"  ? "bg-emerald-500 hover:bg-emerald-600"
-      : displayToggleState === "off" ? "bg-rose-500 hover:bg-rose-600"
-      :                                "bg-gray-400 hover:bg-gray-500"}`}
-    title={
-      displayToggleState === "gray" ? "Event running — click to disable"
-      : displayToggleState === "on"  ? "Turn Off"
-      : "Turn On"
-    }
-  >
-    <Power size={15} strokeWidth={2} />
-    <span className="text-xs font-bold">
-      {displayToggleState === "on"  ? "ON"
-      : displayToggleState === "off" ? "OFF"
-      : "Event"}
-    </span>
-  </button>
-)}
+            {/* Large Power Button for TSD */}
+            {isSchedulerDevice && (
+              <button
+                onClick={handleSchedulerToggleClick}
+                className={`flex flex-col justify-center items-center gap-3 px-4 py-5 rounded-xl text-sm font-semibold text-white transition shadow-sm cursor-pointer active:scale-[.98]
+                  ${displayToggleState === "on" ? "bg-emerald-500 hover:bg-emerald-600"
+                    : displayToggleState === "off" ? "bg-rose-500 hover:bg-rose-600"
+                      : "bg-gray-400 hover:bg-gray-500"}`}
+                title={displayToggleState === "gray" ? "Event running — click to disable" : displayToggleState === "on" ? "Turn Off" : "Turn On"}
+              >
+                <Power size={15} strokeWidth={2} />
+                <span className="text-xs font-bold">
+                  {displayToggleState === "on" ? "ON" : displayToggleState === "off" ? "OFF" : "Event"}
+                </span>
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -2328,7 +987,7 @@ const getCurrentRunningEvent = (events = []) => {
               <div key={m.key} className={`flex items-center gap-3 p-1 border rounded ${statusClass(flag, color)}`}>
                 {m.img ? <img src={m.img} alt={m.label} className="w-6 h-6" />
                   : m.lucideIcon ? <div className="w-6 h-6 flex items-center justify-center">{m.lucideIcon}</div>
-                  : <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />}
+                    : <img src="/alert-icon.png" alt={m.label} className="w-6 h-6" />}
                 <div>
                   <div className="text-xs text-gray-600">{m.label}</div>
                   <div className="text-sm font-medium">{statusText(flag)}</div>
@@ -2339,7 +998,7 @@ const getCurrentRunningEvent = (events = []) => {
         </div>
       )}
 
-      {/* API key / QR */}
+      {/* API key / QR + Last Update */}
       <div>
         {apiKey ? (
           <div className="mt-3 p-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 break-words px-2">
@@ -2365,11 +1024,11 @@ const getCurrentRunningEvent = (events = []) => {
           </div>
         )}
 
-        {lastUpdateTime ? (
+        {lastUpdateTime && (
           <div className="text-center mt-3 p-2 rounded-xl bg-[#07518D]/[0.05] font-thin text-xs sm:text-md">
             Last Update: {formatLastUpdate(lastUpdateTime)}
           </div>
-        ) : null}
+        )}
       </div>
 
       <DownloadModal
@@ -2380,24 +1039,17 @@ const getCurrentRunningEvent = (events = []) => {
         deviceType={deviceType}
       />
 
- 
-
-        {String(deviceType) === "SCHEDULER" && (
-    <div className="pt-6">
-      <EventsSection
-        selectedDevice={{ deviceId, venueId, venueName: displayVenueName, deviceType }}
-
-
-       events={schedulerEvents}
-      onEventsChange={(updated) => setEvents(deviceId, updated)}
-      externalOpen={powerModalOpen}
-      onExternalClose={() => setPowerModalOpen(false)}
-      onToggleChange={(val) => setToggle(deviceId, val)}
-    />
-    </div>
-  )}
-
-
+      {String(deviceType) === "TSD" && (
+        <div className="pt-6">
+          <EventsSection
+            selectedDevice={{ deviceId, venueId, venueName: displayVenueName, deviceType }}
+            onEventsChange={(updated) => { }}
+            externalOpen={powerModalOpen}
+            onExternalClose={() => setPowerModalOpen(false)}
+            onToggleChange={(val) => { }}
+          />
+        </div>
+      )}
     </div>
   );
 }

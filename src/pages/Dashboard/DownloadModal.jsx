@@ -2377,6 +2377,10 @@ export default function DownloadModal({
       temperature: { label: "Temperature (°C)",   unit: "°C" },
       humidity:    { label: "Humidity (%)",        unit: "%" },
     },
+    TSD: {
+      temp: { label: "Temperature (°C)",   unit: "°C" },
+      humi:    { label: "Humidity (%)",        unit: "%" },
+    },
     AQIMD: {
       AQI:         { label: "Air Quality Index",  unit: "AQI" },
       temperature: { label: "Temperature (°C)",   unit: "°C" },
@@ -2387,6 +2391,14 @@ export default function DownloadModal({
       Status:      { label: "Status",             unit: "" },
     },
     EMD: {
+      voltage:  { label: "Voltage (V)",  unit: "V"   },
+      current:  { label: "Current (A)",  unit: "A"   },
+      power:    { label: "Power (W)",    unit: "W",   computed: true },
+      humidity: { label: "Humidity (%)", unit: "%"   },
+      temperature: { label: "Temperature (°C)", unit: "°C" },
+      // units:    { label: "Units (kWh)",  unit: "kWh", computed: true },
+    },
+    ESD: {
       voltage:  { label: "Voltage (V)",  unit: "V"   },
       current:  { label: "Current (A)",  unit: "A"   },
       power:    { label: "Power (W)",    unit: "W",   computed: true },

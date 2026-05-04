@@ -270,7 +270,6 @@ export default function DashboardRightPanel({
           espVoltage={selected?.espVoltage}
           espCurrent={selected?.espCurrent}
           espPower={selected?.espPower}
-          
           // schedulerEvents={selectedDeviceEvents}
           // onSchedulerEventsChange={(updated) =>
           //   onSchedulerEventsChange?.(selectedIdKey, updated)
@@ -309,9 +308,8 @@ export default function DashboardRightPanel({
           lastUpdateTime={null}
           // schedulerEvents={[]}
           // onSchedulerEventsChange={undefined}
-          // schedulerToggleState={null}
+          // schedulerToggleState={null} 
           // onSchedulerToggleChange={undefined}
-
           // onSchedulerEventsChange={undefined}
           // onSchedulerToggleChange={undefined}
           

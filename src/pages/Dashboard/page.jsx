@@ -408,18 +408,24 @@ export default function Dashboard() {
   }, [selectedVenueId, token, isDesktop, POLL_MS]);
 
   //FaRaZ 
-  // fetch events of TSD devices 
+  // fetch events of TSD devices
   const fetchSchedulerData = async () => {
+    console.log(`🔄 [page.jsx] fetchSchedulerData started`);
     try {
       const tsdDevices = freezerDevices.filter(
         (d) => d.deviceType === "TSD"
       );
 
+      console.log(`📋 [page.jsx] Found ${tsdDevices.length} TSD devices`);
+
       for (const device of tsdDevices) {
         const deviceKey = String(device.deviceId);
 
+        console.log(`🔵 [page.jsx] Processing device: ${deviceKey}`);
+
         try {
-          const res = await fetch(
+          // ✅ Fetch current/next event status for toggle state
+          const statusRes = await fetch(
             `${BASE}/event/get-current-events/${device.deviceId}`,
             {
               method: "GET",
@@ -431,37 +437,57 @@ export default function Dashboard() {
             }
           );
 
-          if (!res.ok) continue;
-
-          const data = await res.json();
-          console.log("Event data getting form backend>> ", data)
-
-          // 🔥 CASE 1: CURRENT EVENT
-          if (data.type === "CURRENT" && data.event) {
-            // setEvents(deviceKey, [data.event]);
-            setEvents(deviceKey, [
-              {
-                ...data.event,
-                type: data.type,
-              },
-            ]);
+          if (!statusRes.ok) {
+            console.log(`⚠️ [page.jsx] Status fetch failed for ${deviceKey}`);
+            continue;
           }
 
-          // 🔥 CASE 2: NEXT EVENT
-          else if (data.type === "NEXT" && data.event) {
-            // setEvents(deviceKey, [data.event]);
-            setEvents(deviceKey, [
-              {
-                ...data.event,
-                type: data.type,
-              },
-            ]);
-          }
+          const statusData = await statusRes.json();
+          console.log(`✅ [page.jsx] Status data for ${deviceKey}:`, statusData);
 
-          // 🔥 CASE 3: NO EVENT
-          else {
-            setEvents(deviceKey, []);
-            setToggle(deviceKey, "off");
+          // ✅ Fetch ALL events for the device (don't overwrite with just 1 event)
+          const allEventsRes = await fetch(
+            `${BASE}/event/get-by-deviceid/${device.deviceId}`,
+            {
+              method: "GET",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+            }
+          );
+
+          if (allEventsRes.ok) {
+            const allEventsData = await allEventsRes.json();
+            const allEvents = allEventsData.schedules || [];
+
+            console.log(`📋 [page.jsx] Fetched ${allEvents.length} events for ${deviceKey}`);
+
+            // ✅ Mark the current/next event with type for card display
+            const eventsWithType = allEvents.map(event => {
+              if (statusData.type === "CURRENT" && statusData.event?._id === event._id) {
+                return { ...event, type: "CURRENT" };
+              }
+              if (statusData.type === "NEXT" && statusData.event?._id === event._id) {
+                return { ...event, type: "NEXT" };
+              }
+              return event;
+            });
+
+            console.log(`🎯 [page.jsx] Marked events for ${deviceKey}:`, eventsWithType);
+            setEvents(deviceKey, eventsWithType);
+          } else {
+            console.log(`⚠️ [page.jsx] All events fetch failed for ${deviceKey}, using fallback`);
+            // Fallback to old behavior if all-events endpoint fails
+            if (statusData.type === "CURRENT" && statusData.event) {
+              setEvents(deviceKey, [{ ...statusData.event, type: statusData.type }]);
+            } else if (statusData.type === "NEXT" && statusData.event) {
+              setEvents(deviceKey, [{ ...statusData.event, type: statusData.type }]);
+            } else {
+              setEvents(deviceKey, []);
+              setToggle(deviceKey, "off");
+            }
           }
 
         } catch (err) {

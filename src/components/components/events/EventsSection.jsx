@@ -13,6 +13,7 @@ import { hasCollision } from "./eventUtils";
 import { Plus, CalendarClock } from "lucide-react";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useScheduler } from "../../../contexts/SchedulerContext";
 
 const EventsSection = ({
   selectedDevice,
@@ -24,6 +25,7 @@ const EventsSection = ({
   const [openModal, setOpenModal] = useState(false);
   const scrollContainerRef = useRef(null);
   const [events, setEvents] = useState([]);
+  const { setEvents: setContextEvents, fetchToggleStatus } = useScheduler();
 
   const isModalOpen = openModal || externalOpen;
 
@@ -36,10 +38,54 @@ const EventsSection = ({
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [working, setWorking] = useState(false);
 
+  // ✅ NEW: Fetch current/next event status and mark events
+  const fetchAndMarkEvents = async (deviceId, allEvents) => {
+    try {
+      console.log(`🔵 [EventsSection] Calling API: /event/get-current-events/${deviceId}`);
+
+      // Fetch current/next event status from backend
+      const statusRes = await axios.get(
+        `${import.meta.env.VITE_BACKEND_API}/event/get-current-events/${deviceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      console.log(`✅ [EventsSection] API Response for ${deviceId}:`, statusRes.data);
+
+      if (statusRes.data && statusRes.data.event) {
+        const { type, event } = statusRes.data;
+
+        console.log(`🎯 [EventsSection] Marking event ${event._id} as ${type}`);
+
+        // Mark the matching event with type
+        const markedEvents = allEvents.map(e => {
+          if (e._id === event._id) {
+            return { ...e, type };
+          }
+          return e;
+        });
+
+        console.log(`📦 [EventsSection] Marked events:`, markedEvents);
+        return markedEvents;
+      }
+
+      console.log(`⚠️ [EventsSection] No event in response, returning unmarked events`);
+      return allEvents;
+    } catch (err) {
+      console.error(`❌ [EventsSection] Failed to fetch current/next status:`, err);
+      return allEvents;
+    }
+  };
+
   const fetchEvents = async () => {
     try {
       const deviceId = selectedDevice?.deviceId;
       if (!deviceId) return;
+
+      console.log(`🔄 [EventsSection] fetchEvents called for device: ${deviceId}`);
 
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_API}/event/get-by-deviceid/${deviceId}`,
@@ -50,7 +96,21 @@ const EventsSection = ({
         }
       );
 
-      setEvents(res.data.schedules || []);
+      const fetchedEvents = res.data.schedules || [];
+      console.log(`📋 [EventsSection] Fetched ${fetchedEvents.length} events`);
+      setEvents(fetchedEvents);
+
+      // ✅ Fetch current/next status and mark events with type
+      const markedEvents = await fetchAndMarkEvents(deviceId, fetchedEvents);
+
+      // ✅ Sync marked events to global context so SchedulerDeviceCard sees the changes
+      console.log(`🔄 [EventsSection] Syncing ${markedEvents.length} marked events to context`);
+      setContextEvents(deviceId, markedEvents);
+
+      // ✅ Also fetch toggle status to update ON/OFF state
+      await fetchToggleStatus(deviceId);
+
+      console.log(`✅ [EventsSection] fetchEvents completed for ${deviceId}`);
     } catch (err) {
       console.error("Failed to fetch events:", err);
     }
@@ -183,9 +243,10 @@ const EventsSection = ({
         timer: 1500,
         showConfirmButton: false,
       });
-
+      
       await fetchEvents();
-
+      
+      
     } catch (err) {
       console.error(err);
 

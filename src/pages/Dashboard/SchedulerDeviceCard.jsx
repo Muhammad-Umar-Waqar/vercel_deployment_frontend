@@ -722,7 +722,7 @@
 
 
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { CalendarDays, Sunrise, Sun, Sunset, TimerIcon } from "lucide-react";
 import "../../styles/pages/Dashboard/dashboard-styles.css";
 import TemperatureRangeMeter from "./TemperatureRangeMeter";
@@ -746,35 +746,91 @@ const toMinutes = (t = "") => {
   return h * 60 + (m || 0);
 };
 
+// ✅ NEW: Calculate milliseconds until next event transition
+const calculateNextTransitionTime = (events = [], isOnline = true) => {
+  if (!events || events.length === 0) return null;
+  if (!isOnline) return null; // Don't schedule if device is offline
+
+  const now = new Date();
+  const nowMs = now.getTime();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  const todayDay = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][now.getDay()];
+
+  let nearestTransitionMs = null;
+
+  events.forEach(event => {
+    if (event.status !== "ACTIVE") return;
+
+    const eventDays = (event.days || []).map(d => d.toLowerCase());
+
+    // Check if event applies today
+    if (eventDays.length > 0 && !eventDays.includes(todayDay)) {
+      // TODO: Could calculate next occurrence on a future day
+      return;
+    }
+
+    const startMinutes = toMinutes(event.startTime);
+    const endMinutes = toMinutes(event.endTime);
+
+    // Handle overnight events (e.g., 13:00 → 01:00 next day)
+    const isOvernight = endMinutes < startMinutes;
+
+    // Calculate transition times for today
+    const startMs = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+      Math.floor(startMinutes / 60), startMinutes % 60, 0).getTime();
+
+    let endMs = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+      Math.floor(endMinutes / 60), endMinutes % 60, 0).getTime();
+
+    if (isOvernight && nowMinutes < endMinutes) {
+      // We're in the early morning part of an overnight event
+      // End time is today
+    } else if (isOvernight) {
+      // End time is tomorrow
+      endMs += 24 * 60 * 60 * 1000;
+    }
+
+    // Check if start time is in the future
+    if (startMs > nowMs) {
+      if (!nearestTransitionMs || startMs < nearestTransitionMs) {
+        nearestTransitionMs = startMs;
+      }
+    }
+
+    // Check if end time is in the future
+    if (endMs > nowMs) {
+      if (!nearestTransitionMs || endMs < nearestTransitionMs) {
+        nearestTransitionMs = endMs;
+      }
+    }
+  });
+
+  return nearestTransitionMs;
+};
+
 // Trust backend 'type' field strictly
 const getCurrentRunningEvent = (events = []) => {
   if (!events || events.length === 0) return null;
 
-  let item = events[0];
+  // Find the event marked as CURRENT by backend
+  const currentEvent = events.find(e => e.type === "CURRENT");
 
-  // Handle wrapped format { type: "CURRENT", event: {...} }
-  if (item?.type === "CURRENT" && item?.event) {
-    item = item.event;
-  }
+  console.log(`🔍 [getCurrentRunningEvent] Searching for CURRENT event in ${events.length} events`);
+  console.log(`🔍 [getCurrentRunningEvent] Found:`, currentEvent);
 
-  // Only show gray if backend explicitly returns type: "CURRENT"
-  if (item?.type === "CURRENT") {
-    console.log(`[TSD] Backend sent type: CURRENT → Showing Gray`);
-    return item;
-  }
-
-  return null;
+  return currentEvent || null;
 };
 
 const getNextEvent = (events = []) => {
   if (!events || events.length === 0) return null;
 
-  let item = events[0];
-  if (item?.type === "NEXT" && item?.event) {
-    item = item.event;
-  }
+  // Find the event marked as NEXT by backend
+  const nextEvent = events.find(e => e.type === "NEXT");
 
-  return item?.startTime ? item : null;
+  console.log(`🔍 [getNextEvent] Searching for NEXT event in ${events.length} events`);
+  console.log(`🔍 [getNextEvent] Found:`, nextEvent);
+
+  return nextEvent || null;
 };
 
 // Power Toggle
@@ -941,20 +997,82 @@ const SchedulerDeviceCard = React.memo(function SchedulerDeviceCard({
   onRefreshScheduler,
 }) {
 
-  const { triggerDevice, skipEvent, fetchToggleStatus, toggleMap } = useScheduler();
+  const { triggerDevice, skipEvent, fetchToggleStatus, toggleMap, eventsMap } = useScheduler();
   const toggleState = toggleMap?.[deviceId] ?? "off";
 
-  console.log(`[TSD ${deviceId}] Raw Events:`, events);
+  // ✅ Read events from global context instead of props
+  const contextEvents = eventsMap?.[deviceId] ?? [];
+  const displayEvents = contextEvents.length > 0 ? contextEvents : events;
 
-  const runningEvent = useMemo(() => getCurrentRunningEvent(events), [events]);
-  const nextEvent = useMemo(() => getNextEvent(events), [events]);
+  console.log(`🔵 [SchedulerDeviceCard ${deviceId}] Context events:`, contextEvents);
+  console.log(`🔵 [SchedulerDeviceCard ${deviceId}] Display events:`, displayEvents);
+  console.log(`🔵 [SchedulerDeviceCard ${deviceId}] Toggle state:`, toggleState);
+
+  // ✅ Smart Timer: Schedule refresh at exact event transition times
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    console.log(`⏰ [SchedulerDeviceCard ${deviceId}] Smart timer effect triggered`);
+
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+      console.log(`🧹 [SchedulerDeviceCard ${deviceId}] Cleared existing timer`);
+    }
+
+    // Calculate next transition time
+    const nextTransitionMs = calculateNextTransitionTime(displayEvents, isOnline);
+
+    if (nextTransitionMs) {
+      const now = Date.now();
+      const delayMs = nextTransitionMs - now;
+
+      // Only set timer if transition is within next 24 hours
+      if (delayMs > 0 && delayMs < 24 * 60 * 60 * 1000) {
+        console.log(`⏰ [SchedulerDeviceCard ${deviceId}] Setting timer for ${Math.round(delayMs / 1000)}s from now`);
+
+        timerRef.current = setTimeout(() => {
+          console.log(`🔔 [SchedulerDeviceCard ${deviceId}] Timer fired! Fetching toggle status...`);
+          fetchToggleStatus(deviceId);
+          onRefreshScheduler?.(); // Also refresh events
+          console.log(`✅ [SchedulerDeviceCard ${deviceId}] Timer completed refresh`);
+        }, delayMs);
+      } else {
+        console.log(`⚠️ [SchedulerDeviceCard ${deviceId}] Timer delay out of range: ${delayMs}ms`);
+      }
+    } else {
+      console.log(`⚠️ [SchedulerDeviceCard ${deviceId}] No next transition time calculated`);
+    }
+
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+        console.log(`🧹 [SchedulerDeviceCard ${deviceId}] Cleanup: cleared timer`);
+      }
+    };
+  }, [displayEvents, deviceId, isOnline, fetchToggleStatus, onRefreshScheduler]);
+
+  const runningEvent = useMemo(() => {
+    const result = getCurrentRunningEvent(displayEvents);
+    console.log(`🎯 [SchedulerDeviceCard ${deviceId}] Running event:`, result);
+    return result;
+  }, [displayEvents, deviceId]);
+
+  const nextEvent = useMemo(() => {
+    const result = getNextEvent(displayEvents);
+    console.log(`⏭️ [SchedulerDeviceCard ${deviceId}] Next event:`, result);
+    return result;
+  }, [displayEvents, deviceId]);
 
   // const displayState = runningEvent ? "gray" : toggleState;
 
   const displayState = toggleState;
-  const isDisabled = !!runningEvent;
+  const isDisabled = !!runningEvent || !isOnline;  // Disable if event running OR device offline
 
-  console.log(`[TSD ${deviceId}] Final displayState:`, displayState, "| Is Running:", !!runningEvent);
+  console.log(`[TSD ${deviceId}] Final displayState:`, displayState, "| Is Running:", !!runningEvent, "| Is Online:", isOnline);
 
   useEffect(() => {
     if (deviceId) fetchToggleStatus(deviceId);
@@ -1008,6 +1126,19 @@ const SchedulerDeviceCard = React.memo(function SchedulerDeviceCard({
   const handleToggleClick = async (e) => {
   e.stopPropagation();
 
+  // Check offline status first
+  if (!isOnline) {
+    Swal.fire({
+      icon: "error",
+      title: "Device is Offline",
+      text: "Cannot control the device because it is currently offline. Please check the device connection.",
+      confirmButtonColor: "#EF4444",
+      confirmButtonText: "Okay",
+    });
+    return;
+  }
+
+  // Check if event is running
   if (runningEvent) {
     const result = await Swal.fire({
       title: "Event Currently Running",
@@ -1041,6 +1172,7 @@ const SchedulerDeviceCard = React.memo(function SchedulerDeviceCard({
     return;
   }
 
+  // Device is online and no event running - allow manual toggle
   const nextAction = toggleState === "on" ? "OFF" : "ON";
 
   try {
@@ -1074,9 +1206,12 @@ const SchedulerDeviceCard = React.memo(function SchedulerDeviceCard({
     return `${String(hour12).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   };
 
-  const displayStart = nextEvent?.startTime ? formatTime(nextEvent.startTime) : "--";
-  const displayDuration = nextEvent
-    ? formatDuration(toMinutes(nextEvent.endTime) - toMinutes(nextEvent.startTime))
+  // Show CURRENT event if running, otherwise show NEXT event
+  const displayEvent = runningEvent || nextEvent;
+
+  const displayStart = displayEvent?.startTime ? formatTime(displayEvent.startTime) : "--";
+  const displayDuration = displayEvent
+    ? formatDuration(toMinutes(displayEvent.endTime) - toMinutes(displayEvent.startTime))
     : "--";
 
   const eventType = runningEvent ? "CURRENT" : (nextEvent ? "NEXT" : "--");

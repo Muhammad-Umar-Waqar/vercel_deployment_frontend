@@ -941,7 +941,34 @@ export default function VenueDetailsPanel({
       <div className="relative w-full overflow-hidden mb-6 bg-[#07518D]/[0.05] rounded-xl p-3">
         {isEMD ? (
           <div className="space-y-4">
+           <div className="grid grid-cols-3 gap-4">
+              {topMetrics.map((m) => (
+                <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+                  <div className="mb-2">
+                    {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+                      : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+                      : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+                  </div>
+                  <div className="text-sm text-gray-600">{m.label}</div>
+                  <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              {emdExtraMetrics.map((m) => (
+                <div key={m.key} className="flex-1 flex flex-col items-center justify-center">
+                  <div className="mb-2">
+                    {m.img ? <img src={m.img} className="h-[30px] w-auto" alt={m.label} />
+                      : m.lucideIcon ? <div className="text-[#0D5CA4]">{m.lucideIcon}</div>
+                      : <img src="/odour-alert.svg" className="h-[66px] w-auto" alt={m.label} />}
+                  </div>
+                  <div className="text-sm text-gray-600">{m.label}</div>
+                  <div className="text-xl font-semibold">{renderMetricValue(m)}</div>
+                </div>
+              ))}
+            </div>
             {/* EMD metrics */}
+
           </div>
         ) : (
           <div className={`flex items-center justify-between gap-4 ${topMetrics.length === 2 ? "sm:justify-around" : ""}`}>

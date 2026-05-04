@@ -309,6 +309,8 @@ const EventModal = ({ open, onClose, onSave }) => {
 
       const formattedDays = days.map((d) => fullDaysMap[d]);
 
+      console.log("Saving Event:", { startUTC, endUTC, days: formattedDays });
+
       await onSave({
         startTime: startUTC,
         endTime: endUTC,

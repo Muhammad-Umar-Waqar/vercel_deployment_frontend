@@ -60,10 +60,11 @@ const EventsSection = ({
 
         console.log(`🎯 [EventsSection] Marking event ${event._id} as ${type}`);
 
-        // Mark the matching event with type
+        // Mark the matching event with type and merge additional fields (duration, isOvernight, etc.)
         const markedEvents = allEvents.map(e => {
           if (e._id === event._id) {
-            return { ...e, type };
+            // Merge event data from API response (includes duration, isOvernight, nextDay, etc.)
+            return { ...e, ...event, type };
           }
           return e;
         });

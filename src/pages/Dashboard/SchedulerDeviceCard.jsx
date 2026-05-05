@@ -1199,20 +1199,30 @@ const SchedulerDeviceCard = React.memo(function SchedulerDeviceCard({
 
   const formatTime = (time) => {
     if (!time) return "--:--";
+
+    // Parse UTC time from backend (24-hour format)
     const [h, m] = time.split(":").map(Number);
     const date = new Date();
     date.setUTCHours(h, m, 0);
-    let hour12 = date.getHours() % 12 || 12;
-    return `${String(hour12).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+
+    // Convert to local time
+    const localHours = date.getHours();
+    const localMinutes = date.getMinutes();
+
+    // Convert to 12-hour format with AM/PM
+    const hour12 = localHours % 12 || 12;
+    const ampm = localHours >= 12 ? "PM" : "AM";
+
+    return `${String(hour12).padStart(2, "0")}:${String(localMinutes).padStart(2, "0")} ${ampm}`;
   };
 
   // Show CURRENT event if running, otherwise show NEXT event
   const displayEvent = runningEvent || nextEvent;
 
   const displayStart = displayEvent?.startTime ? formatTime(displayEvent.startTime) : "--";
-  const displayDuration = displayEvent
-    ? formatDuration(toMinutes(displayEvent.endTime) - toMinutes(displayEvent.startTime))
-    : "--";
+
+  // ✅ Use duration from API response instead of calculating
+  const displayDuration = displayEvent?.duration || "--";
 
   const eventType = runningEvent ? "CURRENT" : (nextEvent ? "NEXT" : "--");
 

@@ -464,13 +464,15 @@ export default function Dashboard() {
 
             console.log(`📋 [page.jsx] Fetched ${allEvents.length} events for ${deviceKey}`);
 
-            // ✅ Mark the current/next event with type for card display
+            // ✅ Mark the current/next event with type and merge additional fields (duration, isOvernight, etc.)
             const eventsWithType = allEvents.map(event => {
               if (statusData.type === "CURRENT" && statusData.event?._id === event._id) {
-                return { ...event, type: "CURRENT" };
+                // Merge event data from API response (includes duration, isOvernight, nextDay, etc.)
+                return { ...event, ...statusData.event, type: "CURRENT" };
               }
               if (statusData.type === "NEXT" && statusData.event?._id === event._id) {
-                return { ...event, type: "NEXT" };
+                // Merge event data from API response (includes duration, isOvernight, nextDay, etc.)
+                return { ...event, ...statusData.event, type: "NEXT" };
               }
               return event;
             });

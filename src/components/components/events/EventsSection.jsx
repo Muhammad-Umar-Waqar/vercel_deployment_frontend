@@ -60,11 +60,10 @@ const EventsSection = ({
 
         console.log(`🎯 [EventsSection] Marking event ${event._id} as ${type}`);
 
-        // Mark the matching event with type and merge additional fields (duration, isOvernight, etc.)
+        // Mark the matching event with type
         const markedEvents = allEvents.map(e => {
           if (e._id === event._id) {
-            // Merge event data from API response (includes duration, isOvernight, nextDay, etc.)
-            return { ...e, ...event, type };
+            return { ...e, type };
           }
           return e;
         });
@@ -409,9 +408,11 @@ const EventsSection = ({
           </p>
         </div>
       ) : (
+        <div className="mt-2 min-w-0 w-full overflow-hidden">
+          
         <div
           ref={scrollContainerRef}
-          className="flex gap-3 overflow-x-auto pb-2"
+          className="flex gap-3 overflow-x-auto pb-2 min-w-0"
           style={{ scrollbarWidth: "thin" }}
         >
           {events.map((event) => (
@@ -423,6 +424,7 @@ const EventsSection = ({
             />
           ))}
         </div>
+     </div>
       )}
 
       <EventModal

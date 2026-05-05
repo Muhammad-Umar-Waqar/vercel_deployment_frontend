@@ -852,7 +852,13 @@ export default function Dashboard() {
 
         />
       ) : (
-        <Drawer open={open} onClose={toggleDrawer(false)} anchor="right">
+        <Drawer open={open} onClose={toggleDrawer(false)} anchor="right" PaperProps={{
+    sx: {
+      width: "100%",
+      maxWidth: "100vw",
+    },
+  }}
+  >
           <DashboardRightPanel
             freezerDevices={freezerDevices}
             selectedFreezerDeviceId={selectedFreezerDeviceId}

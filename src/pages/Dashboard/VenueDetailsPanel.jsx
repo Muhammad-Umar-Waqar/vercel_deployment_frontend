@@ -695,7 +695,7 @@ export default function VenueDetailsPanel({
   const { user } = useStore();
   const orgId = organizationId || user?.organization || null;
 
-  const { eventsMap, toggleMap, triggerDevice, skipEvent, fetchToggleStatus } = useScheduler();
+  const { eventsMap, toggleMap, setEvents, triggerDevice, skipEvent, fetchToggleStatus } = useScheduler();
 
   const schedulerEvents = deviceId ? eventsMap[deviceId] ?? [] : [];
   const resolvedToggle = useMemo(() => {
@@ -745,6 +745,57 @@ export default function VenueDetailsPanel({
     return resolvedToggle;
   }, [runningSchedulerEvent, resolvedToggle]);
 
+  // ✅ Refresh events from backend (same logic as EventsSection)
+  const refreshEvents = async () => {
+    try {
+      if (!deviceId) return;
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API}/event/get-by-deviceid/${deviceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      const fetchedEvents = data.schedules || [];
+
+      // Fetch current/next status and mark events
+      const statusRes = await fetch(
+        `${import.meta.env.VITE_BACKEND_API}/event/get-current-events/${deviceId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const statusData = await statusRes.json();
+
+      let markedEvents = fetchedEvents;
+      if (statusData && statusData.event) {
+        const { type, event } = statusData;
+        markedEvents = fetchedEvents.map(e => {
+          if (e._id === event._id) {
+            return { ...e, ...event, type };
+          }
+          return e;
+        });
+      }
+
+      // Sync to context
+      setEvents(deviceId, markedEvents);
+
+      // Also fetch toggle status
+      await fetchToggleStatus(deviceId);
+
+    } catch (err) {
+      console.error("Failed to refresh events:", err);
+    }
+  };
+
   // Handle Toggle Click (Same as Card)
   const handleSchedulerToggleClick = async () => {
     if (runningSchedulerEvent) {
@@ -768,7 +819,7 @@ export default function VenueDetailsPanel({
       if (result.isConfirmed) {
         try {
           await skipEvent(deviceId);
-          await fetchToggleStatus(deviceId);
+          await refreshEvents();
         } catch (err) {
           Swal.fire({
             icon: "error",

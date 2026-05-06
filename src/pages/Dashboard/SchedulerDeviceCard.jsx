@@ -1126,19 +1126,7 @@ const SchedulerDeviceCard = React.memo(function SchedulerDeviceCard({
   const handleToggleClick = async (e) => {
   e.stopPropagation();
 
-  // Check offline status first
-  if (!isOnline) {
-    Swal.fire({
-      icon: "error",
-      title: "Device is Offline",
-      text: "Cannot control the device because it is currently offline. Please check the device connection.",
-      confirmButtonColor: "#EF4444",
-      confirmButtonText: "Okay",
-    });
-    return;
-  }
-
-  // Check if event is running
+  // ✅ Check if event is running FIRST (higher priority)
   if (runningEvent) {
     const result = await Swal.fire({
       title: "Event Currently Running",
@@ -1172,7 +1160,7 @@ const SchedulerDeviceCard = React.memo(function SchedulerDeviceCard({
     return;
   }
 
-  // Device is online and no event running - allow manual toggle
+  // ✅ For TSD: No isOnline check - let API decide via /event/toggle-switch response
   const nextAction = toggleState === "on" ? "OFF" : "ON";
 
   try {

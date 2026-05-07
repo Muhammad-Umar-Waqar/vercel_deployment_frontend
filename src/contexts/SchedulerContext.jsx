@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 import Swal from "sweetalert2";
 
 const SchedulerContext = createContext(null);
@@ -9,17 +9,17 @@ export function SchedulerProvider({ children }) {
   const [eventsMap, setEventsMap] = useState({});
   const [toggleMap, setToggleMap] = useState({});
 
-  const setEvents = (deviceId, updated) =>
+  const setEvents = useCallback((deviceId, updated) =>
     setEventsMap(prev => ({
       ...prev,
       [deviceId]: updated || [],
-    }));
+    })), []);
 
-  const setToggle = (deviceId, val) =>
+  const setToggle = useCallback((deviceId, val) =>
     setToggleMap(prev => ({
       ...prev,
       [deviceId]: val ?? "off",   // ← FORCE DEFAULT OFF
-    }));
+    })), []);
 
 
   // const fetchToggleStatus = async (deviceId) => {
@@ -47,7 +47,7 @@ export function SchedulerProvider({ children }) {
   //   }
   // };
 
-  const fetchToggleStatus = async (deviceId, retries = 5) => {
+  const fetchToggleStatus = useCallback(async (deviceId, retries = 5) => {
     try {
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API}/event/get-toggle-status/${deviceId}`,
@@ -81,7 +81,7 @@ export function SchedulerProvider({ children }) {
     } catch (err) {
       console.error("❌ Fetch toggle error:", err);
     }
-  };
+  }, []);
 
   // const triggerDevice = async (deviceId, action) => {
   //   const res = await fetch(
@@ -141,7 +141,7 @@ export function SchedulerProvider({ children }) {
 
   const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
-  const triggerDevice = async (deviceId, action) => {
+  const triggerDevice = useCallback(async (deviceId, action) => {
     const expected = action === "ON" ? "on" : "off";
 
     try {
@@ -202,9 +202,9 @@ export function SchedulerProvider({ children }) {
         confirmButtonColor: "#EF4444",
       });
     }
-  };
+  }, [fetchToggleStatus]);
 
-  const skipEvent = async (deviceId) => {
+  const skipEvent = useCallback(async (deviceId) => {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_API}/event/skip-event`, {
       method: "POST",
        headers: {
@@ -229,7 +229,7 @@ export function SchedulerProvider({ children }) {
     }));
 
     return data;
-  };
+  }, []);
 
 
   return (

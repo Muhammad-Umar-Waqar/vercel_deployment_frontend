@@ -55,6 +55,14 @@ export default function Dashboard() {
   const [pollHitTime, setPollHitTime] = useState(Date.now());
   const [deviceOnlineMap, setDeviceOnlineMap] = useState({});
   const [deviceLastUpdateMap, setDeviceLastUpdateMap] = useState({});
+  const [deviceInfluxValuesMap, setDeviceInfluxValuesMap] = useState({});
+  const [schedulerDeviceOnlineMap, setSchedulerDeviceOnlineMap] = useState({}); // Separate for TSD/ESD
+  const deviceMetadataRef = React.useRef({ ids: [], typeMap: {} });
+
+  // Use refs to avoid stale closures
+  const deviceInfluxValuesRef = React.useRef({});
+  const deviceLastUpdateRef = React.useRef({});
+  const influxQueryFunctionRef = React.useRef(null);
 
 
   const { eventsMap, toggleMap, setEvents, setToggle } = useScheduler();
@@ -144,9 +152,9 @@ export default function Dashboard() {
 
   // polling interval helper (unchanged)
   const getPollingInterval = () => {
-    if (!user?.timer) return 5 * 60 * 1000;
+    if (!user?.timer) return 10 * 60 * 1000;
     const match = /^(\d+)(s|m)$/.exec(user.timer.trim());
-    if (!match) return 5 * 60 * 1000;
+    if (!match) return 10 * 60 * 1000;  // Changed to 10 mins for consistency
     const value = parseInt(match[1], 10);
     const unit = match[2];
     if (unit === "s") {
@@ -154,7 +162,7 @@ export default function Dashboard() {
     } else if (unit === "m") {
       return Math.min(Math.max(value, 0), 60) * 60 * 1000;
     }
-    return 5 * 60 * 1000;
+    return 10 * 60 * 1000;  // Changed to 10 mins for consistency
   };
 
   const POLL_MS = getPollingInterval();
@@ -302,6 +310,22 @@ export default function Dashboard() {
           const devices = Array.isArray(data.devices) ? data.devices : data.devices ? [data.devices] : [];
           console.log("devices<>", devices);
 
+          // Update device metadata ref for InfluxDB query
+          const deviceIds = devices.map((d) => String(d.deviceId).trim()).filter(Boolean);
+          const deviceTypeMap = {};
+          devices.forEach((d) => {
+            const id = String(d.deviceId).trim();
+            if (id) deviceTypeMap[id] = d.deviceType;
+          });
+          deviceMetadataRef.current = { ids: deviceIds, typeMap: deviceTypeMap };
+          console.log("Updated deviceMetadataRef:", deviceMetadataRef.current);
+
+          // Trigger InfluxDB query immediately after updating metadata
+          if (influxQueryFunctionRef.current) {
+            console.log("Triggering InfluxDB query after API fetch");
+            influxQueryFunctionRef.current();
+          }
+
           //FaRaZ
           // const hasScheduler = withFrontendSeed.some((d) => d.deviceType === "SCHEDULER");
 
@@ -318,19 +342,82 @@ export default function Dashboard() {
             return devices.map((newDevice) => {
               const id = String(newDevice._id ?? newDevice.id ?? newDevice.deviceId);
               const oldDevice = prevMap.get(id);
-              if (!oldDevice) return newDevice;
 
+              // Get InfluxDB values for this device (read from ref to avoid stale closure)
+              const influxKey = String(newDevice.deviceId);
+              const influxValues = deviceInfluxValuesRef.current[influxKey] || {};
+              const influxLastUpdate = deviceLastUpdateRef.current[influxKey] || null;
+
+              console.log(`Merging device ${influxKey}:`, {
+                apiValues: {
+                  espHumidity: newDevice.espHumidity,
+                  espTemprature: newDevice.espTemprature,
+                },
+                influxValues: influxValues,
+                finalValues: {
+                  espHumidity: influxValues.espHumidity !== undefined ? influxValues.espHumidity : null,
+                  espTemprature: influxValues.espTemprature !== undefined ? influxValues.espTemprature : null,
+                }
+              });
+
+              // If no oldDevice, create base structure with InfluxDB fields set to null
+              if (!oldDevice) {
+                return {
+                  ...newDevice,
+                  // Override InfluxDB fields with null (don't use MongoDB values)
+                  espHumidity: influxValues.espHumidity !== undefined ? influxValues.espHumidity : null,
+                  espTemprature: influxValues.espTemprature !== undefined ? influxValues.espTemprature : null,
+                  espOdour: influxValues.espOdour !== undefined ? influxValues.espOdour : null,
+                  espAQI: influxValues.espAQI !== undefined ? influxValues.espAQI : null,
+                  espGL: influxValues.espGL !== undefined ? influxValues.espGL : null,
+                  espVoltage: influxValues.espVoltage !== undefined ? influxValues.espVoltage : null,
+                  espCurrent: influxValues.espCurrent !== undefined ? influxValues.espCurrent : null,
+                  espPower: influxValues.espPower !== undefined ? influxValues.espPower : null,
+                  NH3: influxValues.NH3 !== undefined ? influxValues.NH3 : null,
+                  H2S: influxValues.H2S !== undefined ? influxValues.H2S : null,
+                  PM1: influxValues.PM1 !== undefined ? influxValues.PM1 : null,
+                  PM25: influxValues.PM25 !== undefined ? influxValues.PM25 : null,
+                  PM10: influxValues.PM10 !== undefined ? influxValues.PM10 : null,
+                  Status: influxValues.Status !== undefined ? influxValues.Status : null,
+                  lastUpdateTime: influxLastUpdate,
+                };
+              }
 
               return {
+                // Base device properties (IDs, metadata, etc.)
                 ...oldDevice,
-                ...newDevice,
+                _id: newDevice._id ?? oldDevice._id,
+                id: newDevice.id ?? oldDevice.id,
+                deviceId: newDevice.deviceId ?? oldDevice.deviceId,
+                deviceType: newDevice.deviceType ?? oldDevice.deviceType,
+                venueName: newDevice.venueName ?? oldDevice.venueName,
+                venue: newDevice.venue ?? oldDevice.venue,
+                apiKey: newDevice.apiKey ?? oldDevice.apiKey,
+                chartData: newDevice.chartData ?? oldDevice.chartData,
+                needMaintenance: newDevice.needMaintenance ?? oldDevice.needMaintenance,
+                scheduler: newDevice.scheduler ?? oldDevice.scheduler,
+
+                // InfluxDB fields: NO fallback to API, use ONLY InfluxDB values
+                espHumidity: influxValues.espHumidity !== undefined ? influxValues.espHumidity : null,
+                espTemprature: influxValues.espTemprature !== undefined ? influxValues.espTemprature : null,
+                espOdour: influxValues.espOdour !== undefined ? influxValues.espOdour : null,
+                espAQI: influxValues.espAQI !== undefined ? influxValues.espAQI : null,
+                espGL: influxValues.espGL !== undefined ? influxValues.espGL : null,
+                espVoltage: influxValues.espVoltage !== undefined ? influxValues.espVoltage : null,
+                espCurrent: influxValues.espCurrent !== undefined ? influxValues.espCurrent : null,
+                espPower: influxValues.espPower !== undefined ? influxValues.espPower : null,
+                NH3: influxValues.NH3 !== undefined ? influxValues.NH3 : null,
+                H2S: influxValues.H2S !== undefined ? influxValues.H2S : null,
+                PM1: influxValues.PM1 !== undefined ? influxValues.PM1 : null,
+                PM25: influxValues.PM25 !== undefined ? influxValues.PM25 : null,
+                PM10: influxValues.PM10 !== undefined ? influxValues.PM10 : null,
+                Status: influxValues.Status !== undefined ? influxValues.Status : null,
+
+                // These fields are NOT in InfluxDB, keep from API
                 ambientTemperature: newDevice.ambientTemperature ?? oldDevice.ambientTemperature,
                 freezerTemperature: newDevice.freezerTemperature ?? oldDevice.freezerTemperature,
-                espHumidity: newDevice.espHumidity ?? oldDevice.espHumidity,
-                espTemprature: newDevice.espTemprature ?? oldDevice.espTemprature,
-                espOdour: newDevice.espOdour ?? oldDevice.espOdour,
-                espAQI: newDevice.espAQI ?? oldDevice.espAQI,
-                espGL: newDevice.espGL ?? oldDevice.espGL,
+
+                // Alerts: Always from API (not from InfluxDB)
                 temperatureAlert: newDevice.temperatureAlert ?? oldDevice.temperatureAlert,
                 humidityAlert: newDevice.humidityAlert ?? oldDevice.humidityAlert,
                 odourAlert: newDevice.odourAlert ?? oldDevice.odourAlert,
@@ -338,24 +425,13 @@ export default function Dashboard() {
                 glAlert: newDevice.glAlert ?? oldDevice.glAlert,
                 batteryLow: newDevice.batteryLow ?? oldDevice.batteryLow,
                 refrigeratorAlert: newDevice.refrigeratorAlert ?? oldDevice.refrigeratorAlert,
-                lastUpdateTime: newDevice.lastUpdateTime ?? oldDevice.lastUpdateTime,
 
-                espVoltage: newDevice.espVoltage ?? oldDevice.espVoltage,
-                espCurrent: newDevice.espCurrent ?? oldDevice.espCurrent,
-                // espPower: newDevice.espPower ?? oldDevice.espPower,
-                // compute power: prefer compute from voltage*current if both available else fallback to backend espPower
-                espPower: (() => {
-                  const v = newDevice.espVoltage ?? oldDevice.espVoltage;
-                  const c = newDevice.espCurrent ?? oldDevice.espCurrent;
-                  const vn = Number(v);
-                  const cn = Number(c);
-                  if (Number.isFinite(vn) && Number.isFinite(cn)) {
-                    return +(vn * cn); // numeric product
-                  }
-                  // fallback to any provided espPower (prefer newDevice)
-                  const p = newDevice.espPower ?? oldDevice.espPower;
-                  return p === undefined ? null : p;
-                })(),
+                // Last update time: ONLY from InfluxDB, no fallback
+                lastUpdateTime: influxLastUpdate,
+
+                // Keep nested data structures from API
+                AmbientData: newDevice.AmbientData ?? oldDevice.AmbientData,
+                FreezerData: newDevice.FreezerData ?? oldDevice.FreezerData,
               };
             });
           });
@@ -407,9 +483,147 @@ export default function Dashboard() {
     };
   }, [selectedVenueId, token, isDesktop, POLL_MS]);
 
-  //FaRaZ 
+  // -------------------------
+  // Re-merge devices when InfluxDB values update (without causing infinite loop)
+  // -------------------------
+  useEffect(() => {
+    if (!freezerDevices.length || Object.keys(deviceInfluxValuesMap).length === 0) return;
+
+    setFreezerDevices((prevDevices) => {
+      return prevDevices.map((device) => {
+        const influxKey = String(device.deviceId);
+        // Read from refs to get latest values
+        const influxValues = deviceInfluxValuesRef.current[influxKey] || {};
+        const influxLastUpdate = deviceLastUpdateRef.current[influxKey] || null;
+
+        if (Object.keys(influxValues).length === 0 && !influxLastUpdate) {
+          return device; // No InfluxDB data for this device, keep as is
+        }
+
+        console.log(`Re-merging device ${influxKey} with InfluxDB data:`, {
+          currentValues: {
+            espHumidity: device.espHumidity,
+            espTemprature: device.espTemprature,
+          },
+          influxValues: influxValues,
+        });
+
+        // Update only InfluxDB fields, keep everything else
+        return {
+          ...device,
+          espHumidity: influxValues.espHumidity !== undefined ? influxValues.espHumidity : device.espHumidity,
+          espTemprature: influxValues.espTemprature !== undefined ? influxValues.espTemprature : device.espTemprature,
+          espOdour: influxValues.espOdour !== undefined ? influxValues.espOdour : device.espOdour,
+          espAQI: influxValues.espAQI !== undefined ? influxValues.espAQI : device.espAQI,
+          espGL: influxValues.espGL !== undefined ? influxValues.espGL : device.espGL,
+          espVoltage: influxValues.espVoltage !== undefined ? influxValues.espVoltage : device.espVoltage,
+          espCurrent: influxValues.espCurrent !== undefined ? influxValues.espCurrent : device.espCurrent,
+          espPower: influxValues.espPower !== undefined ? influxValues.espPower : device.espPower,
+          NH3: influxValues.NH3 !== undefined ? influxValues.NH3 : device.NH3,
+          H2S: influxValues.H2S !== undefined ? influxValues.H2S : device.H2S,
+          PM1: influxValues.PM1 !== undefined ? influxValues.PM1 : device.PM1,
+          PM25: influxValues.PM25 !== undefined ? influxValues.PM25 : device.PM25,
+          PM10: influxValues.PM10 !== undefined ? influxValues.PM10 : device.PM10,
+          Status: influxValues.Status !== undefined ? influxValues.Status : device.Status,
+          lastUpdateTime: influxLastUpdate !== null ? influxLastUpdate : device.lastUpdateTime,
+        };
+      });
+    });
+  }, [deviceInfluxValuesMap, deviceLastUpdateMap, freezerDevices.length]);
+
+  // -------------------------
+  // TSD/ESD Online Status Polling (5 seconds)
+  // -------------------------
+  useEffect(() => {
+    if (!freezerDevices || freezerDevices.length === 0) return;
+
+    let mounted = true;
+    let intervalId = null;
+
+    const fetchSchedulerOnlineStatus = async () => {
+      try {
+        // Filter only TSD and ESD devices
+        const schedulerDevices = freezerDevices.filter(
+          (d) => d.deviceType === "TSD" || d.deviceType === "ESD"
+        );
+
+        if (schedulerDevices.length === 0) return;
+
+        console.log(`Fetching online status for ${schedulerDevices.length} TSD/ESD devices`);
+
+        const onlineStatusMap = {};
+
+        // Fetch status for each scheduler device
+        for (const device of schedulerDevices) {
+          const deviceKey = String(device.deviceId);
+
+          try {
+            const res = await fetch(
+              `${BASE}/event/get-current-events/${device.deviceId}`,
+              {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+              }
+            );
+
+            if (!mounted) return;
+
+            if (res.ok) {
+              const data = await res.json();
+              const isOnline = data?.event?.isDeviceOnline ?? false;
+              onlineStatusMap[deviceKey] = isOnline;
+
+              console.log(`TSD/ESD ${deviceKey} online status:`, isOnline);
+
+              // Also update event data in scheduler context
+              if (data.type && data.event) {
+                const eventWithType = { ...data.event, type: data.type };
+                setEvents(deviceKey, [eventWithType]);
+              }
+            } else {
+              console.warn(`Failed to fetch status for ${deviceKey}:`, res.status);
+              onlineStatusMap[deviceKey] = false;
+            }
+          } catch (err) {
+            console.error(`Error fetching status for ${deviceKey}:`, err);
+            onlineStatusMap[deviceKey] = false;
+          }
+        }
+
+        if (mounted) {
+          console.log('📊 Updating schedulerDeviceOnlineMap:', onlineStatusMap);
+          setSchedulerDeviceOnlineMap((prev) => {
+            const updated = { ...prev, ...onlineStatusMap };
+            console.log('📊 New schedulerDeviceOnlineMap state:', updated);
+            return updated;
+          });
+        }
+      } catch (err) {
+        console.error("Error in scheduler online status polling:", err);
+      }
+    };
+
+    // Initial fetch
+    fetchSchedulerOnlineStatus();
+
+    // Poll every 5 seconds
+    intervalId = setInterval(() => {
+      fetchSchedulerOnlineStatus();
+    }, 5000);
+
+    return () => {
+      mounted = false;
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [freezerDevices, token, BASE, setEvents]);
+
+  //FaRaZ
   // fetch events of TSD devices
-  const fetchSchedulerData = async () => {
+  const fetchSchedulerData = React.useCallback(async () => {
     console.log(`🔄 [page.jsx] fetchSchedulerData started`);
     try {
       const tsdDevices = freezerDevices.filter(
@@ -499,13 +713,13 @@ export default function Dashboard() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [freezerDevices, BASE, token, setEvents, setToggle]);
   useEffect(() => {
     if (!freezerDevices || freezerDevices.length === 0) return;
 
     fetchSchedulerData();
 
-  }, [freezerDevices, pollHitTime]);
+  }, [freezerDevices, pollHitTime, fetchSchedulerData]);
 
   // -------------------------
   // Event handlers (UPDATED to set context)
@@ -595,19 +809,79 @@ export default function Dashboard() {
     }
   };
 
-  // ======= rest of file: influx polling + render (unchanged) ========
-  // (I didn't change the Influx effect or device rendering code except to keep existing functionality)
+  // ======= InfluxDB field mapping configuration ========
+  const DEVICE_INFLUX_FIELDS = {
+    OMD: ["temperature", "humidity", "NH3", "H2S", "odor"],
+    GLMD: ["leakage", "temperature", "humidity"],
+    TMD: ["temperature", "humidity"],
+    TSD: ["temp", "humi"],
+    AQIMD: ["AQI", "temperature", "humidity", "PM1", "PM25", "PM10", "Status"],
+    EMD: ["voltage", "current", "temperature", "humidity"],
+    ESD: ["voltage", "current", "temperature", "humidity"],
+  };
+
+  // Map InfluxDB field names to component prop names
+  const mapInfluxToProps = (deviceType, influxData) => {
+    const mapped = {};
+
+    switch (deviceType) {
+      case "TMD":
+        if (influxData.temperature !== undefined) mapped.espTemprature = influxData.temperature;
+        if (influxData.humidity !== undefined) mapped.espHumidity = influxData.humidity;
+        break;
+      case "TSD":
+        if (influxData.temp !== undefined) mapped.espTemprature = influxData.temp;
+        if (influxData.humi !== undefined) mapped.espHumidity = influxData.humi;
+        break;
+      case "OMD":
+        if (influxData.temperature !== undefined) mapped.espTemprature = influxData.temperature;
+        if (influxData.humidity !== undefined) mapped.espHumidity = influxData.humidity;
+        if (influxData.odor !== undefined) mapped.espOdour = influxData.odor;
+        if (influxData.NH3 !== undefined) mapped.NH3 = influxData.NH3;
+        if (influxData.H2S !== undefined) mapped.H2S = influxData.H2S;
+        break;
+      case "AQIMD":
+        if (influxData.AQI !== undefined) mapped.espAQI = influxData.AQI;
+        if (influxData.temperature !== undefined) mapped.espTemprature = influxData.temperature;
+        if (influxData.humidity !== undefined) mapped.espHumidity = influxData.humidity;
+        if (influxData.PM1 !== undefined) mapped.PM1 = influxData.PM1;
+        if (influxData.PM25 !== undefined) mapped.PM25 = influxData.PM25;
+        if (influxData.PM10 !== undefined) mapped.PM10 = influxData.PM10;
+        if (influxData.Status !== undefined) mapped.Status = influxData.Status;
+        break;
+      case "GLMD":
+        if (influxData.leakage !== undefined) mapped.espGL = influxData.leakage;
+        if (influxData.temperature !== undefined) mapped.espTemprature = influxData.temperature;
+        if (influxData.humidity !== undefined) mapped.espHumidity = influxData.humidity;
+        break;
+      case "EMD":
+      case "ESD":
+        if (influxData.voltage !== undefined) mapped.espVoltage = influxData.voltage;
+        if (influxData.current !== undefined) mapped.espCurrent = influxData.current;
+        if (influxData.temperature !== undefined) mapped.espTemprature = influxData.temperature;
+        if (influxData.humidity !== undefined) mapped.espHumidity = influxData.humidity;
+        // Compute power if both voltage and current are available
+        if (influxData.voltage !== undefined && influxData.current !== undefined) {
+          const v = Number(influxData.voltage);
+          const c = Number(influxData.current);
+          if (Number.isFinite(v) && Number.isFinite(c)) {
+            mapped.espPower = +(v * c).toFixed(2);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+
+    return mapped;
+  };
+
+  // ======= rest of file: influx polling + render ========
   useEffect(() => {
     let mounted = true;
     const controller = new AbortController();
     const signal = controller.signal;
     let intervalId = null;
-
-    if (!freezerDevices || freezerDevices.length === 0) {
-      setDeviceOnlineMap({});
-      setDeviceLastUpdateMap({});
-      return () => { };
-    }
 
     const influxUrl = import.meta.env.VITE_INFLUX_URL;
     const influxToken = import.meta.env.VITE_INFLUX_TOKEN;
@@ -615,7 +889,7 @@ export default function Dashboard() {
     const influxBucket = "Odour";
 
     if (!influxUrl || !influxToken || !influxOrg || !influxBucket) {
-      console.warn("Influx env vars not set; skipping LED polling.");
+      console.warn("Influx env vars not set; skipping InfluxDB polling.");
       return () => { };
     }
 
@@ -624,48 +898,121 @@ export default function Dashboard() {
 
     const runQueryForAllDevices = async () => {
       try {
-        const deviceIds = freezerDevices.map((d) => String(d.deviceId).trim()).filter(Boolean);
-        console.log("device ids for influx db ", deviceIds)
-        if (!deviceIds.length) return;
+        // Use ref to get latest device metadata
+        const deviceIds = deviceMetadataRef.current.ids;
+        const deviceTypeMap = deviceMetadataRef.current.typeMap;
+
+        console.log("device ids for influx db ", deviceIds);
+        if (!deviceIds.length) {
+          console.log("No devices yet, skipping InfluxDB query");
+          return; // Skip this iteration, but keep the interval running
+        }
+
+        // Collect all unique fields needed across all devices
+
+        // Collect all unique fields needed across all devices
+        const allFieldsSet = new Set();
+        Object.values(DEVICE_INFLUX_FIELDS).forEach((fields) => {
+          fields.forEach((f) => allFieldsSet.add(f));
+        });
+        const allFields = Array.from(allFieldsSet);
+
         const measureFilter = deviceIds.map((id) => `r._measurement == "${id}"`).join(" or ");
+        const fieldFilter = allFields.map((f) => `r._field == "${f}"`).join(" or ");
+
         const flux = `
   from(bucket: "${influxBucket}")
     |> range(start: -30d)
-    |> filter(fn: (r) => ${measureFilter})
+    |> filter(fn: (r) => (${measureFilter}) and (${fieldFilter}))
     |> last()
-    |> keep(columns: ["_measurement", "_time"])
+    |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value")
   `;
+
         console.log("FLUX QUERY:\n", flux);
         const rows = await queryApi.collectRows(flux);
+        console.log("InfluxDB Raw Rows:", rows);
         if (!mounted) return;
+
         const lastMap = {};
+        const onlineMap = {};
+        const valuesMap = {};
+        // Use user.timer for online threshold, default to 10 mins
+        const thresholdMs = Date.now() - POLL_MS;
+
         for (const r of rows) {
-          const m = r._measurement || r.measurement || r._measurement;
-          // const t = r._time || r._time;
+          const m = r._measurement || r.measurement;
           const t = r._time ?? r.time ?? null;
 
           if (!m) continue;
-          const timeISO = typeof t === "string" ? t : t instanceof Date ? t.toISOString() : String(t);
-          lastMap[String(m)] = timeISO;
-        }
-        const thresholdMs = Date.now() - 1.5 * 60 * 60 * 1000;
-        const onlineMap = {};
-        deviceIds.forEach((id) => {
-          const timeISO = lastMap[id];
-          if (!timeISO) {
-            onlineMap[id] = false;
-          } else {
+
+          const deviceId = String(m);
+
+          // Convert timestamp to ISO string, handle null properly
+          let timeISO = null;
+          if (t) {
+            if (typeof t === "string") {
+              timeISO = t;
+            } else if (t instanceof Date) {
+              timeISO = t.toISOString();
+            } else {
+              timeISO = String(t);
+            }
+          }
+
+          lastMap[deviceId] = timeISO;
+
+          // Check online status
+          if (timeISO) {
             const ts = new Date(timeISO).getTime();
-            onlineMap[id] = Number.isFinite(ts) && ts >= thresholdMs;
+            onlineMap[deviceId] = Number.isFinite(ts) && ts >= thresholdMs;
+          } else {
+            onlineMap[deviceId] = false;
+          }
+
+          // Extract sensor values for this device
+          const deviceType = deviceTypeMap[deviceId];
+          if (deviceType && DEVICE_INFLUX_FIELDS[deviceType]) {
+            const influxData = {};
+            DEVICE_INFLUX_FIELDS[deviceType].forEach((field) => {
+              if (r[field] !== undefined && r[field] !== null) {
+                influxData[field] = r[field];
+              }
+            });
+            const mappedValues = mapInfluxToProps(deviceType, influxData);
+            console.log(`InfluxDB Data for ${deviceId} (${deviceType}):`, {
+              raw: influxData,
+              mapped: mappedValues
+            });
+            valuesMap[deviceId] = mappedValues;
+          }
+        }
+
+        // Handle devices with no data
+        deviceIds.forEach((id) => {
+          if (!lastMap[id]) {
+            onlineMap[id] = false;
           }
         });
+
+        console.log("InfluxDB Final Values Map:", valuesMap);
+        console.log("InfluxDB Online Map:", onlineMap);
+
+        // Update refs first (for fresh reads in API fetch)
+        deviceInfluxValuesRef.current = { ...deviceInfluxValuesRef.current, ...valuesMap };
+        deviceLastUpdateRef.current = { ...deviceLastUpdateRef.current, ...lastMap };
+
+        // Then update state (for re-renders)
         setDeviceLastUpdateMap((prev) => ({ ...prev, ...lastMap }));
         setDeviceOnlineMap((prev) => ({ ...prev, ...onlineMap }));
+        setDeviceInfluxValuesMap((prev) => ({ ...prev, ...valuesMap }));
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Influx LED polling error:", err);
+        console.error("Influx polling error:", err);
       }
     };
+
+    // Store the query function in ref so it can be called from API fetch
+    influxQueryFunctionRef.current = runQueryForAllDevices;
 
     runQueryForAllDevices();
     intervalId = setInterval(() => {
@@ -677,7 +1024,7 @@ export default function Dashboard() {
       if (intervalId) clearInterval(intervalId);
       controller.abort();
     };
-  }, [freezerDevices, POLL_MS]);
+  }, [selectedVenueId, POLL_MS]);
 
   if (loading) {
     return (
@@ -746,8 +1093,21 @@ export default function Dashboard() {
                   {freezerDevices.map((device) => {
                     const idKey = device._id ?? device.id ?? device.deviceId;
                     const influxKey = String(device.deviceId);
-                    const isOnline = Boolean(deviceOnlineMap[influxKey]);
+                    const isOnline = (device.deviceType === "TSD" || device.deviceType === "ESD")
+                      ? Boolean(schedulerDeviceOnlineMap[influxKey])
+                      : Boolean(deviceOnlineMap[influxKey]);
                     const lastUpdateISO = deviceLastUpdateMap[influxKey] || null;
+
+                    // Debug logging for TSD/ESD devices
+                    if (device.deviceType === "TSD" || device.deviceType === "ESD") {
+                      console.log(`🎯 Rendering ${device.deviceType} device ${influxKey}:`, {
+                        deviceType: device.deviceType,
+                        influxKey,
+                        schedulerDeviceOnlineMap,
+                        valueInMap: schedulerDeviceOnlineMap[influxKey],
+                        isOnline,
+                      });
+                    }
 
                     const commonProps = {
                       // key: idKey,
@@ -763,7 +1123,7 @@ export default function Dashboard() {
                       odourAlert: device?.odourAlert,
                       espOdour: device?.espOdour,
                       isOnline,
-                      lastUpdateISO,
+                      lastUpdateISO, 
                     };
 
                     if (device?.deviceType === "AQIMD") {
@@ -848,8 +1208,6 @@ export default function Dashboard() {
           selectedFreezerDeviceId={selectedFreezerDeviceId}
           selectedOrgId={selectedOrgId}
           pollInterval={POLL_MS}
-
-
         />
       ) : (
         <Drawer open={open} onClose={toggleDrawer(false)} anchor="right" PaperProps={{
@@ -859,7 +1217,7 @@ export default function Dashboard() {
     },
   }}
   >
-          <DashboardRightPanel
+        <DashboardRightPanel
             freezerDevices={freezerDevices}
             selectedFreezerDeviceId={selectedFreezerDeviceId}
             selectedOrgId={selectedOrgId}

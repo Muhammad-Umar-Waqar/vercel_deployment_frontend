@@ -865,8 +865,28 @@ export default function VenueDetailsPanel({
   const handleDownload = () => setDownloadOpen(true);
 
   const formatLastUpdate = (time) => {
-    if (!time) return null;
-    const date = new Date(time);
+    console.log('VenueDetailsPanel - lastUpdateTime received:', time, 'Type:', typeof time);
+
+    // Handle string "null" or actual null/undefined
+    if (!time || time === 'null' || time === 'undefined') return null;
+
+    // Handle different timestamp formats
+    let date;
+    if (time instanceof Date) {
+      date = time;
+    } else if (typeof time === 'string' || typeof time === 'number') {
+      date = new Date(time);
+    } else {
+      console.warn('Invalid lastUpdateTime format:', time);
+      return 'Invalid Date';
+    }
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date created from:', time);
+      return 'Invalid Date';
+    }
+
     return date.toLocaleString(undefined, {
       year: "numeric", month: "short", day: "numeric",
       hour: "2-digit", minute: "2-digit",

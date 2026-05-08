@@ -920,9 +920,17 @@ export default function Dashboard() {
         const measureFilter = deviceIds.map((id) => `r._measurement == "${id}"`).join(" or ");
         const fieldFilter = allFields.map((f) => `r._field == "${f}"`).join(" or ");
 
+  //       const flux = `
+  // from(bucket: "${influxBucket}")
+  //   |> range(start: -30d)
+  //   |> filter(fn: (r) => (${measureFilter}) and (${fieldFilter}))
+  //   |> last()
+  //   |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value")
+  // `;
+
         const flux = `
   from(bucket: "${influxBucket}")
-    |> range(start: -30d)
+    |> range(start: 0)
     |> filter(fn: (r) => (${measureFilter}) and (${fieldFilter}))
     |> last()
     |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value")

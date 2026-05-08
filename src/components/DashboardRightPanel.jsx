@@ -202,10 +202,8 @@ export default function DashboardRightPanel({
   className = "",
   onClose = undefined,
   closeIcon = false,
-  // schedulerEventsMap = {},
-  // onSchedulerEventsChange,
-  // schedulerToggleMap = {},       // ← NEW
-  // onSchedulerToggleChange,       // ← NEW
+  schedulerDeviceOnlineMap = {},
+  deviceOnlineMap = {},
 }) {
   const selected = useMemo(() => {
     if (!selectedFreezerDeviceId) return null;
@@ -216,11 +214,11 @@ export default function DashboardRightPanel({
     );
   }, [freezerDevices, selectedFreezerDeviceId, pollInterval]);
 
-  
+
 
   // Derive the key and events for the selected device
   const selectedIdKey = selected
-    ? String(selected._id ?? selected.id ?? selected.deviceId)
+    ? String(selected.deviceId)  // ✅ Use deviceId consistently for online status lookup
     : null;
 
   // const selectedDeviceEvents = selectedIdKey
@@ -236,6 +234,18 @@ export default function DashboardRightPanel({
   const { eventsMap, toggleMap, setEvents, setToggle } = useScheduler();
   const selectedDeviceEvents = selectedIdKey ? eventsMap[selectedIdKey] ?? [] : [];
   const selectedToggleState = selectedIdKey ? toggleMap[selectedIdKey] ?? null : null;
+
+  // ✅ Calculate real online status based on device type
+  const isOnline = useMemo(() => {
+    if (!selected || !selectedIdKey) return true;
+
+    const deviceType = selected.deviceType;
+    if (deviceType === "TSD" || deviceType === "ESD") {
+      return Boolean(schedulerDeviceOnlineMap[selectedIdKey]);
+    } else {
+      return Boolean(deviceOnlineMap[selectedIdKey]);
+    }
+  }, [selected, selectedIdKey, schedulerDeviceOnlineMap, deviceOnlineMap]);
 
 
 
@@ -273,6 +283,7 @@ export default function DashboardRightPanel({
           espVoltage={selected?.espVoltage}
           espCurrent={selected?.espCurrent}
           espPower={selected?.espPower}
+          isOnline={isOnline}
           // schedulerEvents={selectedDeviceEvents}
           // onSchedulerEventsChange={(updated) =>
           //   onSchedulerEventsChange?.(selectedIdKey, updated)
@@ -280,7 +291,7 @@ export default function DashboardRightPanel({
           //    schedulerToggleState={selectedToggleState}
           // onSchedulerToggleChange={(val) =>
           //   onSchedulerToggleChange?.(selectedIdKey, val)
-            
+
           // }
 
           // onSchedulerEventsChange={(updated) => setEvents(selectedIdKey, updated)}

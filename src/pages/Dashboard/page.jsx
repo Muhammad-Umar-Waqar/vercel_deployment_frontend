@@ -1208,6 +1208,8 @@ export default function Dashboard() {
           selectedFreezerDeviceId={selectedFreezerDeviceId}
           selectedOrgId={selectedOrgId}
           pollInterval={POLL_MS}
+          schedulerDeviceOnlineMap={schedulerDeviceOnlineMap}
+          deviceOnlineMap={deviceOnlineMap}
         />
       ) : (
         <Drawer open={open} onClose={toggleDrawer(false)} anchor="right" PaperProps={{
@@ -1224,7 +1226,8 @@ export default function Dashboard() {
             closeIcon={true}
             onClose={toggleDrawer(false)}
             pollInterval={POLL_MS}
-
+            schedulerDeviceOnlineMap={schedulerDeviceOnlineMap}
+            deviceOnlineMap={deviceOnlineMap}
           />
         </Drawer>
       )}

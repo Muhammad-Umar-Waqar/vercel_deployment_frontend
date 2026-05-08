@@ -145,6 +145,34 @@ export function SchedulerProvider({ children }) {
     const expected = action === "ON" ? "on" : "off";
 
     try {
+      // ✅ STEP 1: Check if device is online first
+      const checkRes = await fetch(
+        `${import.meta.env.VITE_BACKEND_API}/event/get-current-events/${deviceId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${TOKEN}`,
+          },
+        }
+      );
+
+      const checkData = await checkRes.json();
+
+      // Check if device is offline
+      if (checkRes.ok && checkData?.event?.isDeviceOnline === false) {
+        Swal.fire({
+          icon: "error",
+          title: "Device is Offline",
+          text: "Cannot turn ON/OFF because the device is currently offline.\nPlease check the device connection.",
+          confirmButtonColor: "#EF4444",
+          confirmButtonText: "Okay",
+        });
+        return; // Stop execution
+      }
+
+      // ✅ STEP 2: Device is online, proceed with toggle
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API}/event/toggle-switch`,
         {
@@ -161,22 +189,7 @@ export function SchedulerProvider({ children }) {
       const data = await res.json();
       console.log("Trigger Response:", data);
 
-      // 🔥 Check for offline device
-      if (data.note === "Device is offline" ||
-        (data.message && data.message.toLowerCase().includes("offline"))) {
-
-        Swal.fire({
-          icon: "error",
-          title: "Device is Offline",
-          text: "Cannot turn ON/OFF because the device is currently offline.\nPlease check the device connection.",
-          confirmButtonColor: "#EF4444",
-          confirmButtonText: "Okay",
-        });
-
-        return; // Stop execution
-      }
-
-      // Handle other API errors
+      // Handle API errors
       if (!res.ok) {
         throw new Error(data.message || "Toggle failed");
       }

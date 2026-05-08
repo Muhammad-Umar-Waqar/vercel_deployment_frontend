@@ -689,6 +689,7 @@ export default function VenueDetailsPanel({
   espVoltage = null,
   espCurrent = null,
   espPower = null,
+  isOnline = true,
 }) {
 
   const dispatch = useDispatch();
@@ -707,6 +708,7 @@ export default function VenueDetailsPanel({
   const venueId = params.get("venue");
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [powerModalOpen, setPowerModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const orgVenues = useSelector((state) => (orgId ? state.Venue.venuesByOrg[orgId] || [] : []));
   const globalVenues = useSelector((state) => state.Venue.Venues || []);
@@ -741,9 +743,10 @@ export default function VenueDetailsPanel({
   }, [schedulerEvents]);
 
   const displayToggleState = useMemo(() => {
-    if (runningSchedulerEvent) return "gray";
+    // Show gray when event is running OR device is offline
+    if (runningSchedulerEvent || !isOnline) return "gray";
     return resolvedToggle;
-  }, [runningSchedulerEvent, resolvedToggle]);
+  }, [runningSchedulerEvent, resolvedToggle, isOnline]);
 
   // ✅ Refresh events from backend (same logic as EventsSection)
   const refreshEvents = async () => {
@@ -818,6 +821,7 @@ export default function VenueDetailsPanel({
 
       if (result.isConfirmed) {
         try {
+          setLoading(true);
           await skipEvent(deviceId);
           await refreshEvents();
         } catch (err) {
@@ -826,6 +830,8 @@ export default function VenueDetailsPanel({
             title: "Failed",
             text: err.message || "Could not skip event",
           });
+        } finally {
+          setLoading(false);
         }
       }
       return;
@@ -833,6 +839,7 @@ export default function VenueDetailsPanel({
 
     // No running event → normal toggle
     try {
+      setLoading(true);
       const nextAction = resolvedToggle === "on" ? "OFF" : "ON";
       await triggerDevice(deviceId, nextAction);
     } catch (err) {
@@ -841,6 +848,8 @@ export default function VenueDetailsPanel({
         title: "Failed",
         text: err.message || "Failed to send command",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1059,15 +1068,25 @@ export default function VenueDetailsPanel({
             {isSchedulerDevice && (
               <button
                 onClick={handleSchedulerToggleClick}
-                className={`flex flex-col justify-center items-center gap-3 px-4 py-5 rounded-xl text-sm font-semibold text-white transition shadow-sm cursor-pointer active:scale-[.98]
-                  ${displayToggleState === "on" ? "bg-emerald-500 hover:bg-emerald-600"
-                    : displayToggleState === "off" ? "bg-rose-500 hover:bg-rose-600"
-                      : "bg-gray-400 hover:bg-gray-500"}`}
-                title={displayToggleState === "gray" ? "Event running — click to disable" : displayToggleState === "on" ? "Turn Off" : "Turn On"}
+                disabled={loading}
+                className={`flex flex-col justify-center items-center gap-3 px-4 py-5 rounded-xl text-sm font-semibold text-white transition shadow-sm active:scale-[.98]
+                  ${loading
+                    ? "bg-gray-400 cursor-wait opacity-70"
+                    : displayToggleState === "on" ? "bg-emerald-500 hover:bg-emerald-600 cursor-pointer"
+                    : displayToggleState === "off" ? "bg-rose-500 hover:bg-rose-600 cursor-pointer"
+                      : "bg-gray-400 hover:bg-gray-500 cursor-pointer"}`}
+                title={loading ? "Processing..." : displayToggleState === "gray" ? "Event running or device offline — click to disable" : displayToggleState === "on" ? "Turn Off" : "Turn On"}
               >
-                <Power size={15} strokeWidth={2} />
+                {loading ? (
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <Power size={15} strokeWidth={2} />
+                )}
                 <span className="text-xs font-bold">
-                  {displayToggleState === "on" ? "ON" : displayToggleState === "off" ? "OFF" : "Event"}
+                  {loading ? "..." : displayToggleState === "on" ? "ON" : displayToggleState === "off" ? "OFF" : "Event"}
                 </span>
               </button>
             )}

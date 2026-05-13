@@ -47,13 +47,14 @@ const EventCard = ({ event, onToggle, onDelete }) => {
     date.setUTCMinutes(minutes);
     date.setUTCSeconds(0);
 
-    // ✅ Convert to LOCAL automatically
-    let h = date.getHours() % 12;
-    if (h === 0) h = 12;
+    // ✅ Convert to LOCAL 12-hour format with AM/PM
+    let h = date.getHours();
+    const period = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12; // Convert 0 to 12, and 13-23 to 1-11
 
     const m = String(date.getMinutes()).padStart(2, "0");
 
-    return `${String(h).padStart(2, "0")}:${m}`;
+    return `${h}:${m} ${period}`;
   };
 
   const shortDay = (day) => {

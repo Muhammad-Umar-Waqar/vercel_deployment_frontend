@@ -808,6 +808,33 @@ const calculateNextTransitionTime = (events = [], isOnline = true) => {
   return nearestTransitionMs;
 };
 
+// Convert UTC time string (HH:MM) to local time string in 12-hour format with AM/PM
+const convertUTCToLocal = (utcTimeString) => {
+  if (!utcTimeString) return utcTimeString;
+
+  try {
+    const [hours, minutes] = utcTimeString.split(':').map(Number);
+
+    // Create a UTC date with today's date + the UTC time
+    const utcDate = new Date();
+    utcDate.setUTCHours(hours, minutes, 0, 0);
+
+    // Get local hours and minutes
+    let localHours = utcDate.getHours();
+    const localMinutes = utcDate.getMinutes();
+
+    // Convert to 12-hour format
+    const period = localHours >= 12 ? 'PM' : 'AM';
+    localHours = localHours % 12 || 12; // Convert 0 to 12, and 13-23 to 1-11
+
+    // Format as H:MM AM/PM (no leading zero for hours in 12-hour format)
+    return `${localHours}:${String(localMinutes).padStart(2, '0')} ${period}`;
+  } catch (err) {
+    console.error('Error converting UTC to local:', err);
+    return utcTimeString; // Return original if conversion fails
+  }
+};
+
 // Trust backend 'type' field strictly
 const getCurrentRunningEvent = (events = []) => {
   if (!events || events.length === 0) return null;
@@ -1146,12 +1173,16 @@ const SchedulerDeviceCard = React.memo(function SchedulerDeviceCard({
 
   // ✅ Check if event is running FIRST (higher priority)
   if (runningEvent) {
+    // Convert UTC times to local 24-hour format
+    const localStartTime = convertUTCToLocal(runningEvent.startTime);
+    const localEndTime = convertUTCToLocal(runningEvent.endTime);
+
     const result = await Swal.fire({
       title: "Event Currently Running",
       html: `
         The <b>${runningEvent.command || "Scheduled"}</b> event is active.<br/>
         <span style="color:#64748b;font-size:13px">
-          ${runningEvent.startTime} → ${runningEvent.endTime}
+          ${localStartTime} → ${localEndTime}
         </span><br/><br/>
         Do you want to disable this event?
       `,

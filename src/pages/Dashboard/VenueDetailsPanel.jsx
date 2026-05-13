@@ -664,6 +664,33 @@ import DownloadModal from "./DownloadModal";
 import EventsSection from "../../components/components/events/EventsSection";
 import { useScheduler } from "../../contexts/SchedulerContext";
 
+// Convert UTC time string (HH:MM) to local time string in 12-hour format with AM/PM
+const convertUTCToLocal = (utcTimeString) => {
+  if (!utcTimeString) return utcTimeString;
+
+  try {
+    const [hours, minutes] = utcTimeString.split(':').map(Number);
+
+    // Create a UTC date with today's date + the UTC time
+    const utcDate = new Date();
+    utcDate.setUTCHours(hours, minutes, 0, 0);
+
+    // Get local hours and minutes
+    let localHours = utcDate.getHours();
+    const localMinutes = utcDate.getMinutes();
+
+    // Convert to 12-hour format
+    const period = localHours >= 12 ? 'PM' : 'AM';
+    localHours = localHours % 12 || 12; // Convert 0 to 12, and 13-23 to 1-11
+
+    // Format as H:MM AM/PM (no leading zero for hours in 12-hour format)
+    return `${localHours}:${String(localMinutes).padStart(2, '0')} ${period}`;
+  } catch (err) {
+    console.error('Error converting UTC to local:', err);
+    return utcTimeString; // Return original if conversion fails
+  }
+};
+
 export default function VenueDetailsPanel({
   organizationId = null,
   venueName = "Karim Korangi Branch",
@@ -802,12 +829,16 @@ export default function VenueDetailsPanel({
   // Handle Toggle Click (Same as Card)
   const handleSchedulerToggleClick = async () => {
     if (runningSchedulerEvent) {
+      // Convert UTC times to local 24-hour format
+      const localStartTime = convertUTCToLocal(runningSchedulerEvent.startTime);
+      const localEndTime = convertUTCToLocal(runningSchedulerEvent.endTime);
+
       const result = await Swal.fire({
         title: "Event Currently Running",
         html: `
           The <b>${runningSchedulerEvent.command || "Scheduled"}</b> event is currently active.<br/>
           <span style="color:#64748b;font-size:13px">
-            ${runningSchedulerEvent.startTime} → ${runningSchedulerEvent.endTime}
+            ${localStartTime} → ${localEndTime}
           </span>
           <br/><br/>
           Do you want to disable this event?

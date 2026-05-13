@@ -1086,7 +1086,7 @@ export default function VenueDetailsPanel({
                   <Power size={15} strokeWidth={2} />
                 )}
                 <span className="text-xs font-bold">
-                  {loading ? "..." : displayToggleState === "on" ? "ON" : displayToggleState === "off" ? "OFF" : "Event"}
+                  {loading ? "..." : displayToggleState === "on" ? "ON" : displayToggleState === "off" ? "OFF" : ""}
                 </span>
               </button>
             )}

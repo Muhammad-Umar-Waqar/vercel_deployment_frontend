@@ -574,7 +574,7 @@ export default function Dashboard() {
 
             if (res.ok) {
               const data = await res.json();
-              const isOnline = data?.event?.isDeviceOnline ?? false;
+              const isOnline = (data?.event?.isDeviceOnline || data?.isDeviceOnline) ?? false;
               onlineStatusMap[deviceKey] = isOnline;
 
               console.log(`TSD/ESD ${deviceKey} online status:`, isOnline);
@@ -952,7 +952,6 @@ export default function Dashboard() {
           const t = r._time ?? r.time ?? null;
 
           if (!m) continue;
-
           const deviceId = String(m);
 
           // Convert timestamp to ISO string, handle null properly

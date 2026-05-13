@@ -161,7 +161,7 @@ export function SchedulerProvider({ children }) {
       const checkData = await checkRes.json();
 
       // Check if device is offline
-      if (checkRes.ok && checkData?.event?.isDeviceOnline === false) {
+      if (checkRes.ok && (checkData?.event?.isDeviceOnline === false || checkData?.isDeviceOnline === false)) {
         Swal.fire({
           icon: "error",
           title: "Device is Offline",

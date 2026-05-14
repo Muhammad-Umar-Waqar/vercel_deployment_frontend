@@ -418,7 +418,7 @@ const EventsSection = ({
         >
           {events.map((event) => (
             <EventCard
-              key={event.id}
+              key={event.id || event._id}
               event={event}
               onToggle={() => toggleEventStatus(event)}
               onDelete={() => handleDeleteClick(event._id)}

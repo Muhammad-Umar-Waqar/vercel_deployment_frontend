@@ -256,75 +256,140 @@ const EventModal = ({ open, onClose, onSave }) => {
   // };
 
   //FaRaZ
-  const handleSave = async () => {
-    if (isSaveDisabled) return;
+  // const handleSave = async () => {
+  //   if (isSaveDisabled) return;
 
-    setIsLoading(true);
+  //   setIsLoading(true);
     
-    if (!start || !end) {
-      return Swal.fire({
-        icon: "warning",
-        title: "Missing Time",
-        text: "Please select both start and end time",
-      });
-    }
+  //   if (!start || !end) {
+  //     return Swal.fire({
+  //       icon: "warning",
+  //       title: "Missing Time",
+  //       text: "Please select both start and end time",
+  //     });
+  //   }
 
-    if (days.length === 0) {
-      return Swal.fire({
-        icon: "warning",
-        title: "No Days Selected",
-        text: "Please select at least one day",
-      });
-    }
+  //   if (days.length === 0) {
+  //     return Swal.fire({
+  //       icon: "warning",
+  //       title: "No Days Selected",
+  //       text: "Please select at least one day",
+  //     });
+  //   }
 
-    // Check same time
-    if (start.isSame(end)) {
-      return Swal.fire({
-        icon: "warning",
-        title: "Invalid Time",
-        text: "Start and End time cannot be the same",
-      });
-    }
+  //   // Check same time
+  //   if (start.isSame(end)) {
+  //     return Swal.fire({
+  //       icon: "warning",
+  //       title: "Invalid Time",
+  //       text: "Start and End time cannot be the same",
+  //     });
+  //   }
 
-    try {
-      // ✅ Convert LOCAL → UTC
-      const startUTC = start.local().utc().format("HH:mm");
-      const endUTC = end.local().utc().format("HH:mm");
+  //   try {
+  //     // ✅ Convert LOCAL → UTC
+  //     const startUTC = start.local().utc().format("HH:mm");
+  //     const endUTC = end.local().utc().format("HH:mm");
 
 
-      console.log("Local:", start.format("HH:mm"));
-      console.log("UTC:", start.utc().format("HH:mm"));
-      console.log("Offset:", start.utcOffset());
+  //     console.log("Local:", start.format("HH:mm"));
+  //     console.log("UTC:", start.utc().format("HH:mm"));
+  //     console.log("Offset:", start.utcOffset());
 
-      // Convert days → backend format
-      const fullDaysMap = {
-        Mon: "monday",
-        Tue: "tuesday",
-        Wed: "wednesday",
-        Thu: "thursday",
-        Fri: "friday",
-        Sat: "saturday",
-        Sun: "sunday",
-      };
+  //     // Convert days → backend format
+  //     const fullDaysMap = {
+  //       Mon: "monday",
+  //       Tue: "tuesday",
+  //       Wed: "wednesday",
+  //       Thu: "thursday",
+  //       Fri: "friday",
+  //       Sat: "saturday",
+  //       Sun: "sunday",
+  //     };
 
-      const formattedDays = days.map((d) => fullDaysMap[d]);
+  //     const formattedDays = days.map((d) => fullDaysMap[d]);
 
-      console.log("Saving Event:", { startUTC, endUTC, days: formattedDays });
+  //     console.log("Saving Event:", { startUTC, endUTC, days: formattedDays });
 
-      await onSave({
-        startTime: startUTC,
-        endTime: endUTC,
-        days: formattedDays,
-      });
+  //     await onSave({
+  //       startTime: startUTC,
+  //       endTime: endUTC,
+  //       days: formattedDays,
+  //     });
 
-      onClose();
+  //     onClose();
 
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const handleSave = async () => {
+  if (isSaveDisabled) return;
+  setIsLoading(true);
+
+  if (start.isSame(end)) {
+    setIsLoading(false);
+    return Swal.fire({
+      icon: "warning",
+      title: "Invalid Time",
+      text: "Start and End time cannot be the same",
+    });
+  }
+
+  try {
+    // ── 1. Convert HH:mm to UTC ──────────────────────────────────────────
+    const startUTC = start.utc().format("HH:mm");
+    const endUTC   = end.utc().format("HH:mm");
+
+    // ── 2. Calculate day shift caused by UTC conversion ───────────────────
+    // Compare local weekday vs UTC weekday for the start time.
+    // dayjs .day() returns 0 (Sun) … 6 (Sat).
+    const localDayIndex = start.day();       // e.g. Thursday = 4
+    const utcDayIndex   = start.utc().day(); // e.g. Wednesday = 3 (PKT +5, 3am → 10pm prev day)
+
+    // Raw difference: -1 means UTC rolled back one day, +1 means rolled forward.
+    // Handle the Sun(0) ↔ Sat(6) wraparound with modular arithmetic.
+    let dayShift = utcDayIndex - localDayIndex; // e.g. 3 - 4 = -1
+    if (dayShift > 1)  dayShift = -1; // e.g. Sat(6) local → Sun(0) UTC
+    if (dayShift < -1) dayShift = 1;  // e.g. Sun(0) local → Sat(6) UTC
+
+    // ── 3. Full day name maps ─────────────────────────────────────────────
+    const shortToIndex = {
+      Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+    };
+    const indexToFull = {
+      0: "sunday", 1: "monday", 2: "tuesday", 3: "wednesday",
+      4: "thursday", 5: "friday", 6: "saturday",
+    };
+
+    // ── 4. Shift each selected day ────────────────────────────────────────
+    const formattedDays = days.map((d) => {
+      const shifted = (shortToIndex[d] + dayShift + 7) % 7; // +7 prevents negative modulo
+      return indexToFull[shifted];
+    });
+
+    console.log("Local start :", start.format("ddd HH:mm"));
+    console.log("UTC start   :", start.utc().format("ddd HH:mm"));
+    console.log("Day shift   :", dayShift);
+    console.log("Payload     :", { startUTC, endUTC, days: formattedDays });
+
+    await onSave({
+      startTime: startUTC,
+      endTime:   endUTC,
+      days:      formattedDays,
+    });
+
+    onClose();
+  } catch (err) {
+    console.error(err);
+    Swal.fire({ icon: "error", title: "Failed", text: "Could not create event" });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const timePickerSx = {
     width: "100%",

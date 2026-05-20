@@ -920,13 +920,13 @@ export default function Dashboard() {
         const measureFilter = deviceIds.map((id) => `r._measurement == "${id}"`).join(" or ");
         const fieldFilter = allFields.map((f) => `r._field == "${f}"`).join(" or ");
 
-  //       const flux = `
-  // from(bucket: "${influxBucket}")
-  //   |> range(start: -30d)
-  //   |> filter(fn: (r) => (${measureFilter}) and (${fieldFilter}))
-  //   |> last()
-  //   |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value")
-  // `;
+        //       const flux = `
+        // from(bucket: "${influxBucket}")
+        //   |> range(start: -30d)
+        //   |> filter(fn: (r) => (${measureFilter}) and (${fieldFilter}))
+        //   |> last()
+        //   |> pivot(rowKey:["_time", "_measurement"], columnKey: ["_field"], valueColumn: "_value")
+        // `;
 
         const flux = `
   from(bucket: "${influxBucket}")
@@ -1130,7 +1130,7 @@ export default function Dashboard() {
                       odourAlert: device?.odourAlert,
                       espOdour: device?.espOdour,
                       isOnline,
-                      lastUpdateISO, 
+                      lastUpdateISO,
                     };
 
                     if (device?.deviceType === "AQIMD") {
@@ -1220,13 +1220,13 @@ export default function Dashboard() {
         />
       ) : (
         <Drawer open={open} onClose={toggleDrawer(false)} anchor="right" PaperProps={{
-    sx: {
-      width: "100%",
-      maxWidth: "100vw",
-    },
-  }}
-  >
-        <DashboardRightPanel
+          sx: {
+            width: "100%",
+            maxWidth: "100vw",
+          },
+        }}
+        >
+          <DashboardRightPanel
             freezerDevices={freezerDevices}
             selectedFreezerDeviceId={selectedFreezerDeviceId}
             selectedOrgId={selectedOrgId}

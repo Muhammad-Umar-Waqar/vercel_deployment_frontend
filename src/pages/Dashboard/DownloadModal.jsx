@@ -4171,7 +4171,14 @@ from(bucket: "${bucket}")
         const base = {
           time: r._time,
           ...influxFields.reduce((acc, f) => {
-            acc[f] = r[f] !== undefined ? r[f] : "";
+            const value = r[f];
+            if (value !== undefined && value !== null && value !== "") {
+              const num = Number(value);
+              // Format numeric values to 2 decimal places
+              acc[f] = Number.isFinite(num) ? +num.toFixed(2) : value;
+            } else {
+              acc[f] = "";
+            }
             return acc;
           }, {}),
         };
